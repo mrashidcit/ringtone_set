@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="38px" height="38px" viewBox="0 0 38 38" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Android" transform="translate(-154.000000, -142.000000)" fill="#FFFFFF">
+            <g id="Group" transform="translate(154.000000, 142.000000)">
+                <rect id="Rectangle" fill-opacity="0.0925207605" x="0" y="0" width="38" height="38" rx="19"></rect>
+                <path d="M21.2501478,14.395376 L26.742099,24.3286443 C27.0093251,24.811975 26.8341377,25.4204216 26.350807,25.6876478 C26.2026863,25.7695414 26.0362033,25.8125 25.8669512,25.8125 L14.8830488,25.8125 C14.330764,25.8125 13.8830488,25.3647847 13.8830488,24.8125 C13.8830488,24.6432479 13.9260074,24.4767649 14.007901,24.3286443 L19.4998522,14.395376 C19.7670784,13.9120452 20.375525,13.7368578 20.8588557,14.0040839 C21.0234965,14.0951113 21.1591204,14.2307352 21.2501478,14.395376 Z" id="Triangle" transform="translate(20.375000, 19.312500) rotate(-270.000000) translate(-20.375000, -19.312500) "></path>
+            </g>
+        </g>
+    </g>
+</svg>
