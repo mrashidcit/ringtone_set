@@ -6,6 +6,7 @@ import 'package:deeze_app/widgets/ringtone_category_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -785,7 +786,7 @@ class _DashbaordState extends State<Dashbaord> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: <Color>[
-                        Color(0xFF4d047d),
+                        Color(0xFF17131F),
                         Color(0xFF17131F),
                         Color(0xFF17131F),
                         Color(0xFF17131F),
@@ -1110,7 +1111,7 @@ class _DashbaordState extends State<Dashbaord> {
                                     fontStyle: FontStyle.normal,
                                     color: Colors.white,
                                     fontSize: 18,
-                                    fontWeight: FontWeight.w700,
+                                    // fontWeight: FontWeight.w700,
                                     wordSpacing: -0.09,
                                   ),
                                 ),
@@ -1148,7 +1149,7 @@ class _DashbaordState extends State<Dashbaord> {
                                     fontStyle: FontStyle.normal,
                                     color: Colors.white,
                                     fontSize: 18,
-                                    fontWeight: FontWeight.w700,
+                                    // fontWeight: FontWeight.w700,
                                     wordSpacing: -0.09,
                                   ),
                                 ),
@@ -1163,7 +1164,7 @@ class _DashbaordState extends State<Dashbaord> {
                           padding: const EdgeInsets.only(left: 40),
                           child: Row(
                             children: [
-                              Image.asset("assets/notification.png"),
+                              SvgPicture.asset("assets/bell.svg"),
                               const SizedBox(
                                 width: 20,
                               ),
@@ -1175,7 +1176,7 @@ class _DashbaordState extends State<Dashbaord> {
                                     fontStyle: FontStyle.normal,
                                     color: Colors.white,
                                     fontSize: 18,
-                                    fontWeight: FontWeight.w700,
+                                    // fontWeight: FontWeight.w700,
                                     wordSpacing: -0.09,
                                   ),
                                 ),
@@ -1192,18 +1193,18 @@ class _DashbaordState extends State<Dashbaord> {
                             children: [
                               Image.asset(
                                 "assets/heart.png",
-                                color: Colors.white,
+                                color: const Color(0xffA49FAD),
                               ),
                               const SizedBox(
                                 width: 29,
                               ),
                               Text(
-                                "Saved",
+                                "Favourite",
                                 style: GoogleFonts.archivo(
                                   fontStyle: FontStyle.normal,
                                   color: Colors.white,
                                   fontSize: 18,
-                                  fontWeight: FontWeight.w700,
+                                  // fontWeight: FontWeight.w700,
                                   wordSpacing: -0.09,
                                 ),
                               ),
@@ -1254,7 +1255,7 @@ class _DashbaordState extends State<Dashbaord> {
                             children: [
                               const Icon(
                                 Icons.settings,
-                                color: Colors.white,
+                                color: Color(0xffA49FAD),
                                 size: 20,
                               ),
                               const SizedBox(
@@ -1264,7 +1265,7 @@ class _DashbaordState extends State<Dashbaord> {
                                 "Settings",
                                 style: GoogleFonts.archivo(
                                   fontStyle: FontStyle.normal,
-                                  color: Colors.white,
+                                  color: const Color(0xffA49FAD),
                                   fontSize: 13,
                                   fontWeight: FontWeight.w400,
                                 ),
@@ -1281,7 +1282,7 @@ class _DashbaordState extends State<Dashbaord> {
                             children: [
                               const Icon(
                                 Icons.privacy_tip,
-                                color: Colors.white,
+                                color: Color(0xffA49FAD),
                                 size: 20,
                               ),
                               const SizedBox(
@@ -1293,7 +1294,7 @@ class _DashbaordState extends State<Dashbaord> {
                                   "Privacy Policy",
                                   style: GoogleFonts.archivo(
                                     fontStyle: FontStyle.normal,
-                                    color: Colors.white,
+                                    color: const Color(0xffA49FAD),
                                     fontSize: 13,
                                     fontWeight: FontWeight.w400,
                                   ),

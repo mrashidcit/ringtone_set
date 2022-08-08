@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ElevateButtonWidget extends StatefulWidget {
   final String labelText, logoText;
   final Color borderColor, foregroundColor, backgroundColor;
+  final Color? textColor;
   final double textSize, borderRadius, padding;
   final bool icon;
   final FontWeight fontWeight;
@@ -20,6 +22,7 @@ class ElevateButtonWidget extends StatefulWidget {
     required this.padding,
     required this.foregroundColor,
     required this.textSize,
+    this.textColor,
     required this.labelText,
   }) : super(key: key);
 
@@ -35,13 +38,7 @@ class _TextButtonWidgetState extends State<ElevateButtonWidget> {
           ? Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text(
-                  widget.logoText,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                SvgPicture.asset('assets/upload_icon.svg', height: 12),
                 // SizedBox(width: widget.logoText == "f" ? 25 : 20),
                 Padding(
                   padding: widget.logoText == "f"
@@ -50,6 +47,7 @@ class _TextButtonWidgetState extends State<ElevateButtonWidget> {
                   child: Text(
                     widget.labelText,
                     style: TextStyle(
+                      color: widget.textColor,
                       fontSize: widget.textSize,
                       fontWeight: widget.fontWeight,
                     ),

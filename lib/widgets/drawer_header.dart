@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_new
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../screens/screens.dart';
 import 'elevated_button_widget.dart';
@@ -71,14 +72,16 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
                   height: 30,
                   width: screenWidth * 0.25,
                   child: ElevateButtonWidget(
-                    labelText: 'upload',
-                    backgroundColor: Color(0xFFFF6411),
-                    foregroundColor: Color(0xFFFF6411),
+                    icon: true,
+                    labelText: 'Upload',
+                    textColor: Colors.white,
+                    backgroundColor: const Color(0xFFFF6411),
+                    foregroundColor: const Color(0xFFFF6411),
                     fontWeight: FontWeight.w400,
                     textSize: 15,
                     padding: 0,
                     borderRadius: 15,
-                    borderColor: Color(0xFFFF6411),
+                    borderColor: const Color(0xFFFF6411),
                     onPressed: () {},
                   ),
                 ),

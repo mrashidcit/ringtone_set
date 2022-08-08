@@ -93,7 +93,7 @@ class _RingtonesCardState extends State<RingtonesCard> {
           trackShape: const RectangularSliderTrackShape(),
         ),
         child: Padding(
-          padding: const EdgeInsets.only(bottom: 20),
+          padding: const EdgeInsets.only(bottom: 14),
           child: Container(
             height: 70,
             width: screenWidth,
