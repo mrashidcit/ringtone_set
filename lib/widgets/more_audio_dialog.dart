@@ -1,3 +1,4 @@
+import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -6,6 +7,7 @@ class MoreAudioDialog extends StatelessWidget {
   final String fileName;
   final String userName;
   final String userImage;
+
   const MoreAudioDialog(
       {Key? key,
       required this.file,
@@ -26,7 +28,7 @@ class MoreAudioDialog extends StatelessWidget {
           child: Card(
             elevation: 10,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -37,35 +39,38 @@ class MoreAudioDialog extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "$fileName",
+                        fileName,
                         style: GoogleFonts.archivo(
                           fontStyle: FontStyle.normal,
                           color: Colors.black,
                           fontSize: 20,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const Icon(
-                        Icons.flag_outlined,
-                        color: Colors.grey,
+                      const AppImageAsset(
+                        image: 'assets/flag.svg',
+                        height: 17,
+                        width: 17,
+                        fit: BoxFit.fill,
                       ),
                     ],
                   ),
                   const SizedBox(
-                    height: 10,
+                    height: 17,
                   ),
                   SizedBox(
                     width: MediaQuery.of(context).size.width,
-                    height: 16,
+                    height: 23,
                     child: ListView.builder(
                         itemCount: 3,
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (context, index) {
                           return Container(
-                            margin: EdgeInsets.only(right: 10),
+                            alignment: Alignment.center,
+                            margin: const EdgeInsets.only(right: 10),
                             decoration: BoxDecoration(
-                                color: Color(0xFFA49FAD),
-                                borderRadius: BorderRadius.circular(3)),
+                                color: const Color(0xFFA49FAD),
+                                borderRadius: BorderRadius.circular(12)),
                             child: Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 13),
@@ -83,13 +88,13 @@ class MoreAudioDialog extends StatelessWidget {
                         }),
                   ),
                   const SizedBox(
-                    height: 15,
+                    height: 17,
                   ),
                   Row(
                     children: [
                       userImage != null
                           ? CircleAvatar(
-                              radius: 15,
+                              radius: 17,
                               backgroundColor: Colors.grey,
                               backgroundImage: NetworkImage(
                                 userImage,
@@ -100,14 +105,14 @@ class MoreAudioDialog extends StatelessWidget {
                               radius: 15,
                             ),
                       const SizedBox(
-                        width: 15,
+                        width: 12,
                       ),
                       Text(
                         userName,
                         style: GoogleFonts.archivo(
                           fontStyle: FontStyle.normal,
-                          color: Color(0xFFA49FAD),
-                          fontSize: 15,
+                          color: const Color(0xFFA49FAD),
+                          fontSize: 13,
                           wordSpacing: -0.05,
                           fontWeight: FontWeight.w400,
                         ),

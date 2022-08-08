@@ -1,29 +1,19 @@
-import 'dart:io';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:dio/dio.dart';
+import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:ndialog/ndialog.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:ringtone_set/ringtone_set.dart';
-
 import '../models/deeze_model.dart';
 import 'audio_select_dialog.dart';
-import 'elevated_button_widget.dart';
 import 'more_audio_dialog.dart';
 
 class CustomAudioPlayer extends StatefulWidget {
   final List<HydraMember> listHydra;
   final int index;
 
-  CustomAudioPlayer({
+  const CustomAudioPlayer({
     Key? key,
     required this.listHydra,
     required this.index,
@@ -38,7 +28,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
 
   animateToSilde(int index) => _controller.animateToPage(
         index,
-        duration: Duration(milliseconds: 100),
+        duration: const Duration(milliseconds: 100),
         curve: Curves.linear,
       );
 
@@ -49,6 +39,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   Duration position = Duration.zero;
   Duration pauseDuration = Duration.zero;
   Duration pausePosition = Duration.zero;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -83,6 +74,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
 
   late int activeIndex = widget.index;
   String myfile = "";
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -113,7 +105,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                 color: Colors.white,
                 fontSize: 20,
                 wordSpacing: -0.1,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w400,
               ),
             ),
             const SizedBox(
@@ -201,7 +193,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
               options: CarouselOptions(
                   height: 272,
                   pageSnapping: true,
-                  viewportFraction: 0.73,
+                  viewportFraction: 0.77,
                   enlargeCenterPage: true,
                   enableInfiniteScroll: false,
                   onPageChanged: (index, reason) async {
@@ -222,7 +214,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
               height: 10,
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.18),
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -230,7 +222,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                     children: [
                       widget.listHydra[activeIndex].user?.image != null
                           ? CircleAvatar(
-                              radius: 15,
+                              radius: 17,
                               backgroundImage: NetworkImage(
                                 widget.listHydra[activeIndex].user!.image!,
                               ),
@@ -240,36 +232,39 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                               radius: 15,
                             ),
                       const SizedBox(
-                        width: 15,
+                        width: 12,
                       ),
                       Text(
                         widget.listHydra[activeIndex].user!.firstName!,
                         style: GoogleFonts.archivo(
                           fontStyle: FontStyle.normal,
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: 13,
                           wordSpacing: -0.05,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 0),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.arrow_downward,
-                          color: Colors.white,
-                          size: 13,
-                        ),
-                        Text(
-                          "0k",
-                          style: GoogleFonts.archivo(
-                              fontStyle: FontStyle.normal, color: Colors.white),
-                        ),
-                      ],
-                    ),
+                  Row(
+                    children: [
+                      const AppImageAsset(
+                        image: 'assets/arrow.svg',
+                        height: 8,
+                        width: 8,
+                        fit: BoxFit.fill,
+                      ),
+                      const SizedBox(
+                        width: 2,
+                      ),
+                      Text(
+                        "23k",
+                        style: GoogleFonts.archivo(
+                            fontSize: 11,
+                            fontStyle: FontStyle.normal,
+                            color: Colors.white),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -280,29 +275,34 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                GestureDetector(
-                  onTap: () {
-                    showCupertinoModalPopup(
-                        context: context,
-                        builder: (context) {
-                          return MoreAudioDialog(
-                            file: myfile,
-                            fileName: widget.listHydra[activeIndex].name!,
-                            userName:
-                                widget.listHydra[activeIndex].user!.firstName!,
-                            userImage:
-                                widget.listHydra[activeIndex].user!.image!,
-                          );
-                        });
-                  },
-                  child: const Icon(
-                    Icons.more_horiz,
-                    color: Colors.grey,
-                    size: 30,
+                SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: GestureDetector(
+                    onTap: () {
+                      showCupertinoModalPopup(
+                          context: context,
+                          builder: (context) {
+                            return MoreAudioDialog(
+                              file: myfile,
+                              fileName: widget.listHydra[activeIndex].name!,
+                              userName: widget
+                                  .listHydra[activeIndex].user!.firstName!,
+                              userImage:
+                                  widget.listHydra[activeIndex].user!.image!,
+                            );
+                          });
+                    },
+                    child: const AppImageAsset(
+                      image: 'assets/dot.svg',
+                      height: 5,
+                      width: 5,
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
                 const SizedBox(
-                  width: 50,
+                  width: 25,
                 ),
                 GestureDetector(
                   onTap: () {
@@ -313,20 +313,31 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                         });
                   },
                   child: Container(
-                      height: 43,
-                      width: 43,
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(
-                          shape: BoxShape.circle, color: Colors.white),
-                      child: Image.asset("assets/call.png")),
+                    height: 60,
+                    width: 60,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                        shape: BoxShape.circle, color: Colors.white),
+                    child: const AppImageAsset(
+                      image: 'assets/call.svg',
+                      height: 70,
+                      width: 70,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
                 const SizedBox(
-                  width: 50,
+                  width: 25,
                 ),
-                const Icon(
-                  Icons.share_outlined,
-                  color: Colors.grey,
-                  size: 30,
+                const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: AppImageAsset(
+                    image: 'assets/share.svg',
+                    height: 17,
+                    width: 17,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ],
             ),
@@ -351,6 +362,7 @@ class BuildPlay extends StatefulWidget {
   final VoidCallback onTap;
 
   final Function(double) onChange;
+
   BuildPlay(
       {Key? key,
       this.duration,
@@ -374,14 +386,13 @@ class BuildPlay extends StatefulWidget {
 class _BuildPlayState extends State<BuildPlay> {
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
     return SliderTheme(
       data: SliderThemeData(
-        trackHeight: 272,
+        trackHeight: widget.activeIndex == widget.index ? 272 : 0,
         thumbShape: SliderComponentShape.noOverlay,
         overlayShape: SliderComponentShape.noOverlay,
         valueIndicatorShape: SliderComponentShape.noOverlay,
-        trackShape: RectangularSliderTrackShape(),
+        trackShape: const RectangularSliderTrackShape(),
       ),
       child: Container(
         width: 254,
@@ -399,32 +410,15 @@ class _BuildPlayState extends State<BuildPlay> {
           children: [
             Align(
               alignment: Alignment.centerRight,
-              child: Container(
-                height: double.infinity,
-                width: 61,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: <Color>[
-                        Color(0xFF9a83a6),
-                        Color(0xFF93b4bb),
-                      ]),
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(6),
-                    bottomRight: Radius.circular(6),
-                  ),
-                ),
-                child: widget.activeIndex == widget.index
-                    ? Padding(
-                        padding: const EdgeInsets.only(bottom: 15, right: 15),
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: Image.asset("assets/image_heart.png"),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-              ),
+              child: widget.activeIndex == widget.index
+                  ? Padding(
+                      padding: const EdgeInsets.only(bottom: 15, right: 15),
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: Image.asset("assets/image_heart.png"),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
             ),
             Slider(
               activeColor: Colors.white12,
