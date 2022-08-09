@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -34,7 +35,11 @@ class AppImageAsset extends StatelessWidget {
             height: webHeight,
             width: webWidth,
             fit: webFit,
-            placeholder: (context, url) => const CircularProgressIndicator(),
+            placeholder: (context, url) => const SizedBox(
+              height: 20,
+              width: 20,
+              child: LoadingPage(),
+            ),
             errorWidget: (context, url, error) => const AppImageAsset(
               image: 'assets/app_logo.svg',
               fit: BoxFit.contain,

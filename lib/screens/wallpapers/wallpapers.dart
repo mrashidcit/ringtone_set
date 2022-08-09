@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deeze_app/screens/tags/tags.dart';
+import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/single_wallpaper.dart';
 import 'package:deeze_app/widgets/wallpaper_category_card.dart';
 import 'package:flutter/material.dart';
@@ -745,14 +746,8 @@ class _WallPapersState extends State<WallPapers> {
                                         fontWeight: FontWeight.w400,
                                       ),
                                     ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    const Icon(
-                                      Icons.arrow_forward,
-                                      color: Colors.white,
-                                      size: 15,
-                                    ),
+                                    const SizedBox(width: 10),
+                                    AppImageAsset(image: 'assets/backward.svg', height: 10)
                                   ],
                                 ),
                               )
@@ -760,11 +755,7 @@ class _WallPapersState extends State<WallPapers> {
                           ),
                         ),
                       ),
-                      const SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 20,
-                        ),
-                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
                       SliverToBoxAdapter(
                         child: SizedBox(
                           height: 60,
@@ -807,11 +798,7 @@ class _WallPapersState extends State<WallPapers> {
                           ),
                         ),
                       ),
-                      const SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 20,
-                        ),
-                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
                       SliverPadding(
                         padding: const EdgeInsets.symmetric(horizontal: 17),
                         sliver: SliverToBoxAdapter(
@@ -825,37 +812,35 @@ class _WallPapersState extends State<WallPapers> {
                           ),
                         ),
                       ),
-                      const SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 15,
-                        ),
-                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 15)),
                       SliverToBoxAdapter(
-                          child: SizedBox(
-                              height: 33, width: screenWidth, child: Tags())),
-                      const SliverToBoxAdapter(
                         child: SizedBox(
-                          height: 15,
+                          height: 33,
+                          width: screenWidth,
+                          child: const Tags(),
                         ),
                       ),
-                      SliverGrid(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 5.0,
-                          crossAxisSpacing: 5.0,
-                          childAspectRatio: 3 / 6,
-                        ),
-                        delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            return CategoryCard(
-                              index: index,
-                              listHydra: hydraMember,
-                              image: hydraMember[index].file!,
-                              name: hydraMember[index].name!,
-                            );
-                          },
-                          childCount: hydraMember.length,
+                      const SliverToBoxAdapter(child: SizedBox(height: 15)),
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        sliver: SliverGrid(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisSpacing: 5.0,
+                            crossAxisSpacing: 5.0,
+                            childAspectRatio: 3 / 6,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              return CategoryCard(
+                                index: index,
+                                listHydra: hydraMember,
+                                image: hydraMember[index].file!,
+                                name: hydraMember[index].name!,
+                              );
+                            },
+                            childCount: hydraMember.length,
+                          ),
                         ),
                       ),
                     ],

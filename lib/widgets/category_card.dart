@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/wallpaper_dispaly.dart';
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -65,11 +66,11 @@ class CategoryCard extends StatelessWidget {
             child: SizedBox(
               width: screenWidth * 0.4,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: CachedNetworkImage(
-                  fit: BoxFit.cover,
-                  imageUrl: image,
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                borderRadius: BorderRadius.circular(6),
+                child: AppImageAsset(
+                  image: image,
+                  isWebImage: true,
+                  webFit: BoxFit.cover,
                 ),
               ),
             ),
