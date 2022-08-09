@@ -64,19 +64,14 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 28,
-                  ),
-                  child: GestureDetector(
-                    onTap: (() {
-                      Navigator.of(context).pop();
-                    }),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.grey,
-                      size: 30,
-                    ),
+                GestureDetector(
+                  onTap: (() {
+                    Navigator.of(context).pop();
+                  }),
+                  child: const Icon(
+                    Icons.arrow_back,
+                    color: Colors.grey,
+                    size: 30,
                   ),
                 ),
                 const SizedBox(

@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:deeze_app/screens/categories/categories.dart';
+import 'package:deeze_app/screens/favourite/favourite_screen.dart';
 import 'package:deeze_app/screens/search/search_screen.dart';
 import 'package:deeze_app/screens/tags/tags.dart';
 import 'package:deeze_app/widgets/ringtone_category_card.dart';
@@ -23,6 +24,7 @@ import '../wallpapers/wallpapers.dart';
 
 class Dashbaord extends StatefulWidget {
   final String type;
+
   const Dashbaord({Key? key, required this.type}) : super(key: key);
 
   @override
@@ -39,6 +41,7 @@ class _DashbaordState extends State<Dashbaord> {
   Duration position = Duration.zero;
   Duration pauseDuration = Duration.zero;
   Duration pausePosition = Duration.zero;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -76,6 +79,7 @@ class _DashbaordState extends State<Dashbaord> {
       RefreshController(initialRefresh: true);
 
   List<HydraMember> hydraMember = [];
+
   Future<bool> fetchRingtone({bool isRefresh = false}) async {
     if (isRefresh) {
       page = 1;
@@ -127,6 +131,7 @@ class _DashbaordState extends State<Dashbaord> {
   final TextEditingController _typeAheadController = TextEditingController();
   bool ishow = false;
   int? selectedIndex;
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -1187,28 +1192,40 @@ class _DashbaordState extends State<Dashbaord> {
                         const SizedBox(
                           height: 30,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 40),
-                          child: Row(
-                            children: [
-                              Image.asset(
-                                "assets/heart.png",
-                                color: const Color(0xffA49FAD),
-                              ),
-                              const SizedBox(
-                                width: 29,
-                              ),
-                              Text(
-                                "Favourite",
-                                style: GoogleFonts.archivo(
-                                  fontStyle: FontStyle.normal,
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  // fontWeight: FontWeight.w700,
-                                  wordSpacing: -0.09,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const FavouriteScreen(
+                                        id: 9,
+                                        type: 'Favourites',
+                                      )),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 40),
+                            child: Row(
+                              children: [
+                                Image.asset(
+                                  "assets/heart.png",
+                                  color: const Color(0xffA49FAD),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(
+                                  width: 29,
+                                ),
+                                Text(
+                                  "Favourite",
+                                  style: GoogleFonts.archivo(
+                                    fontStyle: FontStyle.normal,
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    // fontWeight: FontWeight.w700,
+                                    wordSpacing: -0.09,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(

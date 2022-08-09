@@ -120,7 +120,7 @@ class _RingtonesCardState extends State<RingtonesCard> {
                   },
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -148,7 +148,6 @@ class _RingtonesCardState extends State<RingtonesCard> {
                               color: Colors.white,
                               fontSize: 14,
                               wordSpacing: -0.07,
-                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ],
