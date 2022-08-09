@@ -6,10 +6,12 @@ class LoadingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CircularProgressIndicator(
-      color: Colors.white,
-      backgroundColor: Colors.white.withOpacity(0.2),
-      strokeWidth: 2,
+    return Center(
+      child: CircularProgressIndicator(
+        color: Colors.white,
+        backgroundColor: Colors.white.withOpacity(0.2),
+        strokeWidth: 2,
+      ),
     );
   }
 }

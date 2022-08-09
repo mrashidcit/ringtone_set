@@ -105,9 +105,11 @@ class _TagsState extends State<Tags> {
                   : Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        border:
-                            Border.all(color: Colors.grey.shade600, width: 2),
-                        borderRadius: BorderRadius.circular(13),
+                        border: Border.all(
+                          color: Colors.grey.withOpacity(0.2),
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -116,7 +118,7 @@ class _TagsState extends State<Tags> {
                           style: GoogleFonts.archivo(
                             fontStyle: FontStyle.normal,
                             color: Colors.white,
-                            fontSize: 18,
+                            fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
                         ),

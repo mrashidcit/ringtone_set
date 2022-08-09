@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 import 'dart:math' as math;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -111,9 +112,7 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                       });
                     }),
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 57),
                 child: Row(
@@ -121,7 +120,7 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                   children: [
                     Row(
                       children: [
-                        widget.listHydra?[activeIndex].user?.image != null
+                        widget.listHydra![activeIndex].user!.image != null
                             ? CircleAvatar(
                                 radius: 15,
                                 backgroundImage: NetworkImage(
@@ -132,11 +131,9 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                                 backgroundColor: Colors.grey,
                                 radius: 15,
                               ),
-                        const SizedBox(
-                          width: 15,
-                        ),
+                        const SizedBox(width: 15),
                         Text(
-                          "${widget.listHydra![activeIndex].user!.firstName!}",
+                          widget.listHydra![activeIndex].user!.firstName!,
                           style: GoogleFonts.archivo(
                             fontStyle: FontStyle.normal,
                             color: Colors.white,
@@ -168,45 +165,23 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 30,
-              ),
+              const SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.more_horiz,
-                    color: Colors.grey,
-                    size: 30,
-                  ),
-                  const SizedBox(
-                    width: 60,
-                  ),
+                  const AppImageAsset(image: 'assets/dot.svg', color: Colors.white, height: 6),
+                  const SizedBox(width: 30),
                   GestureDetector(
                     onTap: () {
                       showCupertinoModalPopup(
-                          context: context,
-                          builder: (context) {
-                            return WallpaperSelectDialog(file: file);
-                          });
+                        context: context,
+                        builder: (context) => WallpaperSelectDialog(file: file),
+                      );
                     },
-                    child: Container(
-                      height: 43,
-                      width: 43,
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(
-                          shape: BoxShape.circle, color: Colors.white),
-                      child: Image.asset("assets/save_wall.png"),
-                    ),
+                    child: const AppImageAsset(image: 'assets/wallpaper_down.svg', height: 50),
                   ),
-                  const SizedBox(
-                    width: 60,
-                  ),
-                  const Icon(
-                    Icons.share_outlined,
-                    color: Colors.grey,
-                    size: 25,
-                  ),
+                  const SizedBox(width: 30),
+                  const AppImageAsset(image: 'assets/share.svg', color: Colors.white, height: 18),
                 ],
               ),
             ],
@@ -230,22 +205,23 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
             height: 500,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4),
-              child: CachedNetworkImage(
-                fit: BoxFit.cover,
-                imageUrl: urlImage,
-                errorWidget: (context, url, error) => const Icon(Icons.error),
+              child: AppImageAsset(
+                image: urlImage,
+                isWebImage: true,
+                webFit: BoxFit.cover,
               ),
             ),
           ),
           activeIndex == index
-              ? Padding(
-                  padding: const EdgeInsets.only(bottom: 15, right: 10),
+              ? const Padding(
+                  padding: EdgeInsets.only(bottom: 15, right: 10),
                   child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: Image.asset(
-                        "assets/image_heart.png",
-                        height: 35,
-                      )),
+                    alignment: Alignment.bottomRight,
+                    child: AppImageAsset(
+                      image: 'assets/favourite.svg',
+                      height: 16,
+                    ),
+                  ),
                 )
               : const SizedBox.shrink()
         ],
@@ -337,28 +313,27 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
     return Center(
       child: Card(
         elevation: 10,
+        margin: const EdgeInsets.all(10),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Container(
           height: 292,
-          width: 306,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 28,
-                ),
-                child: GestureDetector(
-                  onTap: (() {
-                    Navigator.of(context).pop();
-                  }),
+              GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  width: 180,
+                  alignment: Alignment.centerLeft,
                   child: const Icon(
                     Icons.arrow_back,
                     color: Colors.grey,
@@ -366,9 +341,7 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               GestureDetector(
                 onTap: () async {
                   ProgressDialog pd = ProgressDialog(
@@ -396,22 +369,22 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                     Navigator.of(context).pop();
                   }
                 },
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 35,
-                  ),
+                child: Container(
+                  width: 180,
+                  alignment: Alignment.center,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.wallpaper,
-                        color: Colors.black,
-                        size: 20,
-                      ),
                       const SizedBox(
                         width: 20,
+                        child: AppImageAsset(
+                          image: 'assets/call_drop.svg',
+                          height: 20,
+                        ),
                       ),
+                      const SizedBox(width: 20),
                       Text(
-                        "SET WALLPAPER",
+                        'SET WALLPAPER',
                         style: GoogleFonts.archivo(
                           fontStyle: FontStyle.normal,
                           color: Colors.black,
@@ -423,9 +396,7 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 22,
-              ),
+              const SizedBox(height: 22),
               GestureDetector(
                 onTap: () async {
                   ProgressDialog pd = ProgressDialog(
@@ -453,22 +424,23 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                     Navigator.of(context).pop();
                   }
                 },
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 35,
-                  ),
+                child: Container(
+                  width: 180,
+                  alignment: Alignment.center,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.lock,
-                        color: Colors.black,
-                        size: 20,
-                      ),
                       const SizedBox(
                         width: 20,
+                        child: AppImageAsset(
+                          image: 'assets/bell.svg',
+                          height: 20,
+                          color: Colors.black,
+                        ),
                       ),
+                      const SizedBox(width: 20),
                       Text(
-                        "SET LOCK SCREEN",
+                        'SET LOCK SCREEN',
                         style: GoogleFonts.archivo(
                           fontStyle: FontStyle.normal,
                           color: Colors.black,
@@ -480,9 +452,7 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 22,
-              ),
+              const SizedBox(height: 22),
               GestureDetector(
                 onTap: () async {
                   ProgressDialog pd = ProgressDialog(
@@ -510,22 +480,22 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                     Navigator.of(context).pop();
                   }
                 },
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 35,
-                  ),
+                child: Container(
+                  width: 180,
+                  alignment: Alignment.center,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.phonelink_lock_rounded,
-                        color: Colors.black,
-                        size: 20,
-                      ),
                       const SizedBox(
                         width: 20,
+                        child: AppImageAsset(
+                          image: 'assets/bell_clock.svg',
+                          height: 20,
+                        ),
                       ),
+                      const SizedBox(width: 20),
                       Text(
-                        "SET BOTH",
+                        'SET BOTH',
                         style: GoogleFonts.archivo(
                           fontStyle: FontStyle.normal,
                           color: Colors.black,
@@ -537,9 +507,7 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 30,
-              ),
+              const SizedBox(height: 30),
               InkWell(
                 onTap: () async {
                   ProgressDialog pd = ProgressDialog(
@@ -569,34 +537,37 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                     Navigator.of(context).pop();
                   }
                 },
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 35,
+                child: Container(
+                  height: 50,
+                  width: 180,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: const LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: <Color>[
+                        Color(0xFF3C99CA),
+                        Color(0xFF7541A0),
+                      ],
+                    ),
                   ),
-                  child: Container(
-                      height: 36,
-                      // margin: EdgeInsets.only(left: 20),
-                      width: 179,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: <Color>[
-                              Color(0xFF7209b7),
-                              Color(0xFF5c3fcc),
-                            ]),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        "SAVE TO MEDIA",
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const AppImageAsset(image: 'assets/save_down.svg', height: 14),
+                      const SizedBox(width: 20),
+                      Text(
+                        'SAVE TO MEDIA',
                         style: GoogleFonts.archivo(
                           fontStyle: FontStyle.normal,
                           color: Colors.white,
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                         ),
-                      )),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
