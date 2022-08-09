@@ -63,7 +63,7 @@ class _CategoriesState extends State<Categories> {
           'Content-Type': 'application/json',
         },
       );
-      print(response.statusCode);
+      print('${response.statusCode} : ${response.request}');
 
       if (response.statusCode == 200) {
         print(response.body);
