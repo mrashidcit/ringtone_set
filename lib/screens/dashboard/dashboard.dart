@@ -231,7 +231,7 @@ class _DashbaordState extends State<Dashbaord> {
                                         padding: const EdgeInsets.only(
                                             left: 30, top: 15),
                                         child: Text(
-                                          "${ringtone!.name}",
+                                          "${ringtone.name}",
                                           style: GoogleFonts.archivo(
                                             fontStyle: FontStyle.normal,
                                             color: Colors.grey,

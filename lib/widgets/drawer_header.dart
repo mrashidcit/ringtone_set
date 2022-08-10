@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_new
 
 import 'package:deeze_app/screens/profile_screen/profile_screen.dart';
+import 'package:deeze_app/screens/upload_screen/upload_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -62,7 +63,7 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ProfileScreen(),));
                 },
                 child: Image.asset(
@@ -88,7 +89,9 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
                     padding: 0,
                     borderRadius: 15,
                     borderColor: const Color(0xFFFF6411),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => const UploadScreen(),));
+                    },
                   ),
                 ),
               ),

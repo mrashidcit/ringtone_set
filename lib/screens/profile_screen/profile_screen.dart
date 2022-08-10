@@ -223,7 +223,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                     padding: const EdgeInsets.only(left: 40),
                     child: Row(
                       children: [
-                        Image.asset("assets/ringtone.png"),
+                        const AppImageAsset(image: "assets/ringtone.svg"),
                         const SizedBox(
                           width: 26,
                         ),
@@ -261,10 +261,8 @@ class ProfileScreenState extends State<ProfileScreen> {
                     padding: const EdgeInsets.only(left: 40),
                     child: Row(
                       children: [
-                        Image.asset("assets/wallpapers.png"),
-                        const SizedBox(
-                          width: 26,
-                        ),
+                        const AppImageAsset(image: "assets/wallpaper.svg"),
+                        const SizedBox(width: 26),
                         Text(
                           "Wallpapers",
                           style: GoogleFonts.archivo(
@@ -320,13 +318,8 @@ class ProfileScreenState extends State<ProfileScreen> {
                     padding: const EdgeInsets.only(left: 40),
                     child: Row(
                       children: [
-                        Image.asset(
-                          "assets/heart.png",
-                          color: const Color(0xffA49FAD),
-                        ),
-                        const SizedBox(
-                          width: 29,
-                        ),
+                        const AppImageAsset(image: "assets/drawer_fav.svg"),
+                        const SizedBox(width: 29),
                         Text(
                           "Favourite",
                           style: GoogleFonts.archivo(
@@ -448,31 +441,8 @@ class ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.only(left: 40),
                   child: Row(
                     children: [
-                      Container(
-                        height: 18,
-                        width: 18,
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Image.asset(
-                          "assets/fblogo.png",
-                          color: Colors.black,
-                        ),
-                      ),
-                      // SizedBox(
-                      //   height: 25,
-                      //   width: 30,
-                      //   child: Image.asset(
-                      //     "assets/ringtone.png",
-                      //     color: Colors.white,
-                      //     fit: BoxFit.cover,
-                      //   ),
-                      // ),
-                      const SizedBox(
-                        width: 30,
-                      ),
+                      const AppImageAsset(image: "assets/facebook.svg"),
+                      const SizedBox(width: 30),
                       Text(
                         "Join us on Facebook",
                         style: GoogleFonts.archivo(
