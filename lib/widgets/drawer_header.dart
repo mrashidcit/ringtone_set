@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_new
 
+import 'package:deeze_app/screens/profile_screen/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -60,8 +61,13 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                "assets/Oval.png",
+              GestureDetector(
+                onTap: (){
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ProfileScreen(),));
+                },
+                child: Image.asset(
+                  "assets/Oval.png",
+                ),
               ),
               const SizedBox(
                 height: 25,

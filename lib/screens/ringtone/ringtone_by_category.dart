@@ -103,7 +103,7 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
           'Content-Type': 'application/json',
         },
       );
-      print('${response.statusCode} : ${response.request}');
+      print(response.statusCode);
 
       if (response.statusCode == 200) {
         print(response.body);

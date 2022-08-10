@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="74px" height="69px" viewBox="0 0 74 69" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group 6</title>
+    <defs>
+        <polygon id="path-1" points="0 0 74 0 74 69 0 69"></polygon>
+        <polygon id="path-3" points="0 0 50 0 50 50 0 50"></polygon>
+        <linearGradient x1="0%" y1="50%" x2="100%" y2="50%" id="linearGradient-5">
+            <stop stop-color="#BF1F86" offset="0%"></stop>
+            <stop stop-color="#D1A121" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Android-Copy-13" transform="translate(-143.000000, -97.000000)">
+            <g id="Group-6" transform="translate(143.000000, 97.000000)">
+                <g id="Group-3">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <g id="Clip-2"></g>
+                </g>
+                <g id="Group-10" transform="translate(12.000000, 12.000000)">
+                    <g id="Group-3">
+                        <mask id="mask-4" fill="white">
+                            <use xlink:href="#path-3"></use>
+                        </mask>
+                        <g id="Clip-2"></g>
+                        <path d="M-3.54700744e-05,25 C-3.54700744e-05,11.1929287 11.1929012,0 24.9999823,0 C38.8074181,0 50,11.1929287 50,25 C50,38.8070713 38.8074181,50 24.9999823,50 C11.1929012,50 -3.54700744e-05,38.8070713 -3.54700744e-05,25" id="Fill-1" fill="url(#linearGradient-5)" mask="url(#mask-4)"></path>
+                    </g>
+                    <path d="M28,19.5 C28,15.9101106 30.9103074,13 34.5,13 C38.0900284,13 41,15.9101106 41,19.5 C41,23.0898894 38.0900284,26 34.5,26 C30.9103074,26 28,23.0898894 28,19.5" id="Fill-4" fill="#FFFFFF"></path>
+                    <path d="M9,19.5 C9,15.9101106 11.9103074,13 15.5,13 C19.0900284,13 22,15.9101106 22,19.5 C22,23.0898894 19.0900284,26 15.5,26 C11.9103074,26 9,23.0898894 9,19.5" id="Fill-6" fill="#FFFFFF"></path>
+                    <path d="M40,30 C40,37.1798039 33.5082087,43 25.4998227,43 C17.4917913,43 11,37.1798039 11,30" id="Stroke-8" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
