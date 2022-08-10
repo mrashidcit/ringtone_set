@@ -1,7 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -15,6 +14,7 @@ import '../../widgets/ringtones_card.dart';
 
 class SearchScreen extends StatefulWidget {
   final String searchText;
+
   const SearchScreen({Key? key, required this.searchText}) : super(key: key);
 
   @override
@@ -31,6 +31,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Duration position = Duration.zero;
   Duration pauseDuration = Duration.zero;
   Duration pausePosition = Duration.zero;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -75,6 +76,7 @@ class _SearchScreenState extends State<SearchScreen> {
   bool isNotification = false;
   bool isRingtone = true;
   List<HydraMember> ringtonelist = [];
+
   Future<bool> fetchRingtone({bool isRefresh = false}) async {
     if (isRefresh) {
       ringtonePage = 1;
@@ -123,6 +125,7 @@ class _SearchScreenState extends State<SearchScreen> {
       return false;
     }
   }
+
 ///////////////////////
 
   int wallpaperPage = 1;
@@ -131,6 +134,7 @@ class _SearchScreenState extends State<SearchScreen> {
       RefreshController(initialRefresh: true);
 
   List<HydraMember> wallpaperList = [];
+
   Future<bool> fetchWallpaper({bool isRefresh = false}) async {
     if (isRefresh) {
       wallpaperPage = 1;
@@ -184,7 +188,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size(0, 60),
+        preferredSize: const Size(0, 60),
         child: Padding(
           padding: const EdgeInsets.only(top: 8),
           child: AppBar(
@@ -216,7 +220,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           vertical: 5,
                           horizontal: 20,
                         ),
-                        focusedBorder: const OutlineInputBorder(
+                        focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(7),
                               topRight: Radius.circular(7)),
@@ -228,20 +232,15 @@ class _SearchScreenState extends State<SearchScreen> {
                           borderSide:
                               BorderSide(color: Color(0xFF5d318c), width: 0.0),
                         ),
-                        // suffixIcon: GestureDetector(
-                        //   onTap: (() {
-                        //     setState(() {
-                        //       ishow = false;
-                        //     });
-                        //   }),
-                        //   child: const Icon(
-                        //     Icons.clear,
-                        //     color: Color(0xFF5d318c),
-                        //   ),
-                        // ),
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: Color(0xFF5d318c),
+                        suffixIcon: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 15.0),
+                          child: AppImageAsset(
+                            image: 'assets/search.svg',
+                            height: 10,
+                            width: 10,
+                            fit: BoxFit.fill,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
@@ -264,7 +263,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               "${ringtone.name}",
                               style: GoogleFonts.archivo(
                                 fontStyle: FontStyle.normal,
-                                color: Color(0xFF5d318c),
+                                color: const Color(0xFF5d318c),
                                 fontSize: 18,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -277,7 +276,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             "No Found",
                             style: GoogleFonts.archivo(
                               fontStyle: FontStyle.normal,
-                              color: Color(0xFF5d318c),
+                              color: const Color(0xFF5d318c),
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
@@ -289,7 +288,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           "Please enter ",
                           style: GoogleFonts.archivo(
                             fontStyle: FontStyle.normal,
-                            color: Color(0xFF5d318c),
+                            color: const Color(0xFF5d318c),
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
                           ),
@@ -314,12 +313,12 @@ class _SearchScreenState extends State<SearchScreen> {
                 Color(0xFF17131F),
               ]),
         ),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(
-              height: 50,
+              height: 30,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -339,32 +338,32 @@ class _SearchScreenState extends State<SearchScreen> {
                         Container(
                           height: 30,
                           alignment: Alignment.center,
-                          width: MediaQuery.of(context).size.width * 0.25,
+                          width: 90,
                           decoration: BoxDecoration(
                             color: isRingtone
-                                ? Color(0xFF5d318c)
+                                ? const Color(0xFF4e3d71)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: Text(
-                            "Ringtone",
+                            "Ringtones",
                             style: GoogleFonts.archivo(
                               fontStyle: FontStyle.normal,
                               color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                         ),
                         const SizedBox(
-                          height: 15,
+                          height: 10,
                         ),
                         Container(
-                          height: 30,
+                          height: 27,
                           alignment: Alignment.center,
-                          width: MediaQuery.of(context).size.width * 0.2,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
                           decoration: BoxDecoration(
-                            color: Color(0xFFFF6666),
+                            color: const Color(0xFFFF6666),
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: Text(
@@ -392,11 +391,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       children: [
                         Container(
                           height: 30,
+                          width: 90,
                           alignment: Alignment.center,
-                          width: MediaQuery.of(context).size.width * 0.25,
+                          // width: MediaQuery.of(context).size.width * 0.25,
                           decoration: BoxDecoration(
                             color: isNotification
-                                ? Color(0xFF5d318c)
+                                ? const Color(0xFF4e3d71)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(15),
                           ),
@@ -405,20 +405,20 @@ class _SearchScreenState extends State<SearchScreen> {
                             style: GoogleFonts.archivo(
                               fontStyle: FontStyle.normal,
                               color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                         ),
                         const SizedBox(
-                          height: 15,
+                          height: 10,
                         ),
                         Container(
-                          height: 30,
+                          height: 27,
                           alignment: Alignment.center,
-                          width: MediaQuery.of(context).size.width * 0.2,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
                           decoration: BoxDecoration(
-                            color: Color(0xFFFF6666),
+                            color: const Color(0xFFFF6666),
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: Text(
@@ -446,11 +446,11 @@ class _SearchScreenState extends State<SearchScreen> {
                       children: [
                         Container(
                           height: 30,
+                          width: 90,
                           alignment: Alignment.center,
-                          width: MediaQuery.of(context).size.width * 0.25,
                           decoration: BoxDecoration(
                             color: isWallpaper
-                                ? Color(0xFF5d318c)
+                                ? const Color(0xFF4e3d71)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(15),
                           ),
@@ -459,20 +459,20 @@ class _SearchScreenState extends State<SearchScreen> {
                             style: GoogleFonts.archivo(
                               fontStyle: FontStyle.normal,
                               color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                         ),
                         const SizedBox(
-                          height: 15,
+                          height: 10,
                         ),
                         Container(
-                          height: 30,
+                          height: 27,
                           alignment: Alignment.center,
-                          width: MediaQuery.of(context).size.width * 0.2,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
                           decoration: BoxDecoration(
-                            color: Color(0xFFFF6666),
+                            color: const Color(0xFFFF6666),
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: Text(
@@ -491,9 +491,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 50,
-            ),
+            const SizedBox(height: 25),
             isWallpaper
                 ? Expanded(
                     child: Padding(
@@ -536,7 +534,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
                   )
-                : SizedBox.shrink(),
+                : const SizedBox.shrink(),
             isRingtone
                 ? Expanded(
                     child: SmartRefresher(
@@ -679,7 +677,51 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
                   )
-                : SizedBox.shrink(),
+                : const SizedBox.shrink(),
+            isNotification
+                ? Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const AppImageAsset(
+                        image: 'assets/no_result.svg',
+                        height: 80,
+                        width: 80,
+                        fit: BoxFit.fill,
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      const Text('No Results Found',
+                          style: TextStyle(color: Colors.white)),
+                      Container(
+                        height: 40,
+                        width: 95,
+                        margin: const EdgeInsets.only(top: 50,bottom: 70),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              AppImageAsset(
+                                image: 'assets/arrow_top.svg',
+                                height: 17,
+                                width: 17,
+                                fit: BoxFit.fill,
+                              ),
+                              SizedBox(
+                                width: 7,
+                              ),
+                              Text('Home', style: TextStyle()),
+                            ]),
+                      ),
+                    ],
+                  ),
+                )
+                : const SizedBox.shrink(),
           ],
         ),
       ),

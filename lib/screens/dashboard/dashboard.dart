@@ -3,6 +3,7 @@ import 'package:deeze_app/screens/categories/categories.dart';
 import 'package:deeze_app/screens/favourite/favourite_screen.dart';
 import 'package:deeze_app/screens/search/search_screen.dart';
 import 'package:deeze_app/screens/tags/tags.dart';
+import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/ringtone_category_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -156,6 +157,9 @@ class _DashbaordState extends State<Dashbaord> {
                                 suggestionsBoxVerticalOffset: 0,
                                 suggestionsBoxDecoration:
                                     const SuggestionsBoxDecoration(
+                                        borderRadius: BorderRadius.only(
+                                            bottomLeft: Radius.circular(7),
+                                            bottomRight: Radius.circular(7)),
                                         color: Colors.white),
                                 suggestionsCallback: _searchServices.search,
                                 debounceDuration:
@@ -173,7 +177,7 @@ class _DashbaordState extends State<Dashbaord> {
                                     filled: true,
                                     contentPadding: const EdgeInsets.symmetric(
                                       vertical: 5,
-                                      horizontal: 20,
+                                      horizontal: 35,
                                     ),
                                     focusedBorder: const OutlineInputBorder(
                                       borderRadius: BorderRadius.only(
@@ -194,8 +198,17 @@ class _DashbaordState extends State<Dashbaord> {
                                           ishow = false;
                                         });
                                       }),
-                                      child: Image.asset(
-                                          "assets/search_field.png"),
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 15.0),
+                                        child: AppImageAsset(
+                                          image: 'assets/search.svg',
+                                          height: 10,
+                                          width: 10,
+                                          fit: BoxFit.fill,
+                                          color: Colors.black,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -216,14 +229,14 @@ class _DashbaordState extends State<Dashbaord> {
                                     }),
                                     child: Padding(
                                         padding: const EdgeInsets.only(
-                                            left: 30, top: 10),
+                                            left: 30, top: 15),
                                         child: Text(
-                                          "${ringtone.name}",
+                                          "${ringtone!.name}",
                                           style: GoogleFonts.archivo(
                                             fontStyle: FontStyle.normal,
-                                            color: Colors.black,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
+                                            color: Colors.grey,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400,
                                           ),
                                         )),
                                   );
