@@ -411,11 +411,11 @@ class _BuildPlayState extends State<BuildPlay> {
             Align(
               alignment: Alignment.centerRight,
               child: widget.activeIndex == widget.index
-                  ? Padding(
-                      padding: const EdgeInsets.only(bottom: 15, right: 15),
+                  ? const Padding(
+                      padding: EdgeInsets.only(bottom: 15, right: 15),
                       child: Align(
                         alignment: Alignment.bottomRight,
-                        child: Image.asset("assets/image_heart.png"),
+                        child: AppImageAsset(image: "assets/favourite.svg"),
                       ),
                     )
                   : const SizedBox.shrink(),
@@ -434,15 +434,12 @@ class _BuildPlayState extends State<BuildPlay> {
               onTap: widget.onTap,
               child: Align(
                 alignment: Alignment.center,
-                child: widget.isPlaying
-                    ? SvgPicture.asset(
-                        "assets/pause.svg",
-                        height: 90,
-                      )
-                    : SvgPicture.asset(
-                        "assets/play.svg",
-                        height: 90,
-                      ),
+                child: AppImageAsset(
+                  image: widget.isPlaying
+                      ? 'assets/pause.svg'
+                      : 'assets/play.svg',
+                  height: 90,
+                ),
               ),
             ),
           ],

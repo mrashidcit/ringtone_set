@@ -22,22 +22,23 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 5), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => const Dashbaord(
-            type: "RINGTONE",
-          ),
-        ),
-      );
-    });
     InternetConnectionChecker().onStatusChange.listen((status) {
       final hasInternet = status == InternetConnectionStatus.connected;
       if (hasInternet) {
+        Timer(const Duration(seconds: 5), () {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => const Dashbaord(
+                type: "RINGTONE",
+              ),
+            ),
+          );
+        });
       } else {
         showCupertinoModalPopup(
           context: context,
-          builder: (context) => const InternetCheckorDialog(),
+          barrierDismissible: false,
+          builder: (context) => const InternetCheckerDialog(),
         );
       }
     });

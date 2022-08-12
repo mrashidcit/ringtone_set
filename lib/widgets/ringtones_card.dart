@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -128,15 +129,12 @@ class _RingtonesCardState extends State<RingtonesCard> {
                         children: [
                           GestureDetector(
                             onTap: widget.onTap,
-                            child: widget.isPlaying
-                                ? SvgPicture.asset(
-                                    "assets/pause.svg",
-                                    height: 50,
-                                  )
-                                : SvgPicture.asset(
-                                    "assets/play.svg",
-                                    height: 50,
-                                  ),
+                            child: AppImageAsset(
+                              image: widget.isPlaying
+                                  ? 'assets/pause.svg'
+                                  : 'assets/play.svg',
+                              height: 50,
+                            ),
                           ),
                           const SizedBox(
                             width: 15,

@@ -282,17 +282,13 @@ class _DashbaordState extends State<Dashbaord> {
                       ishow
                           ? const SizedBox.shrink()
                           : GestureDetector(
-                              onTap: (() {
-                                setState(() {
-                                  ishow = true;
-                                });
-                              }),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
-                                child: Image.asset("assets/search.png"),
+                              onTap: () => setState(() => ishow = true),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 15),
+                                child:
+                                    AppImageAsset(image: 'assets/search.svg'),
                               ),
-                            )
+                            ),
                     ],
                   ),
                 ),
@@ -601,11 +597,12 @@ class _DashbaordState extends State<Dashbaord> {
                     leading: Builder(
                       builder: (ctx) {
                         return GestureDetector(
-                            onTap: (() async {
-                              await audioPlayer.pause();
-                              Scaffold.of(ctx).openDrawer();
-                            }),
-                            child: Image.asset("assets/menu.png"));
+                          onTap: () async {
+                            await audioPlayer.pause();
+                            Scaffold.of(ctx).openDrawer();
+                          },
+                          child: const AppImageAsset(image: 'assets/menu.svg'),
+                        );
                       },
                     ),
                     title: ishow
@@ -647,13 +644,11 @@ class _DashbaordState extends State<Dashbaord> {
                                           color: Color(0xFF5d318c), width: 0.0),
                                     ),
                                     suffixIcon: GestureDetector(
-                                      onTap: (() {
-                                        setState(() {
-                                          ishow = false;
-                                        });
-                                      }),
-                                      child: Image.asset(
-                                          "assets/search_field.png"),
+                                      onTap: () => setState(() => ishow = false),
+                                      child: const AppImageAsset(
+                                        image: 'assets/search.svg',
+                                        color: Colors.black,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -717,10 +712,7 @@ class _DashbaordState extends State<Dashbaord> {
                                               ),
                                               Column(
                                                 children: [
-                                                  Image.asset(
-                                                    "assets/heart.png",
-                                                    height: 30,
-                                                  ),
+                                                  const AppImageAsset(image: 'assets/favourite_fill.svg', height: 30),
                                                   Row(
                                                     children: const [
                                                       Icon(
@@ -781,17 +773,12 @@ class _DashbaordState extends State<Dashbaord> {
                       ishow
                           ? const SizedBox.shrink()
                           : GestureDetector(
-                              onTap: (() {
-                                setState(() {
-                                  ishow = true;
-                                });
-                              }),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
-                                child: Image.asset("assets/search.png"),
+                              onTap: () => setState(() => ishow = true),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 15),
+                                child: AppImageAsset(image: 'assets/search.svg'),
                               ),
-                            )
+                            ),
                     ],
                   ),
                 ),
@@ -1119,7 +1106,7 @@ class _DashbaordState extends State<Dashbaord> {
                             padding: const EdgeInsets.only(left: 40),
                             child: Row(
                               children: [
-                                Image.asset("assets/ringtone.png"),
+                                const AppImageAsset(image: 'assets/ringtone.svg'),
                                 const SizedBox(
                                   width: 26,
                                 ),
@@ -1157,7 +1144,7 @@ class _DashbaordState extends State<Dashbaord> {
                             padding: const EdgeInsets.only(left: 40),
                             child: Row(
                               children: [
-                                Image.asset("assets/wallpapers.png"),
+                                const AppImageAsset(image: "assets/wallpaper.svg"),
                                 const SizedBox(
                                   width: 26,
                                 ),
@@ -1220,10 +1207,7 @@ class _DashbaordState extends State<Dashbaord> {
                             padding: const EdgeInsets.only(left: 40),
                             child: Row(
                               children: [
-                                Image.asset(
-                                  "assets/heart.png",
-                                  color: const Color(0xffA49FAD),
-                                ),
+                                const AppImageAsset(image: 'assets/favourite_fill.svg'),
                                 const SizedBox(
                                   width: 29,
                                 ),
@@ -1348,31 +1332,8 @@ class _DashbaordState extends State<Dashbaord> {
                           padding: const EdgeInsets.only(left: 40),
                           child: Row(
                             children: [
-                              Container(
-                                height: 18,
-                                width: 18,
-                                alignment: Alignment.center,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Image.asset(
-                                  "assets/fblogo.png",
-                                  color: Colors.black,
-                                ),
-                              ),
-                              // SizedBox(
-                              //   height: 25,
-                              //   width: 30,
-                              //   child: Image.asset(
-                              //     "assets/ringtone.png",
-                              //     color: Colors.white,
-                              //     fit: BoxFit.cover,
-                              //   ),
-                              // ),
-                              const SizedBox(
-                                width: 30,
-                              ),
+                              const AppImageAsset(image: "assets/facebook.svg"),
+                              const SizedBox(width: 30),
                               Text(
                                 "Join us on Facebook",
                                 style: GoogleFonts.archivo(

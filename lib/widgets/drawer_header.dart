@@ -2,6 +2,7 @@
 
 import 'package:deeze_app/screens/profile_screen/profile_screen.dart';
 import 'package:deeze_app/screens/upload_screen/upload_screen.dart';
+import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -29,13 +30,8 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                "assets/logo.png",
-                width: 90,
-              ),
-              const SizedBox(
-                height: 50,
-              ),
+              const AppImageAsset(image: "assets/logo.svg", width: 90),
+              const SizedBox(height: 50),
               SizedBox(
                 height: 30,
                 width: screenWidth * 0.25,
@@ -64,11 +60,11 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
             children: [
               GestureDetector(
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ProfileScreen(),));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                  );
                 },
-                child: Image.asset(
-                  "assets/Oval.png",
-                ),
+                child: const AppImageAsset(image: 'assets/dummy_profile_pic.svg'),
               ),
               const SizedBox(
                 height: 25,

@@ -1,10 +1,9 @@
+import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class InternetCheckorDialog extends StatelessWidget {
-  const InternetCheckorDialog({
-    Key? key,
-  }) : super(key: key);
+class InternetCheckerDialog extends StatelessWidget {
+  const InternetCheckerDialog({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,20 +14,16 @@ class InternetCheckorDialog extends StatelessWidget {
         width: 300,
         child: Card(
           elevation: 10,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset("assets/wifi.png"),
-                const SizedBox(
-                  height: 10,
-                ),
+                const AppImageAsset(image: 'assets/wifi.svg'),
+                const SizedBox(height: 30),
                 Text(
-                  "No internet connection",
+                  'No internet connection',
                   style: GoogleFonts.archivo(
                     fontStyle: FontStyle.normal,
                     color: Colors.black,
@@ -36,11 +31,9 @@ class InternetCheckorDialog extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Text(
-                  "Cannot reach our servers",
+                  'Cannot reach our servers',
                   style: GoogleFonts.archivo(
                     fontStyle: FontStyle.normal,
                     color: const Color(0xFFA49FAD),
@@ -48,20 +41,16 @@ class InternetCheckorDialog extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                        },
+                        onTap: () => Navigator.of(context).pop(),
                         child: Text(
-                          "Exit",
+                          'Exit',
                           style: GoogleFonts.archivo(
                             fontStyle: FontStyle.normal,
                             color: Colors.black,
@@ -76,16 +65,15 @@ class InternetCheckorDialog extends StatelessWidget {
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                              // begin: Alignment.centerLeft,
-                              // end: Alignment.centerRight,
-                              colors: [
-                                Color(0xFF7209B7),
-                                Color(0xFF5945CE),
-                              ]),
+                            colors: [
+                              Color(0xFF7209B7),
+                              Color(0xFF5945CE),
+                            ],
+                          ),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          "Retry",
+                          'Retry',
                           style: GoogleFonts.archivo(
                             fontStyle: FontStyle.normal,
                             color: Colors.white,
@@ -93,10 +81,10 @@ class InternetCheckorDialog extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                      )
+                      ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),

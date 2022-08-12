@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deeze_app/bloc/deeze_bloc/wallpaper_bloc/wallpaper_bloc.dart';
 import 'package:deeze_app/screens/tags/tags.dart';
 import 'package:deeze_app/screens/wallpapers/wallpapers.dart';
+import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/single_wallpaper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -162,13 +163,11 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                                         color: Color(0xFF5d318c), width: 0.0),
                                   ),
                                   suffixIcon: GestureDetector(
-                                    onTap: (() {
-                                      setState(() {
-                                        ishow = false;
-                                      });
-                                    }),
-                                    child:
-                                        Image.asset("assets/search_field.png"),
+                                    onTap: () => setState(() => ishow = false),
+                                    child: const AppImageAsset(
+                                      image: 'assets/search.svg',
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -239,16 +238,12 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                     ishow
                         ? const SizedBox.shrink()
                         : GestureDetector(
-                            onTap: (() {
-                              setState(() {
-                                ishow = true;
-                              });
-                            }),
-                            child: Padding(
+                            onTap: () => setState(() => ishow = true),
+                            child: const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 15),
-                              child: Image.asset("assets/search.png"),
+                              child: AppImageAsset(image: 'assets/search.svg'),
                             ),
-                          )
+                          ),
                   ],
                 ),
               ),
@@ -332,10 +327,9 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                   leading: Builder(
                     builder: (ctx) {
                       return GestureDetector(
-                          onTap: (() {
-                            Scaffold.of(ctx).openDrawer();
-                          }),
-                          child: Image.asset("assets/menu.png"));
+                        onTap: () => Scaffold.of(ctx).openDrawer(),
+                        child: const AppImageAsset(image: 'assets/menu.svg'),
+                      );
                     },
                   ),
                   title: ishow
@@ -377,13 +371,11 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                                         color: Color(0xFF5d318c), width: 0.0),
                                   ),
                                   suffixIcon: GestureDetector(
-                                    onTap: (() {
-                                      setState(() {
-                                        ishow = false;
-                                      });
-                                    }),
-                                    child:
-                                        Image.asset("assets/search_field.png"),
+                                    onTap: () => setState(() => ishow = false),
+                                    child: const AppImageAsset(
+                                      image: 'assets/search.svg',
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -485,16 +477,12 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                     ishow
                         ? const SizedBox.shrink()
                         : GestureDetector(
-                            onTap: (() {
-                              setState(() {
-                                ishow = true;
-                              });
-                            }),
-                            child: Padding(
+                            onTap: () => setState(() => ishow = true),
+                            child: const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 15),
-                              child: Image.asset("assets/search.png"),
+                              child: AppImageAsset(image: 'assets/search.svg'),
                             ),
-                          )
+                          ),
                   ],
                 ),
               ),
@@ -600,7 +588,7 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                           padding: const EdgeInsets.only(left: 40),
                           child: Row(
                             children: [
-                              Image.asset("assets/ringtone.png"),
+                              const AppImageAsset(image: 'assets/ringtone.svg'),
                               const SizedBox(
                                 width: 26,
                               ),
@@ -638,7 +626,7 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                           padding: const EdgeInsets.only(left: 40),
                           child: Row(
                             children: [
-                              Image.asset("assets/wallpapers.png"),
+                              const AppImageAsset(image: "assets/wallpaper.svg"),
                               const SizedBox(
                                 width: 26,
                               ),
@@ -663,10 +651,8 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                         padding: const EdgeInsets.only(left: 40),
                         child: Row(
                           children: [
-                            Image.asset("assets/notification.png"),
-                            const SizedBox(
-                              width: 20,
-                            ),
+                            const AppImageAsset(image: 'assets/notification.svg'),
+                            const SizedBox(width: 20),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
@@ -690,10 +676,7 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                         padding: const EdgeInsets.only(left: 40),
                         child: Row(
                           children: [
-                            Image.asset(
-                              "assets/heart.png",
-                              color: Colors.white,
-                            ),
+                            const AppImageAsset(image: 'assets/favourite_fill.svg', color: Colors.white),
                             const SizedBox(
                               width: 29,
                             ),
@@ -817,31 +800,8 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                         padding: const EdgeInsets.only(left: 40),
                         child: Row(
                           children: [
-                            Container(
-                              height: 18,
-                              width: 18,
-                              alignment: Alignment.center,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Image.asset(
-                                "assets/fblogo.png",
-                                color: Colors.black,
-                              ),
-                            ),
-                            // SizedBox(
-                            //   height: 25,
-                            //   width: 30,
-                            //   child: Image.asset(
-                            //     "assets/ringtone.png",
-                            //     color: Colors.white,
-                            //     fit: BoxFit.cover,
-                            //   ),
-                            // ),
-                            const SizedBox(
-                              width: 30,
-                            ),
+                            const AppImageAsset(image: "assets/facebook.svg"),
+                            const SizedBox(width: 30),
                             Text(
                               "Join us on Facebook",
                               style: GoogleFonts.archivo(

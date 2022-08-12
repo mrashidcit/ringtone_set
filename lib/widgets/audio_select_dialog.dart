@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -115,7 +116,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     ),
                     child: Row(
                       children: [
-                        Image.asset("assets/call_down.png"),
+                        const AppImageAsset(image: 'assets/call_drop.svg'),
                         const SizedBox(
                           width: 20,
                         ),
@@ -173,10 +174,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     ),
                     child: Row(
                       children: [
-                        Image.asset("assets/set_notification.png"),
-                        const SizedBox(
-                          width: 20,
-                        ),
+                        const AppImageAsset(image: 'assets/notification.svg'),
+                        const SizedBox(width: 20),
                         Text(
                           "SET NOTIFICATION",
                           style: GoogleFonts.archivo(
@@ -231,7 +230,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     ),
                     child: Row(
                       children: [
-                        Image.asset("assets/alram.png"),
+                        const AppImageAsset(image: 'assets/bell_clock.svg'),
                         const SizedBox(
                           width: 20,
                         ),
@@ -257,10 +256,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                   ),
                   child: Row(
                     children: [
-                      Image.asset("assets/person.png"),
-                      const SizedBox(
-                        width: 20,
-                      ),
+                      const AppImageAsset(image: 'assets/person.svg'),
+                      const SizedBox(width: 20),
                       Text(
                         "SET TO CONTACT",
                         style: GoogleFonts.archivo(

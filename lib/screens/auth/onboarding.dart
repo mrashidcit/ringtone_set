@@ -1,114 +1,88 @@
 import 'package:deeze_app/screens/auth/login.dart';
 import 'package:deeze_app/screens/dashboard/dashboard.dart';
+import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:deeze_app/widgets/app_social_login.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Onboarding extends StatefulWidget {
-  Onboarding({Key? key}) : super(key: key);
+  const Onboarding({Key? key}) : super(key: key);
 
   @override
-  State<Onboarding> createState() => _OnboardingState();
+  State<Onboarding> createState() => OnboardingState();
 }
 
-class _OnboardingState extends State<Onboarding> {
+class OnboardingState extends State<Onboarding> {
   @override
   Widget build(BuildContext context) {
+    print('Current screen --> $runtimeType');
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: <Color>[
-                Color(0xFF4d047d),
-                Color(0xFF4d047d),
-                Color(0xFF050000),
-                Color(0xFF050000),
-                Color(0xFF000000),
-                Color(0xFF000000),
-              ]),
-        ),
-        child: Center(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 220.0),
-              child: Image.asset(
-                "assets/logo.png",
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: <Color>[
+                  Color(0xFF4d047d),
+                  Color(0xFF4d047d),
+                  Color(0xFF17131F),
+                  Color(0xFF17131F),
+                  Color(0xFF17131F),
+                  Color(0xFF17131F),
+                  Color(0xFF17131F),
+                ],
               ),
             ),
-            const SizedBox(
-              height: 40,
-            ),
-            Image.asset(
-              "assets/pimp_your_android_de.png",
-            ),
-            const SizedBox(
-              height: 70,
-            ),
-            GestureDetector(
-              onTap: () {
-                // Navigator.of(context).pushReplacement(
-                //   MaterialPageRoute(
-                //     builder: (_) => Dashbaord(),
-                //   ),
-                // );
-              },
-              child: Image.asset(
-                "assets/google.png",
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            GestureDetector(
-              onTap: () {
-                // Navigator.of(context).pushReplacement(
-                //   MaterialPageRoute(
-                //     builder: (_) => const Dashbaord(),
-                //   ),
-                // );
-              },
-              child: Image.asset(
-                "assets/facebook.png",
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (_) => Login(),
+          ),
+          ListView(
+            primary: true,
+            physics: const BouncingScrollPhysics(),
+            padding:
+            const EdgeInsets.symmetric(horizontal: 35).copyWith(top: 100),
+            children: [
+              const AppImageAsset(image: 'assets/app_logo.svg'),
+              const SizedBox(height: 34),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'pimp your Android device with top ringtones and new wallpapers.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.archivo(
+                    color: Colors.white,
+                    fontStyle: FontStyle.normal,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
-                );
-              },
-              child: Image.asset(
-                "assets/normal.png",
-              ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            GestureDetector(
-              onTap: () {
-                // Navigator.of(context).pushReplacement(
-                //   MaterialPageRoute(
-                //     builder: (_) => const Dashbaord(),
-                //   ),
-                // );
-              },
-              child: const Text(
-                "New Here? Sign Up >",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
                 ),
               ),
-            ),
-          ],
-        )),
+              const SizedBox(height: 40),
+              const AppSocialMediaButton(image: 'assets/google.svg',color: Color(0XFF0764E3), text: 'Google'),
+              const SizedBox(height: 20),
+              const AppSocialMediaButton(image: 'assets/facebook.svg',color: Color(0XFF4267B2), text: 'Facebook'),
+              const SizedBox(height: 20),
+              AppSocialMediaButton(
+                color: Colors.white,
+                text: 'e-mail',
+                onTap: () => Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => const Login()),
+                ),
+              ),
+              const SizedBox(height: 36),
+              Text(
+                'New here?  Sign up',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.archivo(
+                  color: Colors.white,
+                  fontStyle: FontStyle.normal,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
