@@ -1,9 +1,10 @@
+import 'dart:ui';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/deeze_model.dart';
 import 'audio_select_dialog.dart';
@@ -74,6 +75,49 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
 
   late int activeIndex = widget.index;
   String myfile = "";
+  List myGradientList = const [
+    LinearGradient(
+      begin: Alignment.centerRight,
+      end: Alignment.centerLeft,
+      colors: [
+        Color(0xFF289987),
+        Color(0xFF727b64),
+      ],
+    ),
+    LinearGradient(
+      begin: Alignment.centerRight,
+      end: Alignment.centerLeft,
+      colors: [
+        Color(0xFF5951af),
+        Color(0xFF5f5b8c),
+      ],
+    ),
+    LinearGradient(
+      begin: Alignment.centerRight,
+      end: Alignment.centerLeft,
+      colors: [
+        Color(0xFF5d8897),
+        Color(0xFF4f4d7e),
+      ],
+    ),
+    LinearGradient(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+      colors: [
+        Color(0xFF5048dd),
+        Color(0xFF89c0d3),
+      ],
+    ),
+    LinearGradient(
+      begin: Alignment.centerRight,
+      end: Alignment.centerLeft,
+      colors: [
+        Color(0xFF5952af),
+        Color(0xFF5e5b8c),
+      ],
+    ),
+  ];
+  Gradient? gradient;
 
   @override
   Widget build(BuildContext context) {
@@ -81,50 +125,40 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: <Color>[
-                Color(0xFF965a90),
-                Color(0xFF815d84),
-                Color(0xFF56425d),
-                Color(0xFF17131f),
-                Color(0xFF17131f),
-                Color(0xFF17131f),
-              ]),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              widget.listHydra[activeIndex].name!,
-              style: GoogleFonts.archivo(
-                fontStyle: FontStyle.normal,
-                color: Colors.white,
-                fontSize: 20,
-                wordSpacing: -0.1,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            CarouselSlider.builder(
-              carouselController: _controller,
-              itemCount: widget.listHydra.length,
-              itemBuilder: (context, index, realIndex) {
-                final file = widget.listHydra[index].file;
-                final name = widget.listHydra[index].name;
-                // myfile = index == 0
-                //     ? widget.listHydra[0].file!
-                //     : widget.listHydra[index - 1].file!;
-                return activeIndex == index
-                    ? BuildPlay(
+        decoration: BoxDecoration(gradient: gradient),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CarouselSlider.builder(
+                carouselController: _controller,
+                itemCount: widget.listHydra.length,
+                itemBuilder: (context, index, realIndex) {
+                  final file = widget.listHydra[index].file;
+                  final name = widget.listHydra[index].name;
+                  // myfile = index == 0
+                  //     ? widget.listHydra[0].file!
+                  //     : widget.listHydra[index - 1].file!;
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.listHydra[index].name!,
+                        style: GoogleFonts.archivo(
+                          fontStyle: FontStyle.normal,
+                          color: Colors.white,
+                          fontSize: 20,
+                          wordSpacing: -0.1,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      activeIndex == index
+                          ? BuildPlay(
                         onChange: (value) async {
-                          final myposition =
-                              Duration(microseconds: value.toInt());
+                          final myposition = Duration(microseconds: value.toInt());
                           await audioPlayer.seek(myposition);
                           await audioPlayer.resume();
                         },
@@ -143,13 +177,14 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                                 .play(widget.listHydra[index].file!);
                           }
                         }),
-                        audioPlayer:
-                            activeIndex == index ? audioPlayer : pausePlayer,
+                        audioPlayer: activeIndex == index
+                            ? audioPlayer
+                            : pausePlayer,
                         isPlaying: activeIndex == index ? isPlaying : false,
                         duration:
-                            activeIndex == index ? duration : pauseDuration,
+                        activeIndex == index ? duration : pauseDuration,
                         position:
-                            activeIndex == index ? position : pausePosition,
+                        activeIndex == index ? position : pausePosition,
                         activeIndex: activeIndex,
                         file: file!,
                         index: index,
@@ -157,10 +192,9 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                         userName: widget.listHydra[index].user!.firstName!,
                         userProfileUrl: widget.listHydra[index].user!.image,
                       )
-                    : BuildPlay(
+                          : BuildPlay(
                         onChange: (value) async {
-                          final myposition =
-                              Duration(microseconds: value.toInt());
+                          final myposition = Duration(microseconds: value.toInt());
                           await audioPlayer.seek(myposition);
                           await audioPlayer.resume();
                         },
@@ -175,25 +209,86 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                                 .play(widget.listHydra[index].file!);
                           }
                         }),
-                        audioPlayer:
-                            activeIndex == index ? audioPlayer : pausePlayer,
+                        audioPlayer: activeIndex == index
+                            ? audioPlayer
+                            : pausePlayer,
                         isPlaying: activeIndex == index ? isPlaying : false,
                         duration:
-                            activeIndex == index ? duration : pauseDuration,
+                        activeIndex == index ? duration : pauseDuration,
                         position:
-                            activeIndex == index ? position : pausePosition,
+                        activeIndex == index ? position : pausePosition,
                         activeIndex: activeIndex,
                         file: file!,
                         index: index,
                         name: name!,
                         userName: widget.listHydra[index].user!.firstName!,
                         userProfileUrl: widget.listHydra[index].user!.image,
-                      );
-              },
-              options: CarouselOptions(
-                  height: 272,
+                      ),
+                      const SizedBox(height: 10),
+                      if (activeIndex == index)
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.05),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  widget.listHydra[activeIndex].user?.image != null
+                                      ? CircleAvatar(
+                                          radius: 17,
+                                          backgroundImage: NetworkImage(
+                                            widget.listHydra[activeIndex].user!
+                                                .image!,
+                                          ),
+                                        )
+                                      : const CircleAvatar(
+                                          backgroundColor: Colors.grey,
+                                          radius: 15,
+                                        ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    widget.listHydra[activeIndex].user!.firstName!,
+                                    style: GoogleFonts.archivo(
+                                      fontStyle: FontStyle.normal,
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      wordSpacing: -0.05,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const AppImageAsset(
+                                    image: 'assets/arrow.svg',
+                                    height: 8,
+                                    width: 8,
+                                    fit: BoxFit.fill,
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    "23k",
+                                    style: GoogleFonts.archivo(
+                                      fontSize: 11,
+                                      fontStyle: FontStyle.normal,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      const SizedBox(height: 45),
+                    ],
+                  );
+                },
+                options: CarouselOptions(
+                  height: 450,
                   pageSnapping: true,
-                  viewportFraction: 0.77,
+                  viewportFraction: 0.75,
                   enlargeCenterPage: true,
                   enableInfiniteScroll: false,
                   onPageChanged: (index, reason) async {
@@ -204,144 +299,83 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                       await audioPlayer.pause();
                     }
                     setState(() {
+                      gradient = (index % 4 == 0)
+                          ? myGradientList[0]
+                          : (index % 3 == 0)
+                              ? myGradientList[3]
+                              : (index % 2 == 0)
+                                  ? myGradientList[4]
+                                  : myGradientList[1];
                       position = Duration.zero;
                       myfile = widget.listHydra[index].file!;
                       activeIndex = index;
                     });
-                  }),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      widget.listHydra[activeIndex].user?.image != null
-                          ? CircleAvatar(
-                              radius: 17,
-                              backgroundImage: NetworkImage(
-                                widget.listHydra[activeIndex].user!.image!,
-                              ),
-                            )
-                          : const CircleAvatar(
-                              backgroundColor: Colors.grey,
-                              radius: 15,
-                            ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                      Text(
-                        widget.listHydra[activeIndex].user!.firstName!,
-                        style: GoogleFonts.archivo(
-                          fontStyle: FontStyle.normal,
-                          color: Colors.white,
-                          fontSize: 13,
-                          wordSpacing: -0.05,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const AppImageAsset(
-                        image: 'assets/arrow.svg',
-                        height: 8,
-                        width: 8,
-                        fit: BoxFit.fill,
-                      ),
-                      const SizedBox(
-                        width: 2,
-                      ),
-                      Text(
-                        "23k",
-                        style: GoogleFonts.archivo(
-                            fontSize: 11,
-                            fontStyle: FontStyle.normal,
-                            color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ],
+                  },
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 45,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: GestureDetector(
-                    onTap: () {
-                      showCupertinoModalPopup(
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: GestureDetector(
+                      onTap: () {
+                        showCupertinoModalPopup(
                           context: context,
                           builder: (context) {
                             return MoreAudioDialog(
                               file: myfile,
                               fileName: widget.listHydra[activeIndex].name!,
-                              userName: widget
-                                  .listHydra[activeIndex].user!.firstName!,
-                              userImage:
-                                  widget.listHydra[activeIndex].user!.image!,
+                              userName: widget.listHydra[activeIndex].user!.firstName!,
+                              userImage: widget.listHydra[activeIndex].user!.image!,
                             );
-                          });
-                    },
-                    child: const AppImageAsset(
-                      image: 'assets/dot.svg',
-                      height: 5,
-                      width: 5,
-                      fit: BoxFit.fill,
+                          },
+                        );
+                      },
+                      child: const AppImageAsset(
+                        image: 'assets/dot.svg',
+                        height: 5,
+                        width: 5,
+                        fit: BoxFit.fill,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  width: 25,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    showCupertinoModalPopup(
+                  const SizedBox(width: 25),
+                  GestureDetector(
+                    onTap: () {
+                      showCupertinoModalPopup(
                         context: context,
-                        builder: (context) {
-                          return AudioSelectDialog(file: myfile);
-                        });
-                  },
-                  child: Container(
-                    height: 60,
-                    width: 60,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                        shape: BoxShape.circle, color: Colors.white),
-                    child: const AppImageAsset(
-                      image: 'assets/call.svg',
-                      height: 70,
-                      width: 70,
-                      fit: BoxFit.cover,
+                        builder: (context) => AudioSelectDialog(file: myfile),
+                      );
+                    },
+                    child: Container(
+                      height: 60,
+                      width: 60,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white),
+                      child: const AppImageAsset(
+                        image: 'assets/call.svg',
+                        height: 70,
+                        width: 70,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  width: 25,
-                ),
-                const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: AppImageAsset(
+                  const SizedBox(width: 25),
+                  const AppImageAsset(
                     image: 'assets/share.svg',
-                    height: 17,
-                    width: 17,
+                    height: 20,
+                    width: 20,
                     fit: BoxFit.cover,
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -384,6 +418,49 @@ class BuildPlay extends StatefulWidget {
 }
 
 class _BuildPlayState extends State<BuildPlay> {
+  List myGradientList = const [
+    LinearGradient(
+      begin: Alignment.centerRight,
+      end: Alignment.centerLeft,
+      colors: [
+        Color(0xFF289987),
+        Color(0xFF727b64),
+      ],
+    ),
+    LinearGradient(
+      begin: Alignment.centerRight,
+      end: Alignment.centerLeft,
+      colors: [
+        Color(0xFF5951af),
+        Color(0xFF5f5b8c),
+      ],
+    ),
+    LinearGradient(
+      begin: Alignment.centerRight,
+      end: Alignment.centerLeft,
+      colors: [
+        Color(0xFF5d8897),
+        Color(0xFF4f4d7e),
+      ],
+    ),
+    LinearGradient(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+      colors: [
+        Color(0xFF5048dd),
+        Color(0xFF89c0d3),
+      ],
+    ),
+    LinearGradient(
+      begin: Alignment.centerRight,
+      end: Alignment.centerLeft,
+      colors: [
+        Color(0xFF5952af),
+        Color(0xFF5e5b8c),
+      ],
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return SliderTheme(
@@ -395,15 +472,16 @@ class _BuildPlayState extends State<BuildPlay> {
         trackShape: const RectangularSliderTrackShape(),
       ),
       child: Container(
+        height: 254,
         width: 254,
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: <Color>[
-                Color(0xFF9f5c96),
-                Color(0xFF93b1b9),
-              ]),
+          gradient: (widget.index % 4 == 0)
+              ? myGradientList[0]
+              : (widget.index % 3 == 0)
+                  ? myGradientList[3]
+                  : (widget.index % 2 == 0)
+                      ? myGradientList[4]
+                      : myGradientList[1],
           borderRadius: BorderRadius.circular(6),
         ),
         child: Stack(

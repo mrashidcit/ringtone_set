@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -280,253 +281,279 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Container(
+        margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.26),
+        alignment: Alignment.bottomCenter,
         child: Card(
           elevation: 10,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          margin: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Container(
-            height: 340,
-            width: MediaQuery.of(context).size.width,
+            height: 400,
+            alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: Colors.white,
             ),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                left: 30,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      bool success = false;
-                      ProgressDialog pd = ProgressDialog(
-                        context,
-                        message: Text(
-                          "Please Wait!",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.black,
-                          ),
-                        ),
-                      );
-                      pd.show();
-                      try {
-                        success = await RingtoneSet.setRingtoneFromNetwork(
-                            widget.file);
-                      } on PlatformException {
-                        success = false;
-                      }
-                      var snackBar;
-                      if (success) {
-                        snackBar = const SnackBar(
-                          content: Text("Ringtone set successfully!"),
-                        );
-                        Navigator.of(context).pop();
-                      } else {
-                        snackBar = const SnackBar(content: Text("Error"));
-                        Navigator.of(context).pop();
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    },
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.call_end_sharp,
-                          color: Colors.black,
-                          size: 25,
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Text(
-                          "SET RINGTONE",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    width: 180,
+                    alignment: Alignment.centerLeft,
+                    child: const AppImageAsset(
+                      image: 'assets/bakward_arrow.svg',
+                      height: 20,
                     ),
                   ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      bool success = false;
-                      ProgressDialog pd = ProgressDialog(
-                        context,
-                        message: Text(
-                          "Please Wait!",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.black,
-                          ),
-                        ),
-                      );
-                      pd.show();
-                      try {
-                        success = await RingtoneSet.setNotificationFromNetwork(
-                            widget.file);
-                      } on PlatformException {
-                        success = false;
-                      }
-                      var snackBar;
-                      if (success) {
-                        snackBar = const SnackBar(
-                          content:
-                              Text("Notifications sound  set successfully!"),
-                        );
-                        Navigator.of(context).pop();
-                      } else {
-                        snackBar = const SnackBar(content: Text("Error"));
-                        Navigator.of(context).pop();
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    },
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.notifications,
-                          color: Colors.black,
-                          size: 25,
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Text(
-                          "SET NOTIFICATION",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      bool success = false;
-                      ProgressDialog pd = ProgressDialog(
-                        context,
-                        message: Text(
-                          "Please Wait!",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.black,
-                          ),
-                        ),
-                      );
-                      pd.show();
-                      try {
-                        success =
-                            await RingtoneSet.setAlarmFromNetwork(widget.file);
-                      } on PlatformException {
-                        success = false;
-                      }
-                      var snackBar;
-                      if (success) {
-                        snackBar = const SnackBar(
-                          content: Text("Alarm sound  set successfully!"),
-                        );
-                        Navigator.of(context).pop();
-                      } else {
-                        snackBar = const SnackBar(content: Text("Error"));
-                        Navigator.of(context).pop();
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    },
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.alarm,
-                          color: Colors.black,
-                          size: 25,
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Text(
-                          "SET ALARM SOUND",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.person,
-                        color: Colors.black,
-                        size: 25,
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      Text(
-                        "SET TO CONTACT",
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    bool success = false;
+                    ProgressDialog pd = ProgressDialog(
+                      context,
+                      message: Text(
+                        "Please Wait!",
                         style: GoogleFonts.archivo(
                           fontStyle: FontStyle.normal,
                           color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    );
+                    pd.show();
+                    try {
+                      success = await RingtoneSet.setRingtoneFromNetwork(
+                          widget.file);
+                    } on PlatformException {
+                      success = false;
+                    }
+                    var snackBar;
+                    if (success) {
+                      snackBar = const SnackBar(
+                        content: Text("Ringtone set successfully!"),
+                      );
+                      Navigator.of(context).pop();
+                    } else {
+                      snackBar = const SnackBar(content: Text("Error"));
+                      Navigator.of(context).pop();
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  },
+                  child: Container(
+                    width: 180,
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          width: 20,
+                          child: AppImageAsset(
+                            image: 'assets/call_drop.svg',
+                            height: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Text(
+                          'SET RINGTONE',
+                          style: GoogleFonts.archivo(
+                            fontStyle: FontStyle.normal,
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 22),
+                GestureDetector(
+                  onTap: () async {
+                    bool success = false;
+                    ProgressDialog pd = ProgressDialog(
+                      context,
+                      message: Text(
+                        "Please Wait!",
+                        style: GoogleFonts.archivo(
+                          fontStyle: FontStyle.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    );
+                    pd.show();
+                    try {
+                      success = await RingtoneSet.setNotificationFromNetwork(
+                          widget.file);
+                    } on PlatformException {
+                      success = false;
+                    }
+                    var snackBar;
+                    if (success) {
+                      snackBar = const SnackBar(
+                        content:
+                            Text("Notifications sound  set successfully!"),
+                      );
+                      Navigator.of(context).pop();
+                    } else {
+                      snackBar = const SnackBar(content: Text("Error"));
+                      Navigator.of(context).pop();
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  },
+                  child: Container(
+                    width: 180,
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          width: 20,
+                          child: AppImageAsset(
+                            image: 'assets/notification.svg',
+                            height: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Text(
+                          'SET NOTIFICATION',
+                          style: GoogleFonts.archivo(
+                            fontStyle: FontStyle.normal,
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 22),
+                GestureDetector(
+                  onTap: () async {
+                    bool success = false;
+                    ProgressDialog pd = ProgressDialog(
+                      context,
+                      message: Text(
+                        "Please Wait!",
+                        style: GoogleFonts.archivo(
+                          fontStyle: FontStyle.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    );
+                    pd.show();
+                    try {
+                      success =
+                          await RingtoneSet.setAlarmFromNetwork(widget.file);
+                    } on PlatformException {
+                      success = false;
+                    }
+                    var snackBar;
+                    if (success) {
+                      snackBar = const SnackBar(
+                        content: Text("Alarm sound  set successfully!"),
+                      );
+                      Navigator.of(context).pop();
+                    } else {
+                      snackBar = const SnackBar(content: Text("Error"));
+                      Navigator.of(context).pop();
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  },
+                  child: Container(
+                    width: 180,
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          width: 20,
+                          child: AppImageAsset(
+                            image: 'assets/bell_clock.svg',
+                            height: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Text(
+                          'SET ALARM SOUND',
+                          style: GoogleFonts.archivo(
+                            fontStyle: FontStyle.normal,
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 22),
+                Container(
+                  width: 180,
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        width: 20,
+                        child: AppImageAsset(
+                          image: 'assets/person.svg',
+                          height: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Text(
+                        'SET TO CONTACT',
+                        style: GoogleFonts.archivo(
+                          fontStyle: FontStyle.normal,
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  InkWell(
-                    onTap: () {},
-                    child: Container(
-                        height: 37,
-                        // margin: EdgeInsets.only(left: 20),
-                        width: MediaQuery.of(context).size.width * 0.58,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: <Color>[
-                                Color(0xFF7209b7),
-                                Color(0xFF5c3fcc),
-                              ]),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          "SAVE TO MEDIA",
+                ),
+                const SizedBox(height: 30),
+                InkWell(
+                  onTap: () {},
+                  child: Container(
+                    height: 50,
+                    width: 180,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: <Color>[
+                          Color(0xFF7209b7),
+                          Color(0xFF5c3fcc),
+                        ],
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const AppImageAsset(image: 'assets/save_down.svg', height: 14),
+                        const SizedBox(width: 20),
+                        Text(
+                          'SAVE TO MEDIA',
                           style: GoogleFonts.archivo(
                             fontStyle: FontStyle.normal,
                             color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
                           ),
-                        )),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

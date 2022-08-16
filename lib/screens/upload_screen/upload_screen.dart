@@ -24,40 +24,37 @@ class UploadScreenState extends State<UploadScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size(0, 60),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: AppBar(
-            backgroundColor: const Color(0xFF4d047d),
-            elevation: 0,
-            centerTitle: true,
-            leading: Builder(
-              builder: (ctx) {
-                return GestureDetector(
-                  onTap: () => Scaffold.of(ctx).openDrawer(),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    child: AppImageAsset(image: 'assets/menu.svg'),
-                  ),
-                );
-              },
-            ),
-            title: Text(
-              'Upload',
-              style: GoogleFonts.archivo(
-                fontStyle: FontStyle.normal,
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                wordSpacing: 0.34,
-              ),
-            ),
-            actions: const [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                child: AppImageAsset(image: 'assets/search.svg'),
-              ),
-            ],
+        child: AppBar(
+          backgroundColor: const Color(0xFF4d047d),
+          elevation: 0,
+          centerTitle: true,
+          leading: Builder(
+            builder: (ctx) {
+              return GestureDetector(
+                onTap: () => Scaffold.of(ctx).openDrawer(),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: AppImageAsset(image: 'assets/menu.svg'),
+                ),
+              );
+            },
           ),
+          title: Text(
+            'Upload',
+            style: GoogleFonts.archivo(
+              fontStyle: FontStyle.normal,
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              wordSpacing: 0.34,
+            ),
+          ),
+          actions: const [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: AppImageAsset(image: 'assets/search.svg'),
+            ),
+          ],
         ),
       ),
       body: Container(
@@ -82,50 +79,53 @@ class UploadScreenState extends State<UploadScreen> {
           padding: const EdgeInsets.only(top: 50),
           child: Column(
             children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  if (profileImage == null)
-                    GestureDetector(
-                      onTap: () => showCupertinoModalPopup(
-                        context: context,
-                        builder: (context) => Material(
-                          child: Wrap(
-                            children: <Widget>[
-                              ListTile(
-                                  leading: const Icon(Icons.photo_library),
-                                  title: Text(
-                                    Platform.isIOS ? 'Photo' : 'Gallery',
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w200,
-                                    ),
-                                  ),
-                                  onTap: () {
-                                    imageFromGallery();
-                                    Navigator.of(context).pop();
-                                  }),
-                              ListTile(
-                                leading: const Icon(Icons.photo_camera),
-                                title: const Text(
-                                  'Camera',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w200,
-                                  ),
-                                ),
-                                onTap: () {
-                                  imageFromCamera();
-                                  Navigator.of(context).pop();
-                                },
+              GestureDetector(
+                onTap: () {
+                  showCupertinoModalPopup(
+                    context: context,
+                    builder: (context) => Material(
+                      child: Wrap(
+                        children: <Widget>[
+                          ListTile(
+                            leading: const Icon(Icons.photo_library),
+                            title: Text(
+                              Platform.isIOS ? 'Photo' : 'Gallery',
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w200,
                               ),
-                            ],
+                            ),
+                            onTap: () {
+                              imageFromGallery();
+                              Navigator.of(context).pop();
+                            },
                           ),
-                        ),
+                          ListTile(
+                            leading: const Icon(Icons.photo_camera),
+                            title: const Text(
+                              'Camera',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w200,
+                              ),
+                            ),
+                            onTap: () {
+                              imageFromCamera();
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
                       ),
-                      child: DottedBorder(
+                    ),
+                  );
+                },
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (profileImage == null)
+                      DottedBorder(
                         color: const Color(0XFF979797),
                         strokeWidth: 3,
                         dashPattern: const [8, 8],
@@ -148,23 +148,23 @@ class UploadScreenState extends State<UploadScreen> {
                           ),
                         ),
                       ),
-                    ),
-                  profileImage == null
-                      ? const AppImageAsset(image: 'assets/upload_add.svg')
-                      : SizedBox(
-                          height: 250,
-                          width: 150,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.file(
-                              profileImage!,
-                              height: 250,
-                              width: 150,
-                              fit: BoxFit.fill,
+                    profileImage == null
+                        ? const AppImageAsset(image: 'assets/upload_add.svg')
+                        : SizedBox(
+                            height: 250,
+                            width: 150,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                profileImage!,
+                                height: 250,
+                                width: 150,
+                                fit: BoxFit.fill,
+                              ),
                             ),
                           ),
-                        ),
-                ],
+                  ],
+                ),
               ),
               const SizedBox(height: 30),
               if (profileImage != null)
@@ -178,9 +178,7 @@ class UploadScreenState extends State<UploadScreen> {
                         Border.all(color: const Color(0XFF979797), width: 1),
                   ),
                   child: TextFormField(
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
+                    style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                       hintText: 'Title',
@@ -200,12 +198,10 @@ class UploadScreenState extends State<UploadScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      border:
-                          Border.all(color: const Color(0XFF979797), width: 1)),
+                      border: Border.all(color: const Color(0XFF979797), width: 1),
+                  ),
                   child: TextFormField(
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
+                    style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                       hintText: 'Tags',

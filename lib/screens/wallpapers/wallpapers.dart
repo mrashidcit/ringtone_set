@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deeze_app/screens/tags/tags.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/single_wallpaper.dart';
 import 'package:deeze_app/widgets/wallpaper_category_card.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +74,7 @@ class _WallPapersState extends State<WallPapers> {
       "type": "WALLPAPER"
     });
     try {
+      if (isRefresh) setState(() => isLoading = true);
       http.Response response = await http.get(
         uri,
         headers: {
@@ -92,7 +94,7 @@ class _WallPapersState extends State<WallPapers> {
 
         page++;
         totalPage = rawResponse.hydraTotalItems!;
-        setState(() {});
+        setState(() => isLoading = false);
         return true;
       } else {
         return false;
@@ -103,31 +105,33 @@ class _WallPapersState extends State<WallPapers> {
   }
 
   Future<bool> _onWillPop() async {
-    return (await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Are you sure?'),
-            content: const Text('Do you want to exit an App'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('No'),
-              ),
-              TextButton(
-                onPressed: () {
-                  SystemNavigator.pop();
-                },
-                child: const Text('Yes'),
-              ),
-            ],
-          ),
-        )) ??
-        false;
+    ishow
+        ? setState(() => ishow = false)
+        : await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Are you sure?'),
+              content: const Text('Do you want to exit an App'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('No'),
+                ),
+                TextButton(
+                  onPressed: () => SystemNavigator.pop(),
+                  child: const Text('Yes'),
+                ),
+              ],
+            ),
+          );
+    return false;
   }
 
   final SearchServices _searchServices = SearchServices();
   final TextEditingController _typeAheadController = TextEditingController();
   bool ishow = false;
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -308,7 +312,11 @@ class _WallPapersState extends State<WallPapers> {
                       _refreshController.loadFailed();
                     }
                   },
-                  child: CustomScrollView(
+                  header: CustomHeader(builder: (context, mode) => Container()),
+                  footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                  child: isLoading
+                      ? const LoadingPage()
+                      : CustomScrollView(
                     slivers: [
                       const SliverToBoxAdapter(
                         child: SizedBox(
@@ -445,29 +453,27 @@ class _WallPapersState extends State<WallPapers> {
                           child: Tags(),
                         ),
                       ),
-                      const SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 15,
-                        ),
-                      ),
-                      SliverGrid(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 5.0,
-                          crossAxisSpacing: 5.0,
-                          childAspectRatio: 3 / 6,
-                        ),
-                        delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            return CategoryCard(
-                              index: index,
-                              listHydra: hydraMember,
-                              image: hydraMember[index].file!,
-                              name: hydraMember[index].name!,
-                            );
-                          },
-                          childCount: hydraMember.length,
+                      const SliverToBoxAdapter(child: SizedBox(height: 15)),
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        sliver: SliverGrid(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisSpacing: 5.0,
+                            crossAxisSpacing: 5.0,
+                            childAspectRatio: 3 / 6,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              return CategoryCard(
+                                index: index,
+                                listHydra: hydraMember,
+                                image: hydraMember[index].file!,
+                                name: hydraMember[index].name!,
+                              );
+                            },
+                            childCount: hydraMember.length,
+                          ),
                         ),
                       ),
                     ],
@@ -491,7 +497,10 @@ class _WallPapersState extends State<WallPapers> {
                       builder: (ctx) {
                         return GestureDetector(
                           onTap: () => Scaffold.of(ctx).openDrawer(),
-                          child: const AppImageAsset(image: 'assets/menu.svg'),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 15),
+                            child: AppImageAsset(image: 'assets/menu.svg'),
+                          ),
                         );
                       },
                     ),
@@ -688,7 +697,11 @@ class _WallPapersState extends State<WallPapers> {
                       _refreshController.loadFailed();
                     }
                   },
-                  child: CustomScrollView(
+                  header: CustomHeader(builder: (context, mode) => Container()),
+                  footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                  child: isLoading
+                      ? const LoadingPage()
+                      : CustomScrollView(
                     slivers: [
                       const SliverToBoxAdapter(
                         child: SizedBox(

@@ -47,37 +47,37 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Container(
+        margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.26),
+        alignment: Alignment.bottomCenter,
         child: Card(
           elevation: 10,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          margin: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Container(
-            height: 392,
-            width: 306,
+            height: 400,
+            alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: Colors.white,
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 GestureDetector(
-                  onTap: (() {
-                    Navigator.of(context).pop();
-                  }),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.grey,
-                    size: 30,
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    width: 180,
+                    alignment: Alignment.centerLeft,
+                    child: const AppImageAsset(
+                      image: 'assets/bakward_arrow.svg',
+                      height: 20,
+                    ),
                   ),
                 ),
-                const SizedBox(
-                  height: 23,
-                ),
+                const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () async {
                     bool success = false;
@@ -110,18 +110,22 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     }
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 35,
-                    ),
+                  child: Container(
+                    width: 180,
+                    alignment: Alignment.center,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const AppImageAsset(image: 'assets/call_drop.svg'),
                         const SizedBox(
                           width: 20,
+                          child: AppImageAsset(
+                            image: 'assets/call_drop.svg',
+                            height: 20,
+                          ),
                         ),
+                        const SizedBox(width: 20),
                         Text(
-                          "SET RINGTONE",
+                          'SET RINGTONE',
                           style: GoogleFonts.archivo(
                             fontStyle: FontStyle.normal,
                             color: Colors.black,
@@ -133,9 +137,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 23,
-                ),
+                const SizedBox(height: 22),
                 GestureDetector(
                   onTap: () async {
                     bool success = false;
@@ -168,16 +170,22 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     }
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 35,
-                    ),
+                  child: Container(
+                    width: 180,
+                    alignment: Alignment.center,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const AppImageAsset(image: 'assets/notification.svg'),
+                        const SizedBox(
+                          width: 20,
+                          child: AppImageAsset(
+                            image: 'assets/notification.svg',
+                            height: 20,
+                          ),
+                        ),
                         const SizedBox(width: 20),
                         Text(
-                          "SET NOTIFICATION",
+                          'SET NOTIFICATION',
                           style: GoogleFonts.archivo(
                             fontStyle: FontStyle.normal,
                             color: Colors.black,
@@ -189,9 +197,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 23,
-                ),
+                const SizedBox(height: 22),
                 GestureDetector(
                   onTap: () async {
                     bool success = false;
@@ -224,18 +230,22 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     }
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 35,
-                    ),
+                  child: Container(
+                    width: 180,
+                    alignment: Alignment.center,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const AppImageAsset(image: 'assets/bell_clock.svg'),
                         const SizedBox(
                           width: 20,
+                          child: AppImageAsset(
+                            image: 'assets/bell_clock.svg',
+                            height: 20,
+                          ),
                         ),
+                        const SizedBox(width: 20),
                         Text(
-                          "SET ALARM SOUND",
+                          'SET ALARM SOUND',
                           style: GoogleFonts.archivo(
                             fontStyle: FontStyle.normal,
                             color: Colors.black,
@@ -247,19 +257,23 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 23,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 35,
-                  ),
+                const SizedBox(height: 22),
+                Container(
+                  width: 180,
+                  alignment: Alignment.center,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      const AppImageAsset(image: 'assets/person.svg'),
+                      const SizedBox(
+                        width: 20,
+                        child: AppImageAsset(
+                          image: 'assets/person.svg',
+                          height: 20,
+                        ),
+                      ),
                       const SizedBox(width: 20),
                       Text(
-                        "SET TO CONTACT",
+                        'SET TO CONTACT',
                         style: GoogleFonts.archivo(
                           fontStyle: FontStyle.normal,
                           color: Colors.black,
@@ -270,9 +284,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     ],
                   ),
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
                 InkWell(
                   onTap: () async {
                     ProgressDialog pd = ProgressDialog(
@@ -296,34 +308,37 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                       Navigator.of(context).pop();
                     }
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 35,
+                  child: Container(
+                    height: 50,
+                    width: 180,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: <Color>[
+                          Color(0xFF7209b7),
+                          Color(0xFF5c3fcc),
+                        ],
+                      ),
                     ),
-                    child: Container(
-                        height: 36,
-                        // margin: EdgeInsets.only(left: 20),
-                        width: 179,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: <Color>[
-                                Color(0xFF7209b7),
-                                Color(0xFF5c3fcc),
-                              ]),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          "SAVE TO MEDIA",
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const AppImageAsset(image: 'assets/save_down.svg', height: 14),
+                        const SizedBox(width: 20),
+                        Text(
+                          'SAVE TO MEDIA',
                           style: GoogleFonts.archivo(
                             fontStyle: FontStyle.normal,
                             color: Colors.white,
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
                           ),
-                        )),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
