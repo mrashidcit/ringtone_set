@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:deeze_app/screens/upload_screen/upload_status_screen.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
@@ -248,7 +249,13 @@ class UploadScreenState extends State<UploadScreen> {
                         wordSpacing: 0.22,
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      if (profileImage!.lengthSync() < ((1024*1024) * 2)) {
+                        showCupertinoModalPopup(context: context, builder: (context) => const UploadSuccess());
+                      } else {
+                        showCupertinoModalPopup(context: context, builder: (context) => const UploadFail());
+                      }
+                    },
                   ),
                 ),
             ],
