@@ -4,6 +4,7 @@ import 'package:deeze_app/screens/favourite/favourite_screen.dart';
 import 'package:deeze_app/screens/search/search_screen.dart';
 import 'package:deeze_app/screens/tags/tags.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/ringtone_category_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -100,6 +101,7 @@ class _DashbaordState extends State<Dashbaord> {
       "type": "RINGTONE"
     });
     try {
+      if (isRefresh) setState(() => isLoading = true);
       http.Response response = await http.get(
         uri,
         headers: {
@@ -119,7 +121,7 @@ class _DashbaordState extends State<Dashbaord> {
 
         page++;
         totalPage = rawResponse.hydraTotalItems!;
-        setState(() {});
+        setState(() => isLoading = false);
         return true;
       } else {
         return false;
@@ -132,6 +134,7 @@ class _DashbaordState extends State<Dashbaord> {
   final TextEditingController _typeAheadController = TextEditingController();
   bool ishow = false;
   int? selectedIndex;
+  bool isLoading= false;
 
   @override
   Widget build(BuildContext context) {
@@ -329,7 +332,11 @@ class _DashbaordState extends State<Dashbaord> {
                       _refreshController.loadFailed();
                     }
                   },
-                  child: ListView.builder(
+                  header: CustomHeader(builder: (context, mode) => Container()),
+                  footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                  child: isLoading
+                      ? const LoadingPage()
+                      : ListView.builder(
                     itemCount: hydraMember.length,
                     scrollDirection: Axis.vertical,
                     itemBuilder: (context, index) {
@@ -346,7 +353,7 @@ class _DashbaordState extends State<Dashbaord> {
                                       horizontal: 17),
                                   child: Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "Categories",
@@ -364,9 +371,9 @@ class _DashbaordState extends State<Dashbaord> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      const Categories(
-                                                        isRingtone: true,
-                                                      )));
+                                                  const Categories(
+                                                    isRingtone: true,
+                                                  )));
                                         }),
                                         child: Row(
                                           children: [
@@ -401,7 +408,7 @@ class _DashbaordState extends State<Dashbaord> {
                                   height: 60,
                                   width: screenWidth,
                                   child:
-                                      BlocConsumer<CategoryBloc, CategoryState>(
+                                  BlocConsumer<CategoryBloc, CategoryState>(
                                     listener: (context, state) {
                                       // TODO: implement listener
                                     },
@@ -413,7 +420,7 @@ class _DashbaordState extends State<Dashbaord> {
                                       if (state is LoadedCategory) {
                                         return Padding(
                                           padding:
-                                              const EdgeInsets.only(left: 17),
+                                          const EdgeInsets.only(left: 17),
                                           child: ListView.builder(
                                             scrollDirection: Axis.horizontal,
                                             itemCount: 4,
@@ -472,110 +479,110 @@ class _DashbaordState extends State<Dashbaord> {
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: selectedIndex == index
                             ? RingtonesCard(
-                                onNavigate: () async {
-                                  await audioPlayer.pause();
-                                  // ignore: use_build_context_synchronously
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CustomAudioPlayer(
-                                        listHydra: hydraMember,
-                                        index: index,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                onChange: (value) async {
-                                  final myposition =
-                                      Duration(seconds: value.toInt());
-                                  await audioPlayer.seek(myposition);
-                                  await audioPlayer.resume();
-                                },
-                                onTap: (() async {
-                                  // if (isPlaying) {
-                                  // } else {}
-
-                                  setState(() {
-                                    selectedIndex = index;
-                                    position = Duration.zero;
-                                  });
-
-                                  if (isPlaying) {
-                                    await audioPlayer.pause();
-                                  } else {
-                                    await audioPlayer
-                                        .play(hydraMember[index].file!);
-                                  }
-                                }),
-                                audioPlayer: selectedIndex == index
-                                    ? audioPlayer
-                                    : pausePlayer,
-                                isPlaying:
-                                    selectedIndex == index ? isPlaying : false,
-                                duration: selectedIndex == index
-                                    ? duration
-                                    : pauseDuration,
-                                position: selectedIndex == index
-                                    ? position
-                                    : pausePosition,
-                                index: index,
-                                listHydra: hydraMember,
-                                ringtoneName: hydraMember[index].name!,
-                                file: hydraMember[index].file!,
-                              )
-                            : RingtonesCard(
-                                onNavigate: () async {
-                                  await audioPlayer.pause();
-                                  // ignore: use_build_context_synchronously
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CustomAudioPlayer(
-                                        listHydra: hydraMember,
-                                        index: index,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                onChange: (value) async {
-                                  final myposition =
-                                      Duration(seconds: value.toInt());
-                                  await audioPlayer.seek(myposition);
-                                  await audioPlayer.resume();
-                                },
-                                onTap: (() async {
-                                  // if (isPlaying) {
-                                  // } else {}
-
-                                  setState(() {
-                                    selectedIndex = index;
-                                    position = Duration.zero;
-                                    isPlaying = false;
-                                  });
-                                  await audioPlayer.pause();
-                                  if (isPlaying) {
-                                    await audioPlayer.pause();
-                                  } else {
-                                    await audioPlayer
-                                        .play(hydraMember[index].file!);
-                                  }
-                                }),
-                                audioPlayer: selectedIndex == index
-                                    ? audioPlayer
-                                    : pausePlayer,
-                                isPlaying:
-                                    selectedIndex == index ? isPlaying : false,
-                                duration: selectedIndex == index
-                                    ? duration
-                                    : pauseDuration,
-                                position: selectedIndex == index
-                                    ? position
-                                    : pausePosition,
-                                index: index,
-                                listHydra: hydraMember,
-                                ringtoneName: hydraMember[index].name!,
-                                file: hydraMember[index].file!,
+                          onNavigate: () async {
+                            await audioPlayer.pause();
+                            // ignore: use_build_context_synchronously
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CustomAudioPlayer(
+                                  listHydra: hydraMember,
+                                  index: index,
+                                ),
                               ),
+                            );
+                          },
+                          onChange: (value) async {
+                            final myposition =
+                            Duration(seconds: value.toInt());
+                            await audioPlayer.seek(myposition);
+                            await audioPlayer.resume();
+                          },
+                          onTap: (() async {
+                            // if (isPlaying) {
+                            // } else {}
+
+                            setState(() {
+                              selectedIndex = index;
+                              position = Duration.zero;
+                            });
+
+                            if (isPlaying) {
+                              await audioPlayer.pause();
+                            } else {
+                              await audioPlayer
+                                  .play(hydraMember[index].file!);
+                            }
+                          }),
+                          audioPlayer: selectedIndex == index
+                              ? audioPlayer
+                              : pausePlayer,
+                          isPlaying:
+                          selectedIndex == index ? isPlaying : false,
+                          duration: selectedIndex == index
+                              ? duration
+                              : pauseDuration,
+                          position: selectedIndex == index
+                              ? position
+                              : pausePosition,
+                          index: index,
+                          listHydra: hydraMember,
+                          ringtoneName: hydraMember[index].name!,
+                          file: hydraMember[index].file!,
+                        )
+                            : RingtonesCard(
+                          onNavigate: () async {
+                            await audioPlayer.pause();
+                            // ignore: use_build_context_synchronously
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CustomAudioPlayer(
+                                  listHydra: hydraMember,
+                                  index: index,
+                                ),
+                              ),
+                            );
+                          },
+                          onChange: (value) async {
+                            final myposition =
+                            Duration(seconds: value.toInt());
+                            await audioPlayer.seek(myposition);
+                            await audioPlayer.resume();
+                          },
+                          onTap: (() async {
+                            // if (isPlaying) {
+                            // } else {}
+
+                            setState(() {
+                              selectedIndex = index;
+                              position = Duration.zero;
+                              isPlaying = false;
+                            });
+                            await audioPlayer.pause();
+                            if (isPlaying) {
+                              await audioPlayer.pause();
+                            } else {
+                              await audioPlayer
+                                  .play(hydraMember[index].file!);
+                            }
+                          }),
+                          audioPlayer: selectedIndex == index
+                              ? audioPlayer
+                              : pausePlayer,
+                          isPlaying:
+                          selectedIndex == index ? isPlaying : false,
+                          duration: selectedIndex == index
+                              ? duration
+                              : pauseDuration,
+                          position: selectedIndex == index
+                              ? position
+                              : pausePosition,
+                          index: index,
+                          listHydra: hydraMember,
+                          ringtoneName: hydraMember[index].name!,
+                          file: hydraMember[index].file!,
+                        ),
                       );
                     },
                   ),
@@ -601,7 +608,10 @@ class _DashbaordState extends State<Dashbaord> {
                             await audioPlayer.pause();
                             Scaffold.of(ctx).openDrawer();
                           },
-                          child: const AppImageAsset(image: 'assets/menu.svg'),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 15),
+                            child: AppImageAsset(image: 'assets/menu.svg'),
+                          ),
                         );
                       },
                     ),
@@ -791,7 +801,7 @@ class _DashbaordState extends State<Dashbaord> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: <Color>[
-                        Color(0xFF17131F),
+                        Color(0xFF4d047d),
                         Color(0xFF17131F),
                         Color(0xFF17131F),
                         Color(0xFF17131F),
@@ -819,7 +829,11 @@ class _DashbaordState extends State<Dashbaord> {
                       _refreshController.loadFailed();
                     }
                   },
-                  child: ListView.builder(
+                  header: CustomHeader(builder: (context, mode) => Container()),
+                  footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                  child: isLoading
+                      ? const LoadingPage()
+                      : ListView.builder(
                     itemCount: hydraMember.length,
                     scrollDirection: Axis.vertical,
                     itemBuilder: (context, index) {
@@ -836,7 +850,7 @@ class _DashbaordState extends State<Dashbaord> {
                                       horizontal: 17),
                                   child: Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "Categories",
@@ -854,9 +868,9 @@ class _DashbaordState extends State<Dashbaord> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      const Categories(
-                                                        isRingtone: true,
-                                                      )));
+                                                  const Categories(
+                                                    isRingtone: true,
+                                                  )));
                                         }),
                                         child: Row(
                                           children: [
@@ -891,7 +905,7 @@ class _DashbaordState extends State<Dashbaord> {
                                   height: 60,
                                   width: screenWidth,
                                   child:
-                                      BlocConsumer<CategoryBloc, CategoryState>(
+                                  BlocConsumer<CategoryBloc, CategoryState>(
                                     listener: (context, state) {
                                       // TODO: implement listener
                                     },
@@ -903,7 +917,7 @@ class _DashbaordState extends State<Dashbaord> {
                                       if (state is LoadedCategory) {
                                         return Padding(
                                           padding:
-                                              const EdgeInsets.only(left: 17),
+                                          const EdgeInsets.only(left: 17),
                                           child: ListView.builder(
                                             scrollDirection: Axis.horizontal,
                                             itemCount: 4,
@@ -965,110 +979,110 @@ class _DashbaordState extends State<Dashbaord> {
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: selectedIndex == index
                             ? RingtonesCard(
-                                onNavigate: () async {
-                                  await audioPlayer.pause();
-                                  // ignore: use_build_context_synchronously
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CustomAudioPlayer(
-                                        listHydra: hydraMember,
-                                        index: index,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                onChange: (value) async {
-                                  final myposition =
-                                      Duration(microseconds: value.toInt());
-                                  await audioPlayer.seek(myposition);
-                                  await audioPlayer.resume();
-                                },
-                                onTap: (() async {
-                                  // if (isPlaying) {
-                                  // } else {}
-
-                                  setState(() {
-                                    selectedIndex = index;
-                                    position = Duration.zero;
-                                  });
-
-                                  if (isPlaying) {
-                                    await audioPlayer.pause();
-                                  } else {
-                                    await audioPlayer
-                                        .play(hydraMember[index].file!);
-                                  }
-                                }),
-                                audioPlayer: selectedIndex == index
-                                    ? audioPlayer
-                                    : pausePlayer,
-                                isPlaying:
-                                    selectedIndex == index ? isPlaying : false,
-                                duration: selectedIndex == index
-                                    ? duration
-                                    : pauseDuration,
-                                position: selectedIndex == index
-                                    ? position
-                                    : pausePosition,
-                                index: index,
-                                listHydra: hydraMember,
-                                ringtoneName: hydraMember[index].name!,
-                                file: hydraMember[index].file!,
-                              )
-                            : RingtonesCard(
-                                onNavigate: () async {
-                                  await audioPlayer.pause();
-                                  // ignore: use_build_context_synchronously
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CustomAudioPlayer(
-                                        listHydra: hydraMember,
-                                        index: index,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                onChange: (value) async {
-                                  final myposition =
-                                      Duration(microseconds: value.toInt());
-                                  await audioPlayer.seek(myposition);
-                                  await audioPlayer.resume();
-                                },
-                                onTap: (() async {
-                                  // if (isPlaying) {
-                                  // } else {}
-
-                                  setState(() {
-                                    selectedIndex = index;
-                                    position = Duration.zero;
-                                    isPlaying = false;
-                                  });
-                                  await audioPlayer.pause();
-                                  if (isPlaying) {
-                                    await audioPlayer.pause();
-                                  } else {
-                                    await audioPlayer
-                                        .play(hydraMember[index].file!);
-                                  }
-                                }),
-                                audioPlayer: selectedIndex == index
-                                    ? audioPlayer
-                                    : pausePlayer,
-                                isPlaying:
-                                    selectedIndex == index ? isPlaying : false,
-                                duration: selectedIndex == index
-                                    ? duration
-                                    : pauseDuration,
-                                position: selectedIndex == index
-                                    ? position
-                                    : pausePosition,
-                                index: index,
-                                listHydra: hydraMember,
-                                ringtoneName: hydraMember[index].name!,
-                                file: hydraMember[index].file!,
+                          onNavigate: () async {
+                            await audioPlayer.pause();
+                            // ignore: use_build_context_synchronously
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CustomAudioPlayer(
+                                  listHydra: hydraMember,
+                                  index: index,
+                                ),
                               ),
+                            );
+                          },
+                          onChange: (value) async {
+                            final myposition =
+                            Duration(microseconds: value.toInt());
+                            await audioPlayer.seek(myposition);
+                            await audioPlayer.resume();
+                          },
+                          onTap: (() async {
+                            // if (isPlaying) {
+                            // } else {}
+
+                            setState(() {
+                              selectedIndex = index;
+                              position = Duration.zero;
+                            });
+
+                            if (isPlaying) {
+                              await audioPlayer.pause();
+                            } else {
+                              await audioPlayer
+                                  .play(hydraMember[index].file!);
+                            }
+                          }),
+                          audioPlayer: selectedIndex == index
+                              ? audioPlayer
+                              : pausePlayer,
+                          isPlaying:
+                          selectedIndex == index ? isPlaying : false,
+                          duration: selectedIndex == index
+                              ? duration
+                              : pauseDuration,
+                          position: selectedIndex == index
+                              ? position
+                              : pausePosition,
+                          index: index,
+                          listHydra: hydraMember,
+                          ringtoneName: hydraMember[index].name!,
+                          file: hydraMember[index].file!,
+                        )
+                            : RingtonesCard(
+                          onNavigate: () async {
+                            await audioPlayer.pause();
+                            // ignore: use_build_context_synchronously
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CustomAudioPlayer(
+                                  listHydra: hydraMember,
+                                  index: index,
+                                ),
+                              ),
+                            );
+                          },
+                          onChange: (value) async {
+                            final myposition =
+                            Duration(microseconds: value.toInt());
+                            await audioPlayer.seek(myposition);
+                            await audioPlayer.resume();
+                          },
+                          onTap: (() async {
+                            // if (isPlaying) {
+                            // } else {}
+
+                            setState(() {
+                              selectedIndex = index;
+                              position = Duration.zero;
+                              isPlaying = false;
+                            });
+                            await audioPlayer.pause();
+                            if (isPlaying) {
+                              await audioPlayer.pause();
+                            } else {
+                              await audioPlayer
+                                  .play(hydraMember[index].file!);
+                            }
+                          }),
+                          audioPlayer: selectedIndex == index
+                              ? audioPlayer
+                              : pausePlayer,
+                          isPlaying:
+                          selectedIndex == index ? isPlaying : false,
+                          duration: selectedIndex == index
+                              ? duration
+                              : pauseDuration,
+                          position: selectedIndex == index
+                              ? position
+                              : pausePosition,
+                          index: index,
+                          listHydra: hydraMember,
+                          ringtoneName: hydraMember[index].name!,
+                          file: hydraMember[index].file!,
+                        ),
                       );
                     },
                   ),

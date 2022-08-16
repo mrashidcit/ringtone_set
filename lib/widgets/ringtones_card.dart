@@ -154,21 +154,12 @@ class _RingtonesCardState extends State<RingtonesCard> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Icon(
-                            Icons.favorite_border,
-                            color: Colors.white,
-                            size: 25,
-                          ),
-                          SizedBox(
-                            height: 7,
-                          ),
+                          const AppImageAsset(image: 'assets/favourite.svg', height: 16),
+                          const SizedBox(height: 7),
                           Row(
                             children: const [
-                              Icon(
-                                Icons.arrow_downward,
-                                color: Colors.white,
-                                size: 11,
-                              ),
+                              AppImageAsset(image: 'assets/save_down.svg', height: 10),
+                              SizedBox(width: 2),
                               Text(
                                 "23k",
                                 style: TextStyle(

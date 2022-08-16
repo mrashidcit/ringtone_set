@@ -3,6 +3,7 @@ import 'package:deeze_app/bloc/deeze_bloc/wallpaper_bloc/wallpaper_bloc.dart';
 import 'package:deeze_app/screens/tags/tags.dart';
 import 'package:deeze_app/screens/wallpapers/wallpapers.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/single_wallpaper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -76,6 +77,7 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
       "type": "WALLPAPER"
     });
     try {
+      if (isRefresh) setState(() => isLoading = true);
       http.Response response = await http.get(
         uri,
         headers: {
@@ -95,7 +97,7 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
 
         page++;
         totalPage = rawResponse.hydraTotalItems!;
-        setState(() {});
+        setState(() => isLoading = false);
         return true;
       } else {
         return false;
@@ -108,6 +110,7 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
   final SearchServices _searchServices = SearchServices();
   final TextEditingController _typeAheadController = TextEditingController();
   bool ishow = false;
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -293,7 +296,11 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                               _refreshController.loadFailed();
                             }
                           },
-                          child: GridView.builder(
+                          header: CustomHeader(builder: (context, mode) => Container()),
+                          footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                          child: isLoading
+                              ? const LoadingPage()
+                              : GridView.builder(
                               itemCount: hydraMember.length,
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
@@ -534,7 +541,11 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                                 _refreshController.loadFailed();
                               }
                             },
-                            child: GridView.builder(
+                            header: CustomHeader(builder: (context, mode) => Container()),
+                            footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                            child: isLoading
+                                ? const LoadingPage()
+                                : GridView.builder(
                                 itemCount: hydraMember.length,
                                 gridDelegate:
                                     const SliverGridDelegateWithFixedCrossAxisCount(

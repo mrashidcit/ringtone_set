@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/ringtones_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
@@ -98,6 +99,7 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
       "type": "RINGTONE"
     });
     try {
+      if (isRefresh) setState(() => isLoading = true);
       http.Response response = await http.get(
         uri,
         headers: {
@@ -117,7 +119,7 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
 
         page++;
         totalPage = rawResponse.hydraTotalItems!;
-        setState(() {});
+        setState(() => isLoading = false);
         return true;
       } else {
         return false;
@@ -130,6 +132,8 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
   final SearchServices _searchServices = SearchServices();
   final TextEditingController _typeAheadController = TextEditingController();
   bool ishow = false;
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -314,7 +318,11 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                               _refreshController.loadFailed();
                             }
                           },
-                          child: ListView.builder(
+                          header: CustomHeader(builder: (context, mode) => Container()),
+                          footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                          child: isLoading
+                              ? const LoadingPage()
+                              : ListView.builder(
                             itemCount: hydraMember.length,
                             scrollDirection: Axis.vertical,
                             itemBuilder: (context, index) {
@@ -707,7 +715,11 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                               _refreshController.loadFailed();
                             }
                           },
-                          child: ListView.builder(
+                          header: CustomHeader(builder: (context, mode) => Container()),
+                          footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                          child: isLoading
+                              ? const LoadingPage()
+                              : ListView.builder(
                             itemCount: hydraMember.length,
                             scrollDirection: Axis.vertical,
                             itemBuilder: (context, index) {

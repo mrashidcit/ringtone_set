@@ -1,3 +1,4 @@
+import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -101,7 +102,7 @@ class _TagsState extends State<Tags> {
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: hydraMember.isEmpty
-                  ? Center(child: CircularProgressIndicator())
+                  ? const LoadingPage()
                   : Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(

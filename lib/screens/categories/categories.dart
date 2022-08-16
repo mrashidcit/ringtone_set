@@ -1,4 +1,5 @@
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -35,6 +36,7 @@ class _CategoriesState extends State<Categories> {
   final SearchServices _searchServices = SearchServices();
   final TextEditingController _typeAheadController = TextEditingController();
   bool ishow = false;
+  bool isLoading= false;
   int page = 1;
   late int totalPage;
   final RefreshController _refreshController =
@@ -58,6 +60,7 @@ class _CategoriesState extends State<Categories> {
       "itemsPerPage": "20",
     });
     try {
+      if (isRefresh) setState(() => isLoading = true);
       http.Response response = await http.get(
         uri,
         headers: {
@@ -77,7 +80,7 @@ class _CategoriesState extends State<Categories> {
 
         page++;
         totalPage = rawResponse.hydraTotalItems!;
-        setState(() {});
+        setState(() => isLoading = false);
         return true;
       } else {
         return false;
@@ -266,7 +269,11 @@ class _CategoriesState extends State<Categories> {
                       _refreshController.loadFailed();
                     }
                   },
-                  child: GridView.builder(
+                  header: CustomHeader(builder: (context, mode) => Container()),
+                  footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                  child: isLoading
+                      ? const LoadingPage()
+                      : GridView.builder(
                       itemCount: hydraMember.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
@@ -529,7 +536,11 @@ class _CategoriesState extends State<Categories> {
                       _refreshController.loadFailed();
                     }
                   },
-                  child: GridView.builder(
+                  header: CustomHeader(builder: (context, mode) => Container()),
+                  footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                  child: isLoading
+                      ? const LoadingPage()
+                      : GridView.builder(
                       itemCount: hydraMember.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(

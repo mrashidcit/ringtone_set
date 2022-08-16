@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -75,6 +76,7 @@ class _SearchScreenState extends State<SearchScreen> {
   bool isWallpaper = false;
   bool isNotification = false;
   bool isRingtone = true;
+  bool isLoading = false;
   List<HydraMember> ringtonelist = [];
 
   Future<bool> fetchRingtone({bool isRefresh = false}) async {
@@ -97,6 +99,7 @@ class _SearchScreenState extends State<SearchScreen> {
       "type": "RINGTONE"
     });
     try {
+      if (isRefresh) setState(() => isLoading = true);
       http.Response response = await http.get(
         uri,
         headers: {
@@ -116,7 +119,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
         ringtonePage++;
         ringtoneTotalPage = rawResponse.hydraTotalItems!;
-        setState(() {});
+        setState(() => isLoading = false);
         return true;
       } else {
         return false;
@@ -155,6 +158,7 @@ class _SearchScreenState extends State<SearchScreen> {
       "type": "WALLPAPER"
     });
     try {
+      if (isRefresh) setState(() => isLoading = true);
       http.Response response = await http.get(
         uri,
         headers: {
@@ -174,7 +178,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
         wallpaperPage++;
         wallpaperTotalPage = rawResponse.hydraTotalItems!;
-        setState(() {});
+        setState(() => isLoading = false);
         return true;
       } else {
         return false;
@@ -515,7 +519,11 @@ class _SearchScreenState extends State<SearchScreen> {
                             _wallpaperRefreshController.loadFailed();
                           }
                         },
-                        child: GridView.builder(
+                        header: CustomHeader(builder: (context, mode) => Container()),
+                        footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                        child: isLoading
+                            ? const LoadingPage()
+                            : GridView.builder(
                             itemCount: wallpaperList.length,
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
@@ -556,7 +564,11 @@ class _SearchScreenState extends State<SearchScreen> {
                           _ringtoneRefreshController.loadFailed();
                         }
                       },
-                      child: Padding(
+                      header: CustomHeader(builder: (context, mode) => Container()),
+                      footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                      child: isLoading
+                          ? const LoadingPage()
+                          : Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: ListView.builder(
                           itemCount: ringtonelist.length,

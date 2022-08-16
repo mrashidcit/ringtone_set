@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class LoadingPage extends StatelessWidget {
@@ -8,9 +7,9 @@ class LoadingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: CircularProgressIndicator(
-        color: Colors.white,
-        backgroundColor: Colors.white.withOpacity(0.2),
-        strokeWidth: 2,
+        backgroundColor: const Color(0XFFD8D8D8).withAlpha(23),
+        valueColor: const AlwaysStoppedAnimation(Color(0XFFFFFFFF)),
+        strokeWidth: 1,
       ),
     );
   }

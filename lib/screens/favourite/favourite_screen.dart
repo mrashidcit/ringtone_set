@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/ringtones_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -98,6 +99,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
       "type": "RINGTONE"
     });
     try {
+      if (isRefresh) setState(() => isLoading = true);
       http.Response response = await http.get(
         uri,
         headers: {
@@ -117,7 +119,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
 
         page++;
         totalPage = rawResponse.hydraTotalItems!;
-        setState(() {});
+        setState(() => isLoading = false);
         return true;
       } else {
         return false;
@@ -130,6 +132,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
   final SearchServices _searchServices = SearchServices();
   final TextEditingController _typeAheadController = TextEditingController();
   bool iShow = false;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -329,7 +332,11 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                               _refreshController.loadFailed();
                             }
                           },
-                          child: ListView.builder(
+                          header: CustomHeader(builder: (context, mode) => Container()),
+                          footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                          child: isLoading
+                              ? const LoadingPage()
+                              : ListView.builder(
                             itemCount: hydraMember.length,
                             scrollDirection: Axis.vertical,
                             itemBuilder: (context, index) {
@@ -718,7 +725,11 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                               _refreshController.loadFailed();
                             }
                           },
-                          child: ListView.builder(
+                          header: CustomHeader(builder: (context, mode) => Container()),
+                          footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                          child: isLoading
+                              ? const LoadingPage()
+                              : ListView.builder(
                             itemCount: hydraMember.length,
                             padding: EdgeInsets.zero,
                             scrollDirection: Axis.vertical,
