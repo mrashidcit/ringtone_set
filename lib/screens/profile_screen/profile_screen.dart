@@ -25,40 +25,37 @@ class ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size(0, 60),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: AppBar(
-            backgroundColor: const Color(0xFF4d047d),
-            elevation: 0,
-            centerTitle: true,
-            leading: Builder(
-              builder: (ctx) {
-                return GestureDetector(
-                  onTap: () => Scaffold.of(ctx).openDrawer(),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    child: AppImageAsset(image: 'assets/menu.svg'),
-                  ),
-                );
-              },
-            ),
-            title: Text(
-              'Profile',
-              style: GoogleFonts.archivo(
-                fontStyle: FontStyle.normal,
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                wordSpacing: 0.34,
-              ),
-            ),
-            actions: const [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: AppImageAsset(image: 'assets/setting.svg'),
-              ),
-            ],
+        child: AppBar(
+          backgroundColor: const Color(0xFF4d047d),
+          elevation: 0,
+          centerTitle: true,
+          leading: Builder(
+            builder: (ctx) {
+              return GestureDetector(
+                onTap: () => Scaffold.of(ctx).openDrawer(),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: AppImageAsset(image: 'assets/menu.svg'),
+                ),
+              );
+            },
           ),
+          title: Text(
+            'Profile',
+            style: GoogleFonts.archivo(
+              fontStyle: FontStyle.normal,
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              wordSpacing: 0.34,
+            ),
+          ),
+          actions: const [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              child: AppImageAsset(image: 'assets/setting.svg'),
+            ),
+          ],
         ),
       ),
       body: Container(

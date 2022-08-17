@@ -141,55 +141,55 @@ class _WallPapersState extends State<WallPapers> {
             child: Scaffold(
               appBar: PreferredSize(
                 preferredSize: Size(0, 60),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: AppBar(
-                    automaticallyImplyLeading: false,
-                    backgroundColor: const Color(0xFF4d047d),
-                    elevation: 0,
-                    centerTitle: true,
-                    title: ishow
-                        ? SizedBox(
-                            height: 43,
-                            width: MediaQuery.of(context).size.width,
-                            child: TypeAheadFormField<HydraMember?>(
-                                suggestionsBoxVerticalOffset: 0,
-                                suggestionsBoxDecoration:
-                                    const SuggestionsBoxDecoration(
-                                        color: Colors.white),
-                                suggestionsCallback: _searchServices.search,
-                                debounceDuration:
-                                    const Duration(milliseconds: 500),
-                                // hideSuggestionsOnKeyboardHide: false,
-                                textFieldConfiguration: TextFieldConfiguration(
-                                  controller: _typeAheadController,
-                                  decoration: InputDecoration(
-                                    hintText: "",
-                                    hintStyle: const TextStyle(
-                                      color: Color(0xFF5d318c),
-                                      fontSize: 12,
-                                    ),
-                                    fillColor: Colors.white,
-                                    filled: true,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 5,
-                                      horizontal: 20,
-                                    ),
-                                    focusedBorder: const OutlineInputBorder(
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(7),
-                                          topRight: Radius.circular(7)),
-                                      borderSide: BorderSide(
-                                          color: Color(0xFF5d318c), width: 0),
-                                    ),
-                                    enabledBorder: const OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(7)),
-                                      borderSide: BorderSide(
-                                          color: Color(0xFF5d318c), width: 0.0),
-                                    ),
-                                    suffixIcon: GestureDetector(
-                                      onTap: () => setState(() => ishow = false),
+                child: AppBar(
+                  automaticallyImplyLeading: false,
+                  backgroundColor: const Color(0xFF4d047d),
+                  elevation: 0,
+                  centerTitle: true,
+                  title: ishow
+                      ? SizedBox(
+                          height: 43,
+                          width: MediaQuery.of(context).size.width,
+                          child: TypeAheadFormField<HydraMember?>(
+                              suggestionsBoxVerticalOffset: 0,
+                              suggestionsBoxDecoration:
+                                  const SuggestionsBoxDecoration(
+                                      color: Colors.white),
+                              suggestionsCallback: _searchServices.search,
+                              debounceDuration:
+                                  const Duration(milliseconds: 500),
+                              // hideSuggestionsOnKeyboardHide: false,
+                              textFieldConfiguration: TextFieldConfiguration(
+                                controller: _typeAheadController,
+                                decoration: InputDecoration(
+                                  hintText: "",
+                                  hintStyle: const TextStyle(
+                                    color: Color(0xFF5d318c),
+                                    fontSize: 12,
+                                  ),
+                                  fillColor: Colors.white,
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 5,
+                                    horizontal: 20,
+                                  ),
+                                  focusedBorder: const OutlineInputBorder(
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(7),
+                                        topRight: Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                        color: Color(0xFF5d318c), width: 0),
+                                  ),
+                                  enabledBorder: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                        color: Color(0xFF5d318c), width: 0.0),
+                                  ),
+                                  suffixIcon: GestureDetector(
+                                    onTap: () => setState(() => ishow = false),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 12),
                                       child: const AppImageAsset(
                                         image: 'assets/search.svg',
                                         color: Colors.black,
@@ -197,51 +197,40 @@ class _WallPapersState extends State<WallPapers> {
                                     ),
                                   ),
                                 ),
-                                itemBuilder:
-                                    (context, HydraMember? suggestion) {
-                                  final ringtone = suggestion!;
-                                  return GestureDetector(
-                                    onTap: (() {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => SearchScreen(
-                                                  searchText:
-                                                      _typeAheadController.text,
-                                                )),
-                                      );
-                                    }),
-                                    child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 30, top: 10),
-                                        child: Text(
-                                          "${ringtone.name}",
-                                          style: GoogleFonts.archivo(
-                                            fontStyle: FontStyle.normal,
-                                            color: Color(0xFF5d318c),
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        )),
-                                  );
-                                },
-                                onSuggestionSelected:
-                                    (HydraMember? suggestion) {},
-                                noItemsFoundBuilder: (context) => Center(
+                              ),
+                              itemBuilder:
+                                  (context, HydraMember? suggestion) {
+                                final ringtone = suggestion!;
+                                return GestureDetector(
+                                  onTap: (() {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => SearchScreen(
+                                                searchText:
+                                                    _typeAheadController.text,
+                                              )),
+                                    );
+                                  }),
+                                  child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 30, top: 10),
                                       child: Text(
-                                        "No Found",
+                                        "${ringtone.name}",
                                         style: GoogleFonts.archivo(
                                           fontStyle: FontStyle.normal,
                                           color: Color(0xFF5d318c),
                                           fontSize: 18,
                                           fontWeight: FontWeight.w500,
                                         ),
-                                      ),
-                                    ),
-                                errorBuilder: (BuildContext context, error) {
-                                  return Center(
+                                      )),
+                                );
+                              },
+                              onSuggestionSelected:
+                                  (HydraMember? suggestion) {},
+                              noItemsFoundBuilder: (context) => Center(
                                     child: Text(
-                                      "Please enter ",
+                                      "No Found",
                                       style: GoogleFonts.archivo(
                                         fontStyle: FontStyle.normal,
                                         color: Color(0xFF5d318c),
@@ -249,31 +238,42 @@ class _WallPapersState extends State<WallPapers> {
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                  );
-                                }),
-                          )
-                        : Text(
-                            "Wallpapers",
-                            style: GoogleFonts.archivo(
-                              fontStyle: FontStyle.normal,
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
-                              wordSpacing: 0.34,
+                                  ),
+                              errorBuilder: (BuildContext context, error) {
+                                return Center(
+                                  child: Text(
+                                    "Please enter ",
+                                    style: GoogleFonts.archivo(
+                                      fontStyle: FontStyle.normal,
+                                      color: Color(0xFF5d318c),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                );
+                              }),
+                        )
+                      : Text(
+                          "Wallpapers",
+                          style: GoogleFonts.archivo(
+                            fontStyle: FontStyle.normal,
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            wordSpacing: 0.34,
+                          ),
+                        ),
+                  actions: [
+                    ishow
+                        ? const SizedBox.shrink()
+                        : GestureDetector(
+                            onTap: () => setState(() => ishow = true),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              child: AppImageAsset(image: 'assets/search.svg'),
                             ),
                           ),
-                    actions: [
-                      ishow
-                          ? const SizedBox.shrink()
-                          : GestureDetector(
-                              onTap: () => setState(() => ishow = true),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 15),
-                                child: AppImageAsset(image: 'assets/search.svg'),
-                              ),
-                            ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
               backgroundColor: const Color(0xFF4d047d),
@@ -487,63 +487,63 @@ class _WallPapersState extends State<WallPapers> {
             child: Scaffold(
               appBar: PreferredSize(
                 preferredSize: Size(0, 60),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: AppBar(
-                    backgroundColor: const Color(0xFF4d047d),
-                    elevation: 0,
-                    centerTitle: true,
-                    leading: Builder(
-                      builder: (ctx) {
-                        return GestureDetector(
-                          onTap: () => Scaffold.of(ctx).openDrawer(),
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 15),
-                            child: AppImageAsset(image: 'assets/menu.svg'),
-                          ),
-                        );
-                      },
-                    ),
-                    title: ishow
-                        ? SizedBox(
-                            height: 43,
-                            width: MediaQuery.of(context).size.width,
-                            child: TypeAheadField<HydraMember?>(
-                                suggestionsBoxDecoration:
-                                    const SuggestionsBoxDecoration(
-                                        color: Color(0xFF4d047d)),
-                                suggestionsCallback:
-                                    _searchServices.searchWallpers,
-                                debounceDuration:
-                                    const Duration(milliseconds: 500),
-                                // hideSuggestionsOnKeyboardHide: false,
-                                textFieldConfiguration: TextFieldConfiguration(
-                                  decoration: InputDecoration(
-                                    hintText: "",
-                                    hintStyle: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                    ),
-                                    fillColor: Color(0xFF5d318c),
-                                    filled: true,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 5,
-                                      horizontal: 20,
-                                    ),
-                                    focusedBorder: const OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(7)),
-                                      borderSide: BorderSide(
-                                          color: Color(0xFF5d318c), width: 0),
-                                    ),
-                                    enabledBorder: const OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(7)),
-                                      borderSide: BorderSide(
-                                          color: Color(0xFF5d318c), width: 0.0),
-                                    ),
-                                    suffixIcon: GestureDetector(
-                                      onTap: () => setState(() => ishow = false),
+                child: AppBar(
+                  backgroundColor: const Color(0xFF4d047d),
+                  elevation: 0,
+                  centerTitle: true,
+                  leading: Builder(
+                    builder: (ctx) {
+                      return GestureDetector(
+                        onTap: () => Scaffold.of(ctx).openDrawer(),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 15),
+                          child: AppImageAsset(image: 'assets/menu.svg'),
+                        ),
+                      );
+                    },
+                  ),
+                  title: ishow
+                      ? SizedBox(
+                          height: 43,
+                          width: MediaQuery.of(context).size.width,
+                          child: TypeAheadField<HydraMember?>(
+                              suggestionsBoxDecoration:
+                                  const SuggestionsBoxDecoration(
+                                      color: Color(0xFF4d047d)),
+                              suggestionsCallback:
+                                  _searchServices.searchWallpers,
+                              debounceDuration:
+                                  const Duration(milliseconds: 500),
+                              // hideSuggestionsOnKeyboardHide: false,
+                              textFieldConfiguration: TextFieldConfiguration(
+                                decoration: InputDecoration(
+                                  hintText: "",
+                                  hintStyle: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                  fillColor: Color(0xFF5d318c),
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 5,
+                                    horizontal: 20,
+                                  ),
+                                  focusedBorder: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                        color: Color(0xFF5d318c), width: 0),
+                                  ),
+                                  enabledBorder: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                        color: Color(0xFF5d318c), width: 0.0),
+                                  ),
+                                  suffixIcon: GestureDetector(
+                                    onTap: () => setState(() => ishow = false),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 12),
                                       child: const AppImageAsset(
                                         image: 'assets/search.svg',
                                         color: Colors.black,
@@ -551,114 +551,114 @@ class _WallPapersState extends State<WallPapers> {
                                     ),
                                   ),
                                 ),
-                                itemBuilder:
-                                    (context, HydraMember? suggestion) {
-                                  final wallpapers = suggestion!;
-                                  return GestureDetector(
-                                      onTap: (() {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                SingleWallpaper(
-                                              index: 0,
-                                              urlImage: wallpapers.file!,
-                                              userName:
-                                                  wallpapers.user!.firstName!,
-                                              userProfileUrl:
-                                                  wallpapers.user!.image,
-                                            ),
+                              ),
+                              itemBuilder:
+                                  (context, HydraMember? suggestion) {
+                                final wallpapers = suggestion!;
+                                return GestureDetector(
+                                    onTap: (() {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              SingleWallpaper(
+                                            index: 0,
+                                            urlImage: wallpapers.file!,
+                                            userName:
+                                                wallpapers.user!.firstName!,
+                                            userProfileUrl:
+                                                wallpapers.user!.image,
                                           ),
-                                        );
-                                      }),
-                                      child: wallpapers.file == null
-                                          ? Container(
-                                              width: screenWidth * 0.4,
-                                              decoration: BoxDecoration(
-                                                image: const DecorationImage(
-                                                    image: AssetImage(
-                                                      "assets/no_image.jpg",
-                                                    ),
-                                                    fit: BoxFit.fill),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              child: Align(
-                                                alignment: Alignment.bottomLeft,
-                                                child: Padding(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 10),
-                                                  child: Text(
-                                                    wallpapers.name!,
-                                                    style: const TextStyle(
-                                                      fontSize: 20,
-                                                    ),
+                                        ),
+                                      );
+                                    }),
+                                    child: wallpapers.file == null
+                                        ? Container(
+                                            width: screenWidth * 0.4,
+                                            decoration: BoxDecoration(
+                                              image: const DecorationImage(
+                                                  image: AssetImage(
+                                                    "assets/no_image.jpg",
+                                                  ),
+                                                  fit: BoxFit.fill),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: Align(
+                                              alignment: Alignment.bottomLeft,
+                                              child: Padding(
+                                                padding: const EdgeInsets
+                                                        .symmetric(
+                                                    horizontal: 10,
+                                                    vertical: 10),
+                                                child: Text(
+                                                  wallpapers.name!,
+                                                  style: const TextStyle(
+                                                    fontSize: 20,
                                                   ),
                                                 ),
                                               ),
-                                            )
-                                          : SizedBox(
-                                              width: screenWidth * 0.4,
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: CachedNetworkImage(
-                                                  fit: BoxFit.cover,
-                                                  imageUrl: wallpapers.file!,
-                                                  errorWidget: (context, url,
-                                                          error) =>
-                                                      const Icon(Icons.error),
-                                                ),
+                                            ),
+                                          )
+                                        : SizedBox(
+                                            width: screenWidth * 0.4,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: CachedNetworkImage(
+                                                fit: BoxFit.cover,
+                                                imageUrl: wallpapers.file!,
+                                                errorWidget: (context, url,
+                                                        error) =>
+                                                    const Icon(Icons.error),
                                               ),
-                                            ));
-                                },
-                                onSuggestionSelected:
-                                    (HydraMember? suggestion) {},
-                                noItemsFoundBuilder: (context) => const Center(
-                                      child: Text(
-                                        "No Found",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontFamily: 'Poppins-Regular',
-                                        ),
-                                      ),
-                                    ),
-                                errorBuilder: (BuildContext context, error) {
-                                  return const Center(
+                                            ),
+                                          ));
+                              },
+                              onSuggestionSelected:
+                                  (HydraMember? suggestion) {},
+                              noItemsFoundBuilder: (context) => const Center(
                                     child: Text(
-                                      "Please enter ",
+                                      "No Found",
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontFamily: 'Poppins-Regular',
                                       ),
                                     ),
-                                  );
-                                }),
-                          )
-                        : Text(
-                            "Wallpapers",
-                            style: GoogleFonts.archivo(
-                              fontStyle: FontStyle.normal,
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
-                              wordSpacing: 0.34,
+                                  ),
+                              errorBuilder: (BuildContext context, error) {
+                                return const Center(
+                                  child: Text(
+                                    "Please enter ",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontFamily: 'Poppins-Regular',
+                                    ),
+                                  ),
+                                );
+                              }),
+                        )
+                      : Text(
+                          "Wallpapers",
+                          style: GoogleFonts.archivo(
+                            fontStyle: FontStyle.normal,
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            wordSpacing: 0.34,
+                          ),
+                        ),
+                  actions: [
+                    ishow
+                        ? const SizedBox.shrink()
+                        : GestureDetector(
+                            onTap: () => setState(() => ishow = true),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              child: AppImageAsset(image: 'assets/search.svg'),
                             ),
                           ),
-                    actions: [
-                      ishow
-                          ? const SizedBox.shrink()
-                          : GestureDetector(
-                              onTap: () => setState(() => ishow = true),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 15),
-                                child: AppImageAsset(image: 'assets/search.svg'),
-                              ),
-                            ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
               backgroundColor: const Color(0xFF4d047d),
@@ -942,7 +942,7 @@ class _WallPapersState extends State<WallPapers> {
                           padding: const EdgeInsets.only(left: 40),
                           child: Row(
                             children: [
-                              const AppImageAsset(image: 'assets/notification.svg'),
+                              const AppImageAsset(image: 'assets/bell.svg'),
                               const SizedBox(width: 20),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),

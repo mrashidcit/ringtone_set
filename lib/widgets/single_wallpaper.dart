@@ -122,6 +122,7 @@ class _SingleWallpaperState extends State<SingleWallpaper> {
                   onTap: () {
                     showCupertinoModalPopup(
                         context: context,
+                        barrierColor: Colors.black.withOpacity(0.8),
                         builder: (context) {
                           return WallpaperSelectDialog(file: widget.urlImage);
                         });

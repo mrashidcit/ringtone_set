@@ -82,117 +82,124 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
             ],
           ),
         ),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
-          child: Column(
-            children: [
-              CarouselSlider.builder(
-                carouselController: _controller,
-                itemCount: widget.listHydra!.length,
-                itemBuilder: (context, index, realIndex) {
-                  final urlImage = widget.listHydra![index].file!;
+        child: Stack(
+          children: [
+            const AppImageAsset(image: 'assets/drop_shadow.png', height: double.infinity, fit: BoxFit.cover),
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+              child: Column(
+                children: [
+                  CarouselSlider.builder(
+                    carouselController: _controller,
+                    itemCount: widget.listHydra!.length,
+                    itemBuilder: (context, index, realIndex) {
+                      final urlImage = widget.listHydra![index].file!;
 
-                  // file = index == 0
-                  //     ? widget.listHydra![0].file!
-                  //     : widget.listHydra![index - 1].file!;
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      buildImage(
-                        urlImage: urlImage,
-                        index: index,
-                        userName: widget.listHydra![index].user!.firstName!,
-                        userProfileUrl: widget.listHydra![index].user!.image,
-                      ),
-                      const SizedBox(height: 10),
-                      if(activeIndex == index)
-                        Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // file = index == 0
+                      //     ? widget.listHydra![0].file!
+                      //     : widget.listHydra![index - 1].file!;
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Row(
-                            children: [
-                              widget.listHydra![activeIndex].user!.image != null
-                                  ? CircleAvatar(
-                                      radius: 15,
-                                      backgroundImage: NetworkImage(
-                                        widget.listHydra![activeIndex].user!.image!,
-                                      ),
-                                    )
-                                  : const CircleAvatar(
-                                      backgroundColor: Colors.grey,
-                                      radius: 15,
-                                    ),
-                              const SizedBox(width: 15),
-                              Text(
-                                widget.listHydra![activeIndex].user!.firstName!,
-                                style: GoogleFonts.archivo(
-                                  fontStyle: FontStyle.normal,
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  wordSpacing: -0.05,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
+                          buildImage(
+                            urlImage: urlImage,
+                            index: index,
+                            userName: widget.listHydra![index].user!.firstName!,
+                            userProfileUrl: widget.listHydra![index].user!.image,
                           ),
-                          Row(
+                          if (activeIndex == index) const SizedBox(height: 10),
+                          if (activeIndex == index)
+                            Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const AppImageAsset(
-                                image: 'assets/arrow.svg',
-                                height: 8,
-                                width: 8,
-                                fit: BoxFit.fill,
+                              Row(
+                                children: [
+                                  widget.listHydra![activeIndex].user!.image != null
+                                      ? CircleAvatar(
+                                          radius: 15,
+                                          backgroundImage: NetworkImage(
+                                            widget.listHydra![activeIndex].user!.image!,
+                                          ),
+                                        )
+                                      : const CircleAvatar(
+                                          backgroundColor: Colors.grey,
+                                          radius: 15,
+                                        ),
+                                  const SizedBox(width: 15),
+                                  Text(
+                                    widget.listHydra![activeIndex].user!.firstName!,
+                                    style: GoogleFonts.archivo(
+                                      fontStyle: FontStyle.normal,
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      wordSpacing: -0.05,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 2),
-                              Text(
-                                "23k",
-                                style: GoogleFonts.archivo(
-                                  fontSize: 11,
-                                  fontStyle: FontStyle.normal,
-                                  color: Colors.white,
-                                ),
+                              Row(
+                                children: [
+                                  const AppImageAsset(
+                                    image: 'assets/arrow.svg',
+                                    height: 8,
+                                    width: 8,
+                                    fit: BoxFit.fill,
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    "23k",
+                                    style: GoogleFonts.archivo(
+                                      fontSize: 11,
+                                      fontStyle: FontStyle.normal,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ],
-                      ),
-                    ],
-                  );
-                },
-                options: CarouselOptions(
-                    height: 650,
-                    viewportFraction: 0.75,
-                    enableInfiniteScroll: false,
-                    pageSnapping: true,
-                    enlargeCenterPage: true,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        file = widget.listHydra![index].file!;
-                        activeIndex = index;
-                      });
-                    }),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const AppImageAsset(image: 'assets/dot.svg', color: Colors.white, height: 6),
-                  const SizedBox(width: 30),
-                  GestureDetector(
-                    onTap: () {
-                      showCupertinoModalPopup(
-                        context: context,
-                        builder: (context) => WallpaperSelectDialog(file: file),
                       );
                     },
-                    child: const AppImageAsset(image: 'assets/wallpaper_down.svg', height: 50),
+                    options: CarouselOptions(
+                      height: MediaQuery.of(context).size.height * 0.9,
+                      viewportFraction: 0.75,
+                      enableInfiniteScroll: false,
+                      pageSnapping: true,
+                      enlargeCenterPage: true,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          file = widget.listHydra![index].file!;
+                          activeIndex = index;
+                        });
+                      },
+                    ),
                   ),
-                  const SizedBox(width: 30),
-                  const AppImageAsset(image: 'assets/share.svg', color: Colors.white, height: 18),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const AppImageAsset(image: 'assets/dot.svg', color: Colors.white, height: 6),
+                      const SizedBox(width: 30),
+                      GestureDetector(
+                        onTap: () {
+                          showCupertinoModalPopup(
+                            context: context,
+                            barrierColor: Colors.black.withOpacity(0.8),
+                            builder: (context) => WallpaperSelectDialog(file: file),
+                          );
+                        },
+                        child: const AppImageAsset(image: 'assets/wallpaper_down.svg', height: 50),
+                      ),
+                      const SizedBox(width: 30),
+                      const AppImageAsset(image: 'assets/share.svg', color: Colors.white, height: 18),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -345,10 +352,9 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                   child: Container(
                     width: 180,
                     alignment: Alignment.centerLeft,
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.grey,
-                      size: 30,
+                    child: const AppImageAsset(
+                      image: 'assets/bakward_arrow.svg',
+                      height: 20,
                     ),
                   ),
                 ),
@@ -548,37 +554,47 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                       Navigator.of(context).pop();
                     }
                   },
-                  child: Container(
-                    height: 50,
-                    width: 180,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: const LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: <Color>[
-                          Color(0xFF3C99CA),
-                          Color(0xFF7541A0),
-                        ],
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const AppImageAsset(image: 'assets/save_down.svg', height: 14),
-                        const SizedBox(width: 20),
-                        Text(
-                          'SAVE TO MEDIA',
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
+                  child :Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        height: 50,
+                        width: 180,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          gradient: const LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: <Color>[
+                              Color(0xFF3C99CA),
+                              Color(0xFF7541A0),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const AppImageAsset(image: 'assets/save_down.svg', height: 14),
+                            const SizedBox(width: 20),
+                            Text(
+                              'SAVE TO MEDIA',
+                              style: GoogleFonts.archivo(
+                                fontStyle: FontStyle.normal,
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Positioned(
+                        top: -6,
+                        right: -10,
+                        child: AppImageAsset(image: 'assets/premium_badge.svg'),
+                      ),
+                    ],
                   ),
                 ),
               ],

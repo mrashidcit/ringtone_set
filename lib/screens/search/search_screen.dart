@@ -193,103 +193,89 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size(0, 60),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: AppBar(
-              automaticallyImplyLeading: false,
-              backgroundColor: const Color(0xFF4d047d),
-              elevation: 0,
-              centerTitle: true,
-              title: SizedBox(
-                height: 43,
-                width: MediaQuery.of(context).size.width,
-                child: TypeAheadFormField<HydraMember?>(
-                    suggestionsBoxVerticalOffset: 0,
-                    suggestionsBoxDecoration:
-                        const SuggestionsBoxDecoration(color: Colors.white),
-                    suggestionsCallback: _searchServices.search,
-                    debounceDuration: const Duration(milliseconds: 500),
-                    // hideSuggestionsOnKeyboardHide: false,
-                    textFieldConfiguration: TextFieldConfiguration(
-                      controller: _typeAheadController,
-                      decoration: const InputDecoration(
-                        hintText: "",
-                        hintStyle: TextStyle(
-                          color: Color(0xFF5d318c),
-                          fontSize: 12,
-                        ),
-                        fillColor: Colors.white,
-                        filled: true,
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: 5,
-                          horizontal: 20,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(7),
-                              topRight: Radius.circular(7)),
-                          borderSide:
-                              BorderSide(color: Color(0xFF5d318c), width: 0),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(7)),
-                          borderSide:
-                              BorderSide(color: Color(0xFF5d318c), width: 0.0),
-                        ),
-                        suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 15.0),
-                          child: AppImageAsset(
-                            image: 'assets/search.svg',
-                            height: 10,
-                            width: 10,
-                            fit: BoxFit.fill,
-                            color: Colors.black,
-                          ),
+        child: AppBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: const Color(0xFF4d047d),
+            elevation: 0,
+            centerTitle: true,
+            title: SizedBox(
+              height: 43,
+              width: MediaQuery.of(context).size.width,
+              child: TypeAheadFormField<HydraMember?>(
+                  suggestionsBoxVerticalOffset: 0,
+                  suggestionsBoxDecoration:
+                      const SuggestionsBoxDecoration(color: Colors.white),
+                  suggestionsCallback: _searchServices.search,
+                  debounceDuration: const Duration(milliseconds: 500),
+                  // hideSuggestionsOnKeyboardHide: false,
+                  textFieldConfiguration: TextFieldConfiguration(
+                    controller: _typeAheadController,
+                    decoration: const InputDecoration(
+                      hintText: "",
+                      hintStyle: TextStyle(
+                        color: Color(0xFF5d318c),
+                        fontSize: 12,
+                      ),
+                      fillColor: Colors.white,
+                      filled: true,
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 5,
+                        horizontal: 20,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(7),
+                            topRight: Radius.circular(7)),
+                        borderSide:
+                            BorderSide(color: Color(0xFF5d318c), width: 0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(7)),
+                        borderSide:
+                            BorderSide(color: Color(0xFF5d318c), width: 0.0),
+                      ),
+                      suffixIcon: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 15.0),
+                        child: AppImageAsset(
+                          image: 'assets/search.svg',
+                          height: 10,
+                          width: 10,
+                          fit: BoxFit.fill,
+                          color: Colors.black,
                         ),
                       ),
                     ),
-                    itemBuilder: (context, HydraMember? suggestion) {
-                      final ringtone = suggestion!;
-                      return GestureDetector(
-                        onTap: (() {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SearchScreen(
-                                searchText: _typeAheadController.text,
-                              ),
+                  ),
+                  itemBuilder: (context, HydraMember? suggestion) {
+                    final ringtone = suggestion!;
+                    return GestureDetector(
+                      onTap: (() {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SearchScreen(
+                              searchText: _typeAheadController.text,
                             ),
-                          );
-                        }),
-                        child: Padding(
-                            padding: const EdgeInsets.only(left: 30, top: 10),
-                            child: Text(
-                              "${ringtone.name}",
-                              style: GoogleFonts.archivo(
-                                fontStyle: FontStyle.normal,
-                                color: const Color(0xFF5d318c),
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            )),
-                      );
-                    },
-                    onSuggestionSelected: (HydraMember? suggestion) {},
-                    noItemsFoundBuilder: (context) => Center(
+                          ),
+                        );
+                      }),
+                      child: Padding(
+                          padding: const EdgeInsets.only(left: 30, top: 10),
                           child: Text(
-                            "No Found",
+                            "${ringtone.name}",
                             style: GoogleFonts.archivo(
                               fontStyle: FontStyle.normal,
                               color: const Color(0xFF5d318c),
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
-                          ),
-                        ),
-                    errorBuilder: (BuildContext context, error) {
-                      return Center(
+                          )),
+                    );
+                  },
+                  onSuggestionSelected: (HydraMember? suggestion) {},
+                  noItemsFoundBuilder: (context) => Center(
                         child: Text(
-                          "Please enter ",
+                          "No Found",
                           style: GoogleFonts.archivo(
                             fontStyle: FontStyle.normal,
                             color: const Color(0xFF5d318c),
@@ -297,10 +283,21 @@ class _SearchScreenState extends State<SearchScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                      );
-                    }),
-              )),
-        ),
+                      ),
+                  errorBuilder: (BuildContext context, error) {
+                    return Center(
+                      child: Text(
+                        "Please enter ",
+                        style: GoogleFonts.archivo(
+                          fontStyle: FontStyle.normal,
+                          color: const Color(0xFF5d318c),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    );
+                  }),
+            )),
       ),
       body: Container(
         decoration: const BoxDecoration(

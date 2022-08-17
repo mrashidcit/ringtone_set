@@ -308,37 +308,47 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                       Navigator.of(context).pop();
                     }
                   },
-                  child: Container(
-                    height: 50,
-                    width: 180,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: const LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: <Color>[
-                          Color(0xFF7209b7),
-                          Color(0xFF5c3fcc),
-                        ],
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const AppImageAsset(image: 'assets/save_down.svg', height: 14),
-                        const SizedBox(width: 20),
-                        Text(
-                          'SAVE TO MEDIA',
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        height: 50,
+                        width: 180,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          gradient: const LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: <Color>[
+                              Color(0xFF7209b7),
+                              Color(0xFF5c3fcc),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const AppImageAsset(image: 'assets/save_down.svg', height: 14),
+                            const SizedBox(width: 20),
+                            Text(
+                              'SAVE TO MEDIA',
+                              style: GoogleFonts.archivo(
+                                fontStyle: FontStyle.normal,
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Positioned(
+                        top: -6,
+                        right: -10,
+                        child: AppImageAsset(image: 'assets/premium_badge.svg'),
+                      ),
+                    ],
                   ),
                 ),
               ],

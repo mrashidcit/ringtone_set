@@ -145,122 +145,108 @@ class _DashbaordState extends State<Dashbaord> {
             child: Scaffold(
               appBar: PreferredSize(
                 preferredSize: const Size(0, 60),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: AppBar(
-                    automaticallyImplyLeading: false,
-                    backgroundColor: const Color(0xFF4d047d),
-                    elevation: 0,
-                    centerTitle: true,
-                    title: ishow
-                        ? SizedBox(
-                            height: 43,
-                            width: MediaQuery.of(context).size.width,
-                            child: TypeAheadFormField<HydraMember?>(
-                                suggestionsBoxVerticalOffset: 0,
-                                suggestionsBoxDecoration:
-                                    const SuggestionsBoxDecoration(
-                                        borderRadius: BorderRadius.only(
-                                            bottomLeft: Radius.circular(7),
-                                            bottomRight: Radius.circular(7)),
-                                        color: Colors.white),
-                                suggestionsCallback: _searchServices.search,
-                                debounceDuration:
-                                    const Duration(milliseconds: 500),
-                                // hideSuggestionsOnKeyboardHide: false,
-                                textFieldConfiguration: TextFieldConfiguration(
-                                  controller: _typeAheadController,
-                                  decoration: InputDecoration(
-                                    hintText: "",
-                                    hintStyle: const TextStyle(
-                                      color: Color(0xFF5d318c),
-                                      fontSize: 12,
-                                    ),
-                                    fillColor: Colors.white,
-                                    filled: true,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 5,
-                                      horizontal: 35,
-                                    ),
-                                    focusedBorder: const OutlineInputBorder(
+                child: AppBar(
+                  automaticallyImplyLeading: false,
+                  backgroundColor: const Color(0xFF4d047d),
+                  elevation: 0,
+                  centerTitle: true,
+                  title: ishow
+                      ? SizedBox(
+                          height: 43,
+                          width: MediaQuery.of(context).size.width,
+                          child: TypeAheadFormField<HydraMember?>(
+                              suggestionsBoxVerticalOffset: 0,
+                              suggestionsBoxDecoration:
+                                  const SuggestionsBoxDecoration(
                                       borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(7),
-                                          topRight: Radius.circular(7)),
-                                      borderSide: BorderSide(
-                                          color: Color(0xFF5d318c), width: 0),
-                                    ),
-                                    enabledBorder: const OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(7)),
-                                      borderSide: BorderSide(
-                                          color: Color(0xFF5d318c), width: 0.0),
-                                    ),
-                                    suffixIcon: GestureDetector(
-                                      onTap: (() {
-                                        setState(() {
-                                          ishow = false;
-                                        });
-                                      }),
-                                      child: const Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 15.0),
-                                        child: AppImageAsset(
-                                          image: 'assets/search.svg',
-                                          height: 10,
-                                          width: 10,
-                                          fit: BoxFit.fill,
-                                          color: Colors.black,
-                                        ),
+                                          bottomLeft: Radius.circular(7),
+                                          bottomRight: Radius.circular(7)),
+                                      color: Colors.white),
+                              suggestionsCallback: _searchServices.search,
+                              debounceDuration:
+                                  const Duration(milliseconds: 500),
+                              // hideSuggestionsOnKeyboardHide: false,
+                              textFieldConfiguration: TextFieldConfiguration(
+                                controller: _typeAheadController,
+                                decoration: InputDecoration(
+                                  hintText: "",
+                                  hintStyle: const TextStyle(
+                                    color: Color(0xFF5d318c),
+                                    fontSize: 12,
+                                  ),
+                                  fillColor: Colors.white,
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 5,
+                                    horizontal: 35,
+                                  ),
+                                  focusedBorder: const OutlineInputBorder(
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(7),
+                                        topRight: Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                        color: Color(0xFF5d318c), width: 0),
+                                  ),
+                                  enabledBorder: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                        color: Color(0xFF5d318c), width: 0.0),
+                                  ),
+                                  suffixIcon: GestureDetector(
+                                    onTap: (() {
+                                      setState(() {
+                                        ishow = false;
+                                      });
+                                    }),
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 15.0),
+                                      child: AppImageAsset(
+                                        image: 'assets/search.svg',
+                                        height: 10,
+                                        width: 10,
+                                        fit: BoxFit.fill,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),
                                 ),
-                                itemBuilder:
-                                    (context, HydraMember? suggestion) {
-                                  final ringtone = suggestion!;
-                                  return GestureDetector(
-                                    onTap: (() {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => SearchScreen(
-                                            searchText:
-                                                _typeAheadController.text,
-                                          ),
-                                        ),
-                                      );
-                                    }),
-                                    child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 30, top: 15),
-                                        child: Text(
-                                          "${ringtone.name}",
-                                          style: GoogleFonts.archivo(
-                                            fontStyle: FontStyle.normal,
-                                            color: Colors.grey,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        )),
-                                  );
-                                },
-                                onSuggestionSelected:
-                                    (HydraMember? suggestion) {},
-                                noItemsFoundBuilder: (context) => Center(
-                                      child: Text(
-                                        "No Found",
-                                        style: GoogleFonts.archivo(
-                                          fontStyle: FontStyle.normal,
-                                          color: const Color(0xFF5d318c),
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500,
+                              ),
+                              itemBuilder:
+                                  (context, HydraMember? suggestion) {
+                                final ringtone = suggestion!;
+                                return GestureDetector(
+                                  onTap: (() {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SearchScreen(
+                                          searchText:
+                                              _typeAheadController.text,
                                         ),
                                       ),
-                                    ),
-                                errorBuilder: (BuildContext context, error) {
-                                  return Center(
+                                    );
+                                  }),
+                                  child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 30, top: 15),
+                                      child: Text(
+                                        "${ringtone.name}",
+                                        style: GoogleFonts.archivo(
+                                          fontStyle: FontStyle.normal,
+                                          color: Colors.grey,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      )),
+                                );
+                              },
+                              onSuggestionSelected:
+                                  (HydraMember? suggestion) {},
+                              noItemsFoundBuilder: (context) => Center(
                                     child: Text(
-                                      "Please enter ",
+                                      "No Found",
                                       style: GoogleFonts.archivo(
                                         fontStyle: FontStyle.normal,
                                         color: const Color(0xFF5d318c),
@@ -268,32 +254,43 @@ class _DashbaordState extends State<Dashbaord> {
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                  );
-                                }),
-                          )
-                        : Text(
-                            "Ringtones",
-                            style: GoogleFonts.archivo(
-                              fontStyle: FontStyle.normal,
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
-                              wordSpacing: 0.34,
+                                  ),
+                              errorBuilder: (BuildContext context, error) {
+                                return Center(
+                                  child: Text(
+                                    "Please enter ",
+                                    style: GoogleFonts.archivo(
+                                      fontStyle: FontStyle.normal,
+                                      color: const Color(0xFF5d318c),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                );
+                              }),
+                        )
+                      : Text(
+                          "Ringtones",
+                          style: GoogleFonts.archivo(
+                            fontStyle: FontStyle.normal,
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            wordSpacing: 0.34,
+                          ),
+                        ),
+                  actions: [
+                    ishow
+                        ? const SizedBox.shrink()
+                        : GestureDetector(
+                            onTap: () => setState(() => ishow = true),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              child:
+                                  AppImageAsset(image: 'assets/search.svg'),
                             ),
                           ),
-                    actions: [
-                      ishow
-                          ? const SizedBox.shrink()
-                          : GestureDetector(
-                              onTap: () => setState(() => ishow = true),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 15),
-                                child:
-                                    AppImageAsset(image: 'assets/search.svg'),
-                              ),
-                            ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
               backgroundColor: const Color(0xFF4d047d),
@@ -595,66 +592,66 @@ class _DashbaordState extends State<Dashbaord> {
             child: Scaffold(
               appBar: PreferredSize(
                 preferredSize: const Size(0, 60),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: AppBar(
-                    backgroundColor: const Color(0xFF4d047d),
-                    elevation: 0,
-                    centerTitle: true,
-                    leading: Builder(
-                      builder: (ctx) {
-                        return GestureDetector(
-                          onTap: () async {
-                            await audioPlayer.pause();
-                            Scaffold.of(ctx).openDrawer();
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 15),
-                            child: AppImageAsset(image: 'assets/menu.svg'),
-                          ),
-                        );
-                      },
-                    ),
-                    title: ishow
-                        ? SizedBox(
-                            height: 43,
-                            width: MediaQuery.of(context).size.width,
-                            child: TypeAheadField<HydraMember?>(
-                                suggestionsBoxDecoration:
-                                    const SuggestionsBoxDecoration(
-                                        color: Color(0xFF4d047d)),
-                                suggestionsCallback:
-                                    _searchServices.searchRingtone,
-                                debounceDuration:
-                                    const Duration(milliseconds: 500),
-                                // hideSuggestionsOnKeyboardHide: false,
-                                textFieldConfiguration: TextFieldConfiguration(
-                                  decoration: InputDecoration(
-                                    hintText: "",
-                                    hintStyle: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                    ),
-                                    fillColor: const Color(0xFF5d318c),
-                                    filled: true,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 5,
-                                      horizontal: 20,
-                                    ),
-                                    focusedBorder: const OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(7)),
-                                      borderSide: BorderSide(
-                                          color: Color(0xFF5d318c), width: 0),
-                                    ),
-                                    enabledBorder: const OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(7)),
-                                      borderSide: BorderSide(
-                                          color: Color(0xFF5d318c), width: 0.0),
-                                    ),
-                                    suffixIcon: GestureDetector(
-                                      onTap: () => setState(() => ishow = false),
+                child: AppBar(
+                  backgroundColor: const Color(0xFF4d047d),
+                  elevation: 0,
+                  centerTitle: true,
+                  leading: Builder(
+                    builder: (ctx) {
+                      return GestureDetector(
+                        onTap: () async {
+                          await audioPlayer.pause();
+                          Scaffold.of(ctx).openDrawer();
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 15),
+                          child: AppImageAsset(image: 'assets/menu.svg'),
+                        ),
+                      );
+                    },
+                  ),
+                  title: ishow
+                      ? SizedBox(
+                          height: 43,
+                          width: MediaQuery.of(context).size.width,
+                          child: TypeAheadField<HydraMember?>(
+                              suggestionsBoxDecoration:
+                                  const SuggestionsBoxDecoration(
+                                      color: Color(0xFF4d047d)),
+                              suggestionsCallback:
+                                  _searchServices.searchRingtone,
+                              debounceDuration:
+                                  const Duration(milliseconds: 500),
+                              // hideSuggestionsOnKeyboardHide: false,
+                              textFieldConfiguration: TextFieldConfiguration(
+                                decoration: InputDecoration(
+                                  hintText: "",
+                                  hintStyle: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                  fillColor: const Color(0xFF5d318c),
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 5,
+                                    horizontal: 20,
+                                  ),
+                                  focusedBorder: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                        color: Color(0xFF5d318c), width: 0),
+                                  ),
+                                  enabledBorder: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(7)),
+                                    borderSide: BorderSide(
+                                        color: Color(0xFF5d318c), width: 0.0),
+                                  ),
+                                  suffixIcon: GestureDetector(
+                                    onTap: () => setState(() => ishow = false),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 12),
                                       child: const AppImageAsset(
                                         image: 'assets/search.svg',
                                         color: Colors.black,
@@ -662,135 +659,135 @@ class _DashbaordState extends State<Dashbaord> {
                                     ),
                                   ),
                                 ),
-                                itemBuilder:
-                                    (context, HydraMember? suggestion) {
-                                  final ringtone = suggestion!;
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 20),
-                                    child: Container(
-                                        height: 65,
-                                        width: screenWidth,
-                                        decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
-                                              begin: Alignment.centerLeft,
-                                              end: Alignment.centerRight,
-                                              colors: [
-                                                Color(0xFF279A88),
-                                                Color(0xFF737B64),
-                                                Color(0xFF4F4C7E),
-                                                Color(0xFF4F4C7E),
-                                              ]),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    height: 35,
-                                                    width: 35,
-                                                    alignment: Alignment.center,
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: Color(0xFF798975),
-                                                    ),
-                                                    child: const Icon(
-                                                      Icons.play_arrow_sharp,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 15,
-                                                  ),
-                                                  Text(
-                                                    ringtone.name!,
-                                                    style: GoogleFonts.archivo(
-                                                      fontStyle:
-                                                          FontStyle.normal,
-                                                      color: Colors.white,
-                                                      fontSize: 18,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Column(
-                                                children: [
-                                                  const AppImageAsset(image: 'assets/favourite_fill.svg', height: 30),
-                                                  Row(
-                                                    children: const [
-                                                      Icon(
-                                                        Icons.arrow_downward,
-                                                        color: Colors.white,
-                                                        size: 15,
-                                                      ),
-                                                      Text(
-                                                        "23k",
-                                                        style: TextStyle(
-                                                          fontSize: 15,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        )),
-                                  );
-                                },
-                                onSuggestionSelected:
-                                    (HydraMember? suggestion) {},
-                                noItemsFoundBuilder: (context) => const Center(
-                                      child: Text(
-                                        "No Found",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontFamily: 'Poppins-Regular',
-                                        ),
+                              ),
+                              itemBuilder:
+                                  (context, HydraMember? suggestion) {
+                                final ringtone = suggestion!;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 20),
+                                  child: Container(
+                                      height: 65,
+                                      width: screenWidth,
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
+                                            colors: [
+                                              Color(0xFF279A88),
+                                              Color(0xFF737B64),
+                                              Color(0xFF4F4C7E),
+                                              Color(0xFF4F4C7E),
+                                            ]),
+                                        borderRadius:
+                                            BorderRadius.circular(10),
                                       ),
-                                    ),
-                                errorBuilder: (BuildContext context, error) {
-                                  return const Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 35,
+                                                  width: 35,
+                                                  alignment: Alignment.center,
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: Color(0xFF798975),
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.play_arrow_sharp,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  width: 15,
+                                                ),
+                                                Text(
+                                                  ringtone.name!,
+                                                  style: GoogleFonts.archivo(
+                                                    fontStyle:
+                                                        FontStyle.normal,
+                                                    color: Colors.white,
+                                                    fontSize: 18,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Column(
+                                              children: [
+                                                const AppImageAsset(image: 'assets/favourite_fill.svg', height: 30),
+                                                Row(
+                                                  children: const [
+                                                    Icon(
+                                                      Icons.arrow_downward,
+                                                      color: Colors.white,
+                                                      size: 15,
+                                                    ),
+                                                    Text(
+                                                      "23k",
+                                                      style: TextStyle(
+                                                        fontSize: 15,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      )),
+                                );
+                              },
+                              onSuggestionSelected:
+                                  (HydraMember? suggestion) {},
+                              noItemsFoundBuilder: (context) => const Center(
                                     child: Text(
-                                      "Please enter ",
+                                      "No Found",
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontFamily: 'Poppins-Regular',
                                       ),
                                     ),
-                                  );
-                                }),
-                          )
-                        : Text(
-                            "Ringtones",
-                            style: GoogleFonts.archivo(
-                              fontStyle: FontStyle.normal,
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
-                              wordSpacing: 0.34,
+                                  ),
+                              errorBuilder: (BuildContext context, error) {
+                                return const Center(
+                                  child: Text(
+                                    "Please enter ",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontFamily: 'Poppins-Regular',
+                                    ),
+                                  ),
+                                );
+                              }),
+                        )
+                      : Text(
+                          "Ringtones",
+                          style: GoogleFonts.archivo(
+                            fontStyle: FontStyle.normal,
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            wordSpacing: 0.34,
+                          ),
+                        ),
+                  actions: [
+                    ishow
+                        ? const SizedBox.shrink()
+                        : GestureDetector(
+                            onTap: () => setState(() => ishow = true),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              child: AppImageAsset(image: 'assets/search.svg'),
                             ),
                           ),
-                    actions: [
-                      ishow
-                          ? const SizedBox.shrink()
-                          : GestureDetector(
-                              onTap: () => setState(() => ishow = true),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 15),
-                                child: AppImageAsset(image: 'assets/search.svg'),
-                              ),
-                            ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
               backgroundColor: const Color(0xFF4d047d),
@@ -1370,27 +1367,29 @@ class _DashbaordState extends State<Dashbaord> {
   }
 
   Future<bool> _onWillPop() async {
-    return (await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Are you sure?'),
-            content: const Text('Do you want to exit an App'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('No'),
-              ),
-              TextButton(
-                onPressed: () {
-                  SystemNavigator.pop();
-                  audioPlayer.pause();
-                  audioPlayer.dispose();
-                },
-                child: const Text('Yes'),
-              ),
-            ],
-          ),
-        )) ??
-        false;
+    ishow
+        ? setState(() => ishow = false)
+        : await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Are you sure?'),
+              content: const Text('Do you want to exit an App'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('No'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    SystemNavigator.pop();
+                    audioPlayer.pause();
+                    audioPlayer.dispose();
+                  },
+                  child: const Text('Yes'),
+                ),
+              ],
+            ),
+          );
+    return false;
   }
 }
