@@ -107,6 +107,12 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                             index: index,
                             userName: widget.listHydra![index].user!.firstName!,
                             userProfileUrl: widget.listHydra![index].user!.image,
+                            isFavourite: widget.listHydra![index].isFavourite,
+                            onTap: () {
+                              setState(() {
+                                widget.listHydra![index].isFavourite = !widget.listHydra![index].isFavourite;
+                              });
+                            },
                           ),
                           if (activeIndex == index) const SizedBox(height: 10),
                           if (activeIndex == index)
@@ -210,6 +216,8 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
     required int index,
     required String userName,
     String? userProfileUrl,
+    bool isFavourite= false,
+    required GestureTapCallback onTap
   }) {
     return SizedBox(
       height: 500,
@@ -228,14 +236,19 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
             ),
           ),
           activeIndex == index
-              ? const Padding(
-                  padding: EdgeInsets.only(bottom: 15, right: 10),
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: AppImageAsset(
-                      image: 'assets/favourite.svg',
-                      height: 16,
-                    ),
+              ? GestureDetector(
+                  onTap:  onTap,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 15, right: 15),
+                    child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: isFavourite
+                            ? const AppImageAsset(image: "assets/favourite.svg")
+                            : const AppImageAsset(
+                                image: "assets/favourite_fill.svg",
+                                height: 17,
+                                width: 17,
+                              )),
                   ),
                 )
               : const SizedBox.shrink()

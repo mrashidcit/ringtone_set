@@ -47,6 +47,7 @@ class HydraMember {
     this.categories,
     this.tags,
     this.enabled = true,
+    this.isFavourite = false,
   });
 
   int? id;
@@ -57,6 +58,7 @@ class HydraMember {
   List<String>? categories;
   List<String>? tags;
   bool enabled;
+  bool isFavourite;
 
   factory HydraMember.fromJson(Map<String, dynamic> json) => HydraMember(
         id: json["id"],
@@ -67,6 +69,7 @@ class HydraMember {
         categories: List<String>.from(json["categories"].map((x) => x)),
         tags: List<String>.from(json["tags"].map((x) => x)),
         enabled: json["enabled"],
+        isFavourite: json["isFavourite"] ?? false,
       );
 }
 

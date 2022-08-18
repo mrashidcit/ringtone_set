@@ -180,6 +180,13 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                                     .play(widget.listHydra[index].file!);
                               }
                             }),
+                            onTapFavourite: () {
+                              setState(() {
+                                widget.listHydra[index].isFavourite =
+                                !widget.listHydra[index].isFavourite;
+                              });
+                            },
+                            isFavourite: widget.listHydra[index].isFavourite,
                             audioPlayer: activeIndex == index
                                 ? audioPlayer
                                 : pausePlayer,
@@ -196,14 +203,22 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                             userProfileUrl: widget.listHydra[index].user!.image,
                           )
                               : BuildPlay(
-                            onChange: (value) async {
-                              final myposition = Duration(microseconds: value.toInt());
-                              await audioPlayer.seek(myposition);
-                              await audioPlayer.resume();
-                            },
-                            onTap: (() async {
-                              // if (isPlaying) {
-                              // } else {}
+                                  onChange: (value) async {
+                                    final myposition = Duration(microseconds: value.toInt());
+                                    await audioPlayer.seek(myposition);
+                                    await audioPlayer.resume();
+                                  },
+                                  onTapFavourite: () {
+                                    setState(() {
+                                      widget.listHydra[index].isFavourite =
+                                          !widget.listHydra[index].isFavourite;
+                                    });
+                                  },
+                                  isFavourite:
+                                      widget.listHydra[index].isFavourite,
+                                  onTap: (() async {
+                                    // if (isPlaying) {
+                                    // } else {}
 
                               if (isPlaying) {
                                 await audioPlayer.pause();
@@ -400,8 +415,9 @@ class BuildPlay extends StatefulWidget {
   Duration? position;
   final AudioPlayer audioPlayer;
   bool isPlaying;
+  bool isFavourite;
   final VoidCallback onTap;
-
+  final VoidCallback onTapFavourite;
   final Function(double) onChange;
 
   BuildPlay(
@@ -411,12 +427,14 @@ class BuildPlay extends StatefulWidget {
       required this.audioPlayer,
       required this.isPlaying,
       required this.onTap,
+      required this.onTapFavourite,
       required this.onChange,
       required this.file,
       required this.name,
       required this.index,
       required this.userName,
       this.userProfileUrl,
+      required this.isFavourite,
       required this.activeIndex})
       : super(key: key);
 
@@ -493,18 +511,6 @@ class _BuildPlayState extends State<BuildPlay> {
         ),
         child: Stack(
           children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: widget.activeIndex == widget.index
-                  ? const Padding(
-                      padding: EdgeInsets.only(bottom: 15, right: 15),
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: AppImageAsset(image: "assets/favourite.svg"),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
             Slider(
               activeColor: Colors.white12,
               inactiveColor: Colors.transparent,
@@ -520,12 +526,32 @@ class _BuildPlayState extends State<BuildPlay> {
               child: Align(
                 alignment: Alignment.center,
                 child: AppImageAsset(
-                  image: widget.isPlaying
-                      ? 'assets/pause.svg'
-                      : 'assets/play.svg',
+                  image:
+                      widget.isPlaying ? 'assets/pause.svg' : 'assets/play.svg',
                   height: 90,
                 ),
               ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: widget.activeIndex == widget.index
+                  ? GestureDetector(
+                      onTap: widget.onTapFavourite,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 15, right: 15),
+                        child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: widget.isFavourite
+                                ? const AppImageAsset(
+                                    image: "assets/favourite.svg")
+                                : const AppImageAsset(
+                                    image: "assets/favourite_fill.svg",
+                                    height: 17,
+                                    width: 17,
+                                  )),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
             ),
           ],
         ),
