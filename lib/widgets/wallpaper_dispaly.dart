@@ -242,7 +242,7 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                     padding: const EdgeInsets.only(bottom: 15, right: 15),
                     child: Align(
                         alignment: Alignment.bottomRight,
-                        child: isFavourite
+                        child: !isFavourite
                             ? const AppImageAsset(image: "assets/favourite.svg")
                             : const AppImageAsset(
                                 image: "assets/favourite_fill.svg",

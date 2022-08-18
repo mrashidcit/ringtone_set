@@ -541,7 +541,7 @@ class _BuildPlayState extends State<BuildPlay> {
                         padding: const EdgeInsets.only(bottom: 15, right: 15),
                         child: Align(
                             alignment: Alignment.bottomRight,
-                            child: widget.isFavourite
+                            child: !widget.isFavourite
                                 ? const AppImageAsset(
                                     image: "assets/favourite.svg")
                                 : const AppImageAsset(
