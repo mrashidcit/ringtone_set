@@ -143,156 +143,6 @@ class _DashbaordState extends State<Dashbaord> {
         ? WillPopScope(
             onWillPop: _onWillPop,
             child: Scaffold(
-              appBar: PreferredSize(
-                preferredSize: const Size(0, 60),
-                child: AppBar(
-                  automaticallyImplyLeading: false,
-                  backgroundColor: const Color(0xFF4d047d),
-                  elevation: 0,
-                  centerTitle: true,
-                  title: ishow
-                      ? SizedBox(
-                          height: 43,
-                          width: MediaQuery.of(context).size.width,
-                          child: TypeAheadFormField<HydraMember?>(
-                              suggestionsBoxVerticalOffset: 0,
-                              suggestionsBoxDecoration:
-                                  const SuggestionsBoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                          bottomLeft: Radius.circular(7),
-                                          bottomRight: Radius.circular(7)),
-                                      color: Colors.white),
-                              suggestionsCallback: _searchServices.search,
-                              debounceDuration:
-                                  const Duration(milliseconds: 500),
-                              // hideSuggestionsOnKeyboardHide: false,
-                              textFieldConfiguration: TextFieldConfiguration(
-                                controller: _typeAheadController,
-                                decoration: InputDecoration(
-                                  hintText: "",
-                                  hintStyle: const TextStyle(
-                                    color: Color(0xFF5d318c),
-                                    fontSize: 12,
-                                  ),
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 5,
-                                    horizontal: 35,
-                                  ),
-                                  focusedBorder: const OutlineInputBorder(
-                                    borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(7),
-                                        topRight: Radius.circular(7)),
-                                    borderSide: BorderSide(
-                                        color: Color(0xFF5d318c), width: 0),
-                                  ),
-                                  enabledBorder: const OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(7)),
-                                    borderSide: BorderSide(
-                                        color: Color(0xFF5d318c), width: 0.0),
-                                  ),
-                                  suffixIcon: GestureDetector(
-                                    onTap: (() {
-                                      setState(() {
-                                        ishow = false;
-                                      });
-                                    }),
-                                    child: const Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 15.0),
-                                      child: AppImageAsset(
-                                        image: 'assets/search.svg',
-                                        height: 10,
-                                        width: 10,
-                                        fit: BoxFit.fill,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              itemBuilder:
-                                  (context, HydraMember? suggestion) {
-                                final ringtone = suggestion!;
-                                return GestureDetector(
-                                  onTap: (() {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => SearchScreen(
-                                          searchText:
-                                              _typeAheadController.text,
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                  child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 30, top: 15),
-                                      child: Text(
-                                        "${ringtone.name}",
-                                        style: GoogleFonts.archivo(
-                                          fontStyle: FontStyle.normal,
-                                          color: Colors.grey,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      )),
-                                );
-                              },
-                              onSuggestionSelected:
-                                  (HydraMember? suggestion) {},
-                              noItemsFoundBuilder: (context) => Center(
-                                    child: Text(
-                                      "No Found",
-                                      style: GoogleFonts.archivo(
-                                        fontStyle: FontStyle.normal,
-                                        color: const Color(0xFF5d318c),
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                              errorBuilder: (BuildContext context, error) {
-                                return Center(
-                                  child: Text(
-                                    "Please enter ",
-                                    style: GoogleFonts.archivo(
-                                      fontStyle: FontStyle.normal,
-                                      color: const Color(0xFF5d318c),
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                );
-                              }),
-                        )
-                      : Text(
-                          "Ringtones",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w600,
-                            wordSpacing: 0.34,
-                          ),
-                        ),
-                  actions: [
-                    ishow
-                        ? const SizedBox.shrink()
-                        : GestureDetector(
-                            onTap: () => setState(() => ishow = true),
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 15),
-                              child:
-                                  AppImageAsset(image: 'assets/search.svg'),
-                            ),
-                          ),
-                  ],
-                ),
-              ),
               backgroundColor: const Color(0xFF4d047d),
               body: Container(
                 height: MediaQuery.of(context).size.height,
@@ -331,257 +181,404 @@ class _DashbaordState extends State<Dashbaord> {
                   },
                   header: CustomHeader(builder: (context, mode) => Container()),
                   footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
-                  child: isLoading
-                      ? const LoadingPage()
-                      : ListView.builder(
-                    itemCount: hydraMember.length,
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
-                        return SizedBox(
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 17),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Categories",
-                                        style: GoogleFonts.archivo(
-                                          fontStyle: FontStyle.normal,
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          wordSpacing: 0.19,
-                                          fontWeight: FontWeight.w600,
+                  child: SafeArea(
+                    child: Stack(
+                      children: [
+                        Column(
+                          children: [
+                            const SizedBox(height: 50),
+                            Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 20),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 17),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Categories",
+                                          style: GoogleFonts.archivo(
+                                            fontStyle: FontStyle.normal,
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            wordSpacing: 0.19,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: (() {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                  const Categories(
-                                                    isRingtone: true,
-                                                  )));
-                                        }),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              "View All",
-                                              style: GoogleFonts.archivo(
-                                                fontStyle: FontStyle.normal,
-                                                color: Colors.white,
-                                                fontSize: 10,
-                                                wordSpacing: 0.16,
-                                                fontWeight: FontWeight.w400,
+                                        GestureDetector(
+                                          onTap: (() {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                    const Categories(
+                                                      isRingtone: true,
+                                                    )));
+                                          }),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                "View All",
+                                                style: GoogleFonts.archivo(
+                                                  fontStyle: FontStyle.normal,
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  wordSpacing: 0.16,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
                                               ),
-                                            ),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            const Icon(
-                                              Icons.arrow_forward,
-                                              color: Colors.white,
-                                              size: 15,
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              const Icon(
+                                                Icons.arrow_forward,
+                                                color: Colors.white,
+                                                size: 15,
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                SizedBox(
-                                  height: 60,
-                                  width: screenWidth,
-                                  child:
-                                  BlocConsumer<CategoryBloc, CategoryState>(
-                                    listener: (context, state) {
-                                      // TODO: implement listener
-                                    },
-                                    builder: (context, state) {
-                                      if (state is CategoryInitial) {
+                                  const SizedBox(height: 20),
+                                  SizedBox(
+                                    height: 60,
+                                    width: screenWidth,
+                                    child:
+                                    BlocConsumer<CategoryBloc, CategoryState>(
+                                      listener: (context, state) {
+                                        // TODO: implement listener
+                                      },
+                                      builder: (context, state) {
+                                        if (state is CategoryInitial) {
+                                          return const Center(
+                                              child: CircularProgressIndicator());
+                                        }
+                                        if (state is LoadedCategory) {
+                                          return Container(
+                                            height: 50,
+                                            margin:
+                                            const EdgeInsets.only(left: 17),
+                                            child: ListView.builder(
+                                              scrollDirection: Axis.horizontal,
+                                              itemCount: 4,
+                                              itemBuilder: (context, index) {
+                                                return Padding(
+                                                  padding: const EdgeInsets.only(
+                                                      right: 12),
+                                                  child: RingtoneCategoryCard(
+                                                    id: state.categories!
+                                                        .hydraMember![index].id!,
+                                                    image: state
+                                                        .categories
+                                                        ?.hydraMember?[index]
+                                                        .image,
+                                                    name: state
+                                                        .categories
+                                                        ?.hydraMember?[index]
+                                                        .name,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        }
                                         return const Center(
                                             child: CircularProgressIndicator());
-                                      }
-                                      if (state is LoadedCategory) {
-                                        return Padding(
-                                          padding:
-                                          const EdgeInsets.only(left: 17),
-                                          child: ListView.builder(
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: 4,
-                                            itemBuilder: (context, index) {
-                                              return Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 12),
-                                                child: RingtoneCategoryCard(
-                                                  id: state.categories!
-                                                      .hydraMember![index].id!,
-                                                  image: state
-                                                      .categories
-                                                      ?.hydraMember?[index]
-                                                      .image,
-                                                  name: state
-                                                      .categories
-                                                      ?.hydraMember?[index]
-                                                      .name,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        );
-                                      }
-                                      return const Center(
-                                          child: CircularProgressIndicator());
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 17),
+                                    child: Text(
+                                      "Popular",
+                                      style: GoogleFonts.archivo(
+                                        fontStyle: FontStyle.normal,
+                                        color: Colors.white,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 15),
+                                  SizedBox(
+                                    height: 33,
+                                    width: screenWidth,
+                                    child: const Tags(),
+                                  ),
+                                  const SizedBox(height: 30),
+                                ]),
+                            Expanded(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: hydraMember.length,
+                                itemBuilder: (context, index) => Padding(
+                                  padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                                  child: selectedIndex == index
+                                      ? RingtonesCard(
+                                    onNavigate: () async {
+                                      await audioPlayer.pause();
+                                      // ignore: use_build_context_synchronously
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              CustomAudioPlayer(
+                                                listHydra: hydraMember,
+                                                index: index,
+                                              ),
+                                        ),
+                                      );
                                     },
+                                    onChange: (value) async {
+                                      final myposition =
+                                      Duration(seconds: value.toInt());
+                                      await audioPlayer.seek(myposition);
+                                      await audioPlayer.resume();
+                                    },
+                                    onTap: (() async {
+                                      // if (isPlaying) {
+                                      // } else {}
+
+                                      setState(() {
+                                        selectedIndex = index;
+                                        position = Duration.zero;
+                                      });
+
+                                      if (isPlaying) {
+                                        await audioPlayer.pause();
+                                      } else {
+                                        await audioPlayer
+                                            .play(hydraMember[index].file!);
+                                      }
+                                    }),
+                                    audioPlayer: selectedIndex == index
+                                        ? audioPlayer
+                                        : pausePlayer,
+                                    isPlaying: selectedIndex == index
+                                        ? isPlaying
+                                        : false,
+                                    duration: selectedIndex == index
+                                        ? duration
+                                        : pauseDuration,
+                                    position: selectedIndex == index
+                                        ? position
+                                        : pausePosition,
+                                    index: index,
+                                    listHydra: hydraMember,
+                                    ringtoneName: hydraMember[index].name!,
+                                    file: hydraMember[index].file!,
+                                  )
+                                      : RingtonesCard(
+                                    onNavigate: () async {
+                                      await audioPlayer.pause();
+                                      // ignore: use_build_context_synchronously
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              CustomAudioPlayer(
+                                                listHydra: hydraMember,
+                                                index: index,
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                    onChange: (value) async {
+                                      final myposition =
+                                      Duration(seconds: value.toInt());
+                                      await audioPlayer.seek(myposition);
+                                      await audioPlayer.resume();
+                                    },
+                                    onTap: (() async {
+                                      // if (isPlaying) {
+                                      // } else {}
+
+                                      setState(() {
+                                        selectedIndex = index;
+                                        position = Duration.zero;
+                                        isPlaying = false;
+                                      });
+                                      await audioPlayer.pause();
+                                      if (isPlaying) {
+                                        await audioPlayer.pause();
+                                      } else {
+                                        await audioPlayer
+                                            .play(hydraMember[index].file!);
+                                      }
+                                    }),
+                                    audioPlayer: selectedIndex == index
+                                        ? audioPlayer
+                                        : pausePlayer,
+                                    isPlaying: selectedIndex == index
+                                        ? isPlaying
+                                        : false,
+                                    duration: selectedIndex == index
+                                        ? duration
+                                        : pauseDuration,
+                                    position: selectedIndex == index
+                                        ? position
+                                        : pausePosition,
+                                    index: index,
+                                    listHydra: hydraMember,
+                                    ringtoneName: hydraMember[index].name!,
+                                    file: hydraMember[index].file!,
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 17),
-                                  child: Text(
-                                    "Popular",
-                                    style: GoogleFonts.archivo(
-                                      fontStyle: FontStyle.normal,
-                                      color: Colors.white,
-                                      fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 16),
+                              height: 46,
+                              width: MediaQuery.of(context).size.width,
+                              child: TextFormField(
+                                controller: _typeAheadController,
+                                onChanged: (data) => setState(() {}),
+                                decoration: InputDecoration(
+                                  hintText: "",
+                                  hintStyle: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                  fillColor: Colors.white,
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 5,
+                                    horizontal: 20,
+                                  ),
+                                  focusedBorder: const OutlineInputBorder(
+                                    borderRadius: BorderRadius.only(topRight: Radius.circular(7),topLeft: Radius.circular(7)),
+                                    borderSide:
+                                    BorderSide(color: Color(0xFF5d318c), width: 0),
+                                  ),
+                                  enabledBorder: const OutlineInputBorder(
+                                    borderRadius: BorderRadius.only(topRight: Radius.circular(7),topLeft: Radius.circular(7)),
+                                    borderSide:
+                                    BorderSide(color: Color(0xFF5d318c), width: 0.0),
+                                  ),
+                                  suffixIcon: GestureDetector(
+                                    onTap: () => setState(() => ishow = false),
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 12),
+                                      child: AppImageAsset(
+                                        image: 'assets/search.svg',
+                                        color: Colors.black,
+                                      ),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 15,
-                                ),
-                                const Tags(),
-                                const SizedBox(
-                                  height: 30,
-                                ),
-                              ]),
-                        );
-                      }
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: selectedIndex == index
-                            ? RingtonesCard(
-                          onNavigate: () async {
-                            await audioPlayer.pause();
-                            // ignore: use_build_context_synchronously
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CustomAudioPlayer(
-                                  listHydra: hydraMember,
-                                  index: index,
+                              ),
+                            ),
+                            FutureBuilder<List<HydraMember>>(
+                                future: _searchServices.searchRingtone(_typeAheadController.text.trim()),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<List<HydraMember>> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return const Text("Something went wrong");
+                                  }
+                                  if (snapshot.connectionState == ConnectionState.done) {
+                                    return Container(
+                                      color: Colors.white,
+                                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: snapshot.data!.length > 4
+                                            ? 4
+                                            : snapshot.data!.length,
+                                        itemBuilder: (context, index) => GestureDetector(
+                                          onTap: (() {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) => SearchScreen(
+                                                    searchText:
+                                                    snapshot.data![index].name!,
+                                                  )),
+                                            );
+                                          }),
+                                          child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 30, top: 10, bottom: 10),
+                                              child: Text(
+                                                "${snapshot.data![index].name}",
+                                                style: GoogleFonts.archivo(
+                                                  fontStyle: FontStyle.normal,
+                                                  color: const Color(0xFF5d318c),
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              )),
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                }),
+                            Container(
+                              width: MediaQuery.of(context).size.width,
+                              margin: const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.all(30).copyWith(top: 10),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(10),
+                                  bottomRight: Radius.circular(10),
                                 ),
                               ),
-                            );
-                          },
-                          onChange: (value) async {
-                            final myposition =
-                            Duration(seconds: value.toInt());
-                            await audioPlayer.seek(myposition);
-                            await audioPlayer.resume();
-                          },
-                          onTap: (() async {
-                            // if (isPlaying) {
-                            // } else {}
-
-                            setState(() {
-                              selectedIndex = index;
-                              position = Duration.zero;
-                            });
-
-                            if (isPlaying) {
-                              await audioPlayer.pause();
-                            } else {
-                              await audioPlayer
-                                  .play(hydraMember[index].file!);
-                            }
-                          }),
-                          audioPlayer: selectedIndex == index
-                              ? audioPlayer
-                              : pausePlayer,
-                          isPlaying:
-                          selectedIndex == index ? isPlaying : false,
-                          duration: selectedIndex == index
-                              ? duration
-                              : pauseDuration,
-                          position: selectedIndex == index
-                              ? position
-                              : pausePosition,
-                          index: index,
-                          listHydra: hydraMember,
-                          ringtoneName: hydraMember[index].name!,
-                          file: hydraMember[index].file!,
-                        )
-                            : RingtonesCard(
-                          onNavigate: () async {
-                            await audioPlayer.pause();
-                            // ignore: use_build_context_synchronously
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CustomAudioPlayer(
-                                  listHydra: hydraMember,
-                                  index: index,
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Trending search',
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 10,
+                                    children: List.generate(
+                                      _searchServices
+                                          .trendingSearchItems.length,
+                                      (index) => Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8, horizontal: 10),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: const Color(0XFFE1E1E1)),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Text(
+                                          _searchServices
+                                              .trendingSearchItems[index],
+                                          style: const TextStyle(
+                                              color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            );
-                          },
-                          onChange: (value) async {
-                            final myposition =
-                            Duration(seconds: value.toInt());
-                            await audioPlayer.seek(myposition);
-                            await audioPlayer.resume();
-                          },
-                          onTap: (() async {
-                            // if (isPlaying) {
-                            // } else {}
-
-                            setState(() {
-                              selectedIndex = index;
-                              position = Duration.zero;
-                              isPlaying = false;
-                            });
-                            await audioPlayer.pause();
-                            if (isPlaying) {
-                              await audioPlayer.pause();
-                            } else {
-                              await audioPlayer
-                                  .play(hydraMember[index].file!);
-                            }
-                          }),
-                          audioPlayer: selectedIndex == index
-                              ? audioPlayer
-                              : pausePlayer,
-                          isPlaying:
-                          selectedIndex == index ? isPlaying : false,
-                          duration: selectedIndex == index
-                              ? duration
-                              : pauseDuration,
-                          position: selectedIndex == index
-                              ? position
-                              : pausePosition,
-                          index: index,
-                          listHydra: hydraMember,
-                          ringtoneName: hydraMember[index].name!,
-                          file: hydraMember[index].file!,
+                            ),
+                          ],
                         ),
-                      );
-                    },
+                      ],
+                    ),
                   ),
                 ),
               ),

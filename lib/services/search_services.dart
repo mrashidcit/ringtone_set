@@ -5,6 +5,15 @@ import '../models/deeze_model.dart';
 import '../uitilities/end_points.dart';
 
 class SearchServices {
+  List<String> trendingSearchItems = [
+    'Android',
+    'Pubg',
+    'Sport',
+    'Sport',
+    'Releasing',
+    'Abstract',
+    'Sport'
+  ];
   Future<List<HydraMember>> searchRingtone(String query) async {
     var url = getDeezeAppUrlContent;
 
@@ -27,7 +36,7 @@ class SearchServices {
     if (response.statusCode == 200) {
       print(response.body);
       var rawResponse = deezeFromJson(response.body);
-      return rawResponse.hydraMember!;
+      return query.isEmpty ? [] : rawResponse.hydraMember!;
     } else {
       throw Exception();
     }
@@ -54,7 +63,7 @@ class SearchServices {
     if (response.statusCode == 200) {
       print(response.body);
       var rawResponse = deezeFromJson(response.body);
-      return rawResponse.hydraMember!;
+      return query.isEmpty ? [] : rawResponse.hydraMember!;
     } else {
       throw Exception();
     }
