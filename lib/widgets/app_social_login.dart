@@ -32,10 +32,10 @@ class AppSocialMediaButton extends StatelessWidget {
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: image.isNotEmpty ? MainAxisAlignment.start : MainAxisAlignment.center,
           children: [
-            if (image.isNotEmpty) AppImageAsset(image: image),
-            if (image.isNotEmpty) const SizedBox(width: 30),
+            if (image.isNotEmpty) SizedBox(width: 65,child: AppImageAsset(image: image,height: 25,width: 25,)),
+            if (image.isNotEmpty) const SizedBox(width: 5),
             Text(
               'Log in with $text',
               style: GoogleFonts.archivo(

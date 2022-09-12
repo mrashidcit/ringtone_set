@@ -1,3 +1,4 @@
+import 'package:deeze_app/models/search_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -14,7 +15,8 @@ class SearchServices {
     'Abstract',
     'Sport'
   ];
-  Future<List<HydraMember>> searchRingtone(String query) async {
+
+  Future<List<SearchModel>> searchRingtone(String query) async {
     var url = getDeezeAppUrlContent;
 
     Uri uri = Uri.parse(url).replace(queryParameters: {
@@ -35,14 +37,16 @@ class SearchServices {
 
     if (response.statusCode == 200) {
       print(response.body);
-      var rawResponse = deezeFromJson(response.body);
-      return query.isEmpty ? [] : rawResponse.hydraMember!;
+
+      List<SearchModel> rawResponse = searchModelFromJson(response.body);
+
+      return query.isEmpty ? [] : rawResponse;
     } else {
       throw Exception();
     }
   }
 
-  Future<List<HydraMember>> search(String query) async {
+  Future<List<SearchModel>> search(String query) async {
     var url = getDeezeAppUrlContent;
 
     Uri uri = Uri.parse(url).replace(queryParameters: {
@@ -62,14 +66,15 @@ class SearchServices {
 
     if (response.statusCode == 200) {
       print(response.body);
-      var rawResponse = deezeFromJson(response.body);
-      return query.isEmpty ? [] : rawResponse.hydraMember!;
+      List<SearchModel> rawResponse = searchModelFromJson(response.body);
+
+      return query.isEmpty ? [] : rawResponse ;
     } else {
       throw Exception();
     }
   }
 
-  Future<List<HydraMember>> searchWallpers(String query) async {
+  Future<List<HydraMember>> searchWallpapers(String query) async {
     var url = getDeezeAppUrlContent;
 
     Uri uri = Uri.parse(url).replace(queryParameters: {

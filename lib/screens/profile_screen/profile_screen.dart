@@ -203,7 +203,7 @@ class ProfileScreenState extends State<ProfileScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                MyDrawerHeader(),
+                const MyDrawerHeader(showProfile: false),
                 const SizedBox(height: 40),
                 InkWell(
                   onTap: () async {
@@ -302,6 +302,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 30),
                 GestureDetector(
                   onTap: () {
+                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(

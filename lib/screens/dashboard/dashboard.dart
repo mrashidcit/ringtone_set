@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:deeze_app/models/search_model.dart';
 import 'package:deeze_app/screens/categories/categories.dart';
 import 'package:deeze_app/screens/favourite/favourite_screen.dart';
 import 'package:deeze_app/screens/search/search_screen.dart';
@@ -445,6 +446,20 @@ class _DashbaordState extends State<Dashbaord> {
                               child: TextFormField(
                                 controller: _typeAheadController,
                                 onChanged: (data) => setState(() {}),
+                                onFieldSubmitted: (val){
+                                  FocusScope.of(context).unfocus();
+                                  if(_typeAheadController.text.isNotEmpty){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => SearchScreen(
+                                            searchText:
+                                            _typeAheadController.text,
+                                          )),
+                                    );
+                                  }
+                                  _typeAheadController.clear();
+                                },
                                 decoration: InputDecoration(
                                   hintText: "",
                                   hintStyle: const TextStyle(
@@ -468,7 +483,21 @@ class _DashbaordState extends State<Dashbaord> {
                                     BorderSide(color: Color(0xFF5d318c), width: 0.0),
                                   ),
                                   suffixIcon: GestureDetector(
-                                    onTap: () => setState(() => ishow = false),
+                                    onTap: () {
+                                      FocusScope.of(context).unfocus();
+                                      _typeAheadController.text.isEmpty ?
+                                      ishow = false
+                                          : Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => SearchScreen(
+                                              searchText:
+                                              _typeAheadController.text,
+                                            )),
+                                      );
+                                      _typeAheadController.clear();
+                                      setState(() {});
+                                    },
                                     child: const Padding(
                                       padding: EdgeInsets.symmetric(horizontal: 12),
                                       child: AppImageAsset(
@@ -480,12 +509,18 @@ class _DashbaordState extends State<Dashbaord> {
                                 ),
                               ),
                             ),
-                            FutureBuilder<List<HydraMember>>(
+                            FutureBuilder<List<SearchModel>>(
                                 future: _searchServices.searchRingtone(_typeAheadController.text.trim()),
                                 builder: (BuildContext context,
-                                    AsyncSnapshot<List<HydraMember>> snapshot) {
+                                    AsyncSnapshot<List<SearchModel>> snapshot) {
                                   if (snapshot.hasError) {
-                                    return const Text("Something went wrong");
+                                    return Container(
+                                        color: Colors.white,
+                                        alignment: Alignment.centerLeft,
+                                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                                        padding: const EdgeInsets.symmetric(vertical: 10).copyWith(left: 30),
+                                        child: const Text("Something went wrong",style: TextStyle(color: Color(0xFF5d318c)),)
+                                    );
                                   }
                                   if (snapshot.connectionState == ConnectionState.done) {
                                     return Container(
@@ -493,6 +528,7 @@ class _DashbaordState extends State<Dashbaord> {
                                       margin: const EdgeInsets.symmetric(horizontal: 16),
                                       child: ListView.builder(
                                         shrinkWrap: true,
+                                        padding: EdgeInsets.zero,
                                         itemCount: snapshot.data!.length > 4
                                             ? 4
                                             : snapshot.data!.length,
@@ -611,7 +647,7 @@ class _DashbaordState extends State<Dashbaord> {
                       ? SizedBox(
                           height: 43,
                           width: MediaQuery.of(context).size.width,
-                          child: TypeAheadField<HydraMember?>(
+                          child: TypeAheadField<SearchModel?>(
                               suggestionsBoxDecoration:
                                   const SuggestionsBoxDecoration(
                                       color: Color(0xFF4d047d)),
@@ -658,7 +694,7 @@ class _DashbaordState extends State<Dashbaord> {
                                 ),
                               ),
                               itemBuilder:
-                                  (context, HydraMember? suggestion) {
+                                  (context, SearchModel? suggestion) {
                                 final ringtone = suggestion!;
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 20),
@@ -742,7 +778,7 @@ class _DashbaordState extends State<Dashbaord> {
                                 );
                               },
                               onSuggestionSelected:
-                                  (HydraMember? suggestion) {},
+                                  (SearchModel? suggestion) {},
                               noItemsFoundBuilder: (context) => const Center(
                                     child: Text(
                                       "No Found",
@@ -1202,6 +1238,7 @@ class _DashbaordState extends State<Dashbaord> {
                         ),
                         GestureDetector(
                           onTap: () {
+                            Navigator.pop(context);
                             Navigator.push(
                               context,
                               MaterialPageRoute(

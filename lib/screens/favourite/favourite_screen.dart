@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:deeze_app/models/search_model.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/ringtones_card.dart';
@@ -316,6 +317,20 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                         child: TextFormField(
                                           controller: _typeAheadController,
                                           onChanged: (data) => setState(() {}),
+                                          onFieldSubmitted: (val){
+                                            FocusScope.of(context).unfocus();
+                                            if(_typeAheadController.text.isNotEmpty){
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) => SearchScreen(
+                                                      searchText:
+                                                      _typeAheadController.text,
+                                                    )),
+                                              );
+                                            }
+                                            _typeAheadController.clear();
+                                          },
                                           decoration: InputDecoration(
                                             hintText: "",
                                             hintStyle: const TextStyle(
@@ -339,7 +354,21 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                               BorderSide(color: Color(0xFF5d318c), width: 0.0),
                                             ),
                                             suffixIcon: GestureDetector(
-                                              onTap: () => setState(() => iShow = false),
+                                              onTap: () {
+                                                FocusScope.of(context).unfocus();
+                                                _typeAheadController.text.isEmpty ?
+                                                iShow = false
+                                                    : Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) => SearchScreen(
+                                                        searchText:
+                                                        _typeAheadController.text,
+                                                      )),
+                                                );
+                                                _typeAheadController.clear();
+                                                setState(() {});
+                                                },
                                               child: const Padding(
                                                 padding: EdgeInsets.symmetric(horizontal: 12),
                                                 child: AppImageAsset(
@@ -351,10 +380,10 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                           ),
                                         ),
                                       ),
-                                      FutureBuilder<List<HydraMember>>(
+                                      FutureBuilder<List<SearchModel>>(
                                           future: _searchServices.search(_typeAheadController.text.trim()),
                                           builder: (BuildContext context,
-                                              AsyncSnapshot<List<HydraMember>> snapshot) {
+                                              AsyncSnapshot<List<SearchModel>> snapshot) {
                                             if (snapshot.hasError) {
                                               return const Text("Something went wrong");
                                             }
@@ -483,7 +512,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                     ? SizedBox(
                         height: 43,
                         width: MediaQuery.of(context).size.width,
-                        child: TypeAheadField<HydraMember?>(
+                        child: TypeAheadField<SearchModel?>(
                             suggestionsBoxDecoration:
                                 const SuggestionsBoxDecoration(
                                     color: Color(0xFF4d047d)),
@@ -535,7 +564,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                 ),
                               ),
                             ),
-                            itemBuilder: (context, HydraMember? suggestion) {
+                            itemBuilder: (context, SearchModel? suggestion) {
                               final ringtone = suggestion!;
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 20),
@@ -623,7 +652,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                               );
                             },
                             onSuggestionSelected:
-                                (HydraMember? suggestion) {},
+                                (SearchModel? suggestion) {},
                             noItemsFoundBuilder: (context) => const Center(
                                   child: Text(
                                     "No Found",
@@ -962,29 +991,34 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                       const SizedBox(
                         height: 30,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 40),
-                        child: Row(
-                          children: [
-                            const AppImageAsset(
-                              image: 'assets/favourite_fill.svg',
-                              height: 15,
-                              width: 15,
-                              fit: BoxFit.fill,
-                            ),
-                            const SizedBox(
-                              width: 25,
-                            ),
-                            Text(
-                              "Favourite",
-                              style: GoogleFonts.archivo(
-                                fontStyle: FontStyle.normal,
-                                color: Colors.white,
-                                fontSize: 16,
-                                wordSpacing: -0.09,
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.pop(context);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 40),
+                          child: Row(
+                            children: [
+                              const AppImageAsset(
+                                image: 'assets/favourite_fill.svg',
+                                height: 15,
+                                width: 15,
+                                fit: BoxFit.fill,
                               ),
-                            ),
-                          ],
+                              const SizedBox(
+                                width: 25,
+                              ),
+                              Text(
+                                "Favourite",
+                                style: GoogleFonts.archivo(
+                                  fontStyle: FontStyle.normal,
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  wordSpacing: -0.09,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(

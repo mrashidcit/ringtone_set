@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:deeze_app/models/search_model.dart';
 import 'package:deeze_app/screens/tags/tags.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
@@ -312,7 +313,7 @@ class _WallPapersState extends State<WallPapers> {
                               child: SizedBox(
                                 height: 33,
                                 width: screenWidth,
-                                child: Tags(),
+                                child: const Tags(),
                               ),
                             ),
                             const SliverToBoxAdapter(child: SizedBox(height: 15)),
@@ -351,6 +352,20 @@ class _WallPapersState extends State<WallPapers> {
                                 child: TextFormField(
                                   controller: _typeAheadController,
                                   onChanged: (data) => setState(() {}),
+                                  onFieldSubmitted: (val){
+                                    FocusScope.of(context).unfocus();
+                                    if(_typeAheadController.text.isNotEmpty) {
+                                      Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => SearchScreen(
+                                            searchText:
+                                            _typeAheadController.text,
+                                          )),
+                                    );
+                                    }
+                                    _typeAheadController.clear();
+                                  },
                                   decoration: InputDecoration(
                                     hintText: "",
                                     hintStyle: const TextStyle(
@@ -374,7 +389,21 @@ class _WallPapersState extends State<WallPapers> {
                                       BorderSide(color: Color(0xFF5d318c), width: 0.0),
                                     ),
                                     suffixIcon: GestureDetector(
-                                      onTap: () => setState(() => ishow = false),
+                                      onTap: () {
+                                        FocusScope.of(context).unfocus();
+                                        _typeAheadController.text.isEmpty ?
+                                        ishow = false
+                                        : Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => SearchScreen(
+                                                searchText:
+                                                _typeAheadController.text,
+                                              )),
+                                        );
+                                        _typeAheadController.clear();
+                                        setState(() {});
+                                      },
                                       child: const Padding(
                                         padding: EdgeInsets.symmetric(horizontal: 12),
                                         child: AppImageAsset(
@@ -386,10 +415,10 @@ class _WallPapersState extends State<WallPapers> {
                                   ),
                                 ),
                               ),
-                              FutureBuilder<List<HydraMember>>(
+                              FutureBuilder<List<SearchModel>>(
                                   future: _searchServices.search(_typeAheadController.text.trim()),
                                   builder: (BuildContext context,
-                                      AsyncSnapshot<List<HydraMember>> snapshot) {
+                                      AsyncSnapshot<List<SearchModel>> snapshot) {
                                     if (snapshot.hasError) {
                                       return const Text("Something went wrong");
                                     }
@@ -404,6 +433,8 @@ class _WallPapersState extends State<WallPapers> {
                                               : snapshot.data!.length,
                                           itemBuilder: (context, index) => GestureDetector(
                                             onTap: (() {
+                                              FocusScope.of(context).unfocus();
+                                              _typeAheadController.clear();
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
@@ -412,6 +443,7 @@ class _WallPapersState extends State<WallPapers> {
                                                       snapshot.data![index].name!,
                                                     )),
                                               );
+
                                             }),
                                             child: Padding(
                                                 padding: const EdgeInsets.only(
@@ -495,7 +527,7 @@ class _WallPapersState extends State<WallPapers> {
             onWillPop: _onWillPop,
             child: Scaffold(
               appBar: PreferredSize(
-                preferredSize: Size(0, 60),
+                preferredSize: const Size(0, 60),
                 child: AppBar(
                   backgroundColor: const Color(0xFF4d047d),
                   elevation: 0,
@@ -520,7 +552,7 @@ class _WallPapersState extends State<WallPapers> {
                                   const SuggestionsBoxDecoration(
                                       color: Color(0xFF4d047d)),
                               suggestionsCallback:
-                                  _searchServices.searchWallpers,
+                                  _searchServices.searchWallpapers,
                               debounceDuration:
                                   const Duration(milliseconds: 500),
                               // hideSuggestionsOnKeyboardHide: false,
@@ -531,7 +563,7 @@ class _WallPapersState extends State<WallPapers> {
                                     color: Colors.white,
                                     fontSize: 12,
                                   ),
-                                  fillColor: Color(0xFF5d318c),
+                                  fillColor: const Color(0xFF5d318c),
                                   filled: true,
                                   contentPadding: const EdgeInsets.symmetric(
                                     vertical: 5,
@@ -551,9 +583,9 @@ class _WallPapersState extends State<WallPapers> {
                                   ),
                                   suffixIcon: GestureDetector(
                                     onTap: () => setState(() => ishow = false),
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 12),
-                                      child: const AppImageAsset(
+                                    child: const Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                                      child: AppImageAsset(
                                         image: 'assets/search.svg',
                                         color: Colors.black,
                                       ),
@@ -756,7 +788,7 @@ class _WallPapersState extends State<WallPapers> {
                                       ),
                                     ),
                                     const SizedBox(width: 10),
-                                    AppImageAsset(image: 'assets/backward.svg', height: 10)
+                                    const AppImageAsset(image: 'assets/backward.svg', height: 10)
                                   ],
                                 ),
                               )
@@ -868,7 +900,7 @@ class _WallPapersState extends State<WallPapers> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        MyDrawerHeader(),
+                        const MyDrawerHeader(),
                         const SizedBox(
                           height: 40,
                         ),
@@ -1008,7 +1040,7 @@ class _WallPapersState extends State<WallPapers> {
                           padding: const EdgeInsets.only(left: 37),
                           child: Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.info,
                                 color: Colors.white,
                                 size: 20,
@@ -1035,7 +1067,7 @@ class _WallPapersState extends State<WallPapers> {
                           padding: const EdgeInsets.only(left: 37),
                           child: Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.settings,
                                 color: Colors.white,
                                 size: 20,
@@ -1062,7 +1094,7 @@ class _WallPapersState extends State<WallPapers> {
                           padding: const EdgeInsets.only(left: 37),
                           child: Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.privacy_tip,
                                 color: Colors.white,
                                 size: 20,

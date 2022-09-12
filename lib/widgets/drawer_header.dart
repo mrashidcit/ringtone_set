@@ -8,7 +8,9 @@ import '../screens/screens.dart';
 import 'elevated_button_widget.dart';
 
 class MyDrawerHeader extends StatefulWidget {
-  const MyDrawerHeader({Key? key}) : super(key: key);
+  final bool showProfile;
+  final bool showUpload;
+  const MyDrawerHeader({Key? key,this.showProfile = true,this.showUpload = true}) : super(key: key);
 
   @override
   State<MyDrawerHeader> createState() => _MyDrawerHeaderState();
@@ -34,9 +36,12 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
               const Spacer(flex: 2),
               GestureDetector(
                 onTap: () {
-                  Navigator.of(context).push(
+                  Navigator.pop(context);
+                  if(widget.showProfile) {
+                    Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => const ProfileScreen()),
                   );
+                  }
                 },
                 child: const AppImageAsset(image: 'assets/dummy_profile_pic.svg', height: 70),
               ),
@@ -60,10 +65,13 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
                   padding: 0,
                   borderRadius: 15,
                   borderColor: Colors.white,
-                  onPressed: () => Navigator.push(
+                  onPressed: () {
+                    Scaffold.of(context).closeDrawer();
+                    Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const Login()),
-                  ),
+                    MaterialPageRoute(builder: (context) => const OnBoarding()),
+                  );
+                  },
                 ),
               ),
               const Spacer(flex: 2),
@@ -81,11 +89,16 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
                   padding: 0,
                   borderRadius: 15,
                   borderColor: const Color(0xFFFF6411),
-                  onPressed: () => Navigator.of(context).push(
+                  onPressed: () {
+                    Scaffold.of(context).closeDrawer();
+                    if(widget.showUpload) {
+                      Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => const UploadScreen(),
                     ),
-                  ),
+                  );
+                    }
+                  },
                 ),
               ),
               const Spacer(),
