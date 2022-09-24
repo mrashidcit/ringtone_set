@@ -7,7 +7,7 @@ import 'package:transparent_image/transparent_image.dart';
 import '../models/deeze_model.dart';
 
 class CategoryCard extends StatelessWidget {
-  final List<HydraMember>? listHydra;
+  final List<DeezeItemModel>? listHydra;
   final int? index;
   final bool iscategory;
   final image;

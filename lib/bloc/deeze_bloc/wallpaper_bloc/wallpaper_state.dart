@@ -6,7 +6,7 @@ abstract class WallpaperState {}
 class WallpaperInitial extends WallpaperState {}
 
 class WallpaperLoaded extends WallpaperState {
-  Deeze? deeze;
+  List<DeezeItemModel>? deeze;
   WallpaperLoaded({this.deeze});
 }
 

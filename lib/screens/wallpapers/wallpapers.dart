@@ -38,6 +38,13 @@ class _WallPapersState extends State<WallPapers> {
     super.initState();
     // context.read<WallpaperBloc>().add(LoadWallpapers());
     context.read<CategoryBloc>().add(LoadCategory());
+    scrollController.addListener(() {
+      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+        setState(() {
+          isDataLoad = true;
+        });
+      }
+    });
     // WidgetsBinding.instance.addPostFrameCallback((timeStamp) => loadData());
   }
 
@@ -51,16 +58,18 @@ class _WallPapersState extends State<WallPapers> {
   }
 
   int page = 1;
-  late int totalPage;
+  int? totalPage;
   final RefreshController _refreshController =
       RefreshController(initialRefresh: true);
+  ScrollController scrollController = ScrollController();
+  bool isDataLoad = false;
 
-  List<HydraMember> hydraMember = [];
+  List<DeezeItemModel> hydraMember = [];
   Future<bool> fetchWallpapers({bool isRefresh = false}) async {
     if (isRefresh) {
       page = 1;
     } else {
-      if (page >= totalPage) {
+      if (totalPage == 0) {
         _refreshController.loadNoData();
         return false;
       }
@@ -86,16 +95,22 @@ class _WallPapersState extends State<WallPapers> {
 
       if (response.statusCode == 200) {
         print(response.body);
-        var rawResponse = deezeFromJson(response.body);
+        var rawResponse = deezeItemModelFromJson(response.body);
         if (isRefresh) {
-          hydraMember = rawResponse.hydraMember!;
+          hydraMember = rawResponse;
         } else {
-          hydraMember.addAll(rawResponse.hydraMember!);
+          hydraMember.addAll(rawResponse);
         }
 
         page++;
-        totalPage = rawResponse.hydraTotalItems!;
-        setState(() => isLoading = false);
+        totalPage = rawResponse.length;
+        setState(() {
+          isLoading = false;
+          if(isDataLoad && totalPage == 0){
+            showMessage(context, message: 'No data available!');
+          }
+          isDataLoad = false;
+        });
         return true;
       } else {
         return false;
@@ -177,11 +192,12 @@ class _WallPapersState extends State<WallPapers> {
                     }
                   },
                   header: CustomHeader(builder: (context, mode) => Container()),
-                  footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                  footer: CustomFooter(builder: (context, mode) => isDataLoad && totalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
                   child: SafeArea(
                     child: Stack(
                       children: [
                         CustomScrollView(
+                          controller: scrollController,
                           slivers: [
                             const SliverToBoxAdapter(
                               child: SizedBox(height: 70),
@@ -268,12 +284,9 @@ class _WallPapersState extends State<WallPapers> {
                                               padding:
                                               const EdgeInsets.only(right: 12),
                                               child: WallpaperCategoryCard(
-                                                id: state.categories!
-                                                    .hydraMember![index].id!,
-                                                image: state.categories
-                                                    ?.hydraMember?[index].image,
-                                                name: state.categories
-                                                    ?.hydraMember?[index].name,
+                                                id: state.categories![index].id!,
+                                                image: state.categories![index].image,
+                                                name: state.categories![index].name,
                                               ),
                                             );
                                           },
@@ -365,6 +378,7 @@ class _WallPapersState extends State<WallPapers> {
                                     );
                                     }
                                     _typeAheadController.clear();
+                                    ishow = false;
                                   },
                                   decoration: InputDecoration(
                                     hintText: "",
@@ -391,16 +405,21 @@ class _WallPapersState extends State<WallPapers> {
                                     suffixIcon: GestureDetector(
                                       onTap: () {
                                         FocusScope.of(context).unfocus();
-                                        _typeAheadController.text.isEmpty ?
-                                        ishow = false
-                                        : Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => SearchScreen(
-                                                searchText:
-                                                _typeAheadController.text,
-                                              )),
-                                        );
+                                        if(_typeAheadController.text.isEmpty){
+                                          ishow = false;
+                                        }
+                                        else{
+                                          _typeAheadController.clear();
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => SearchScreen(
+                                                  searchText:
+                                                  _typeAheadController.text,
+                                                )),
+                                          );
+                                          ishow = false;
+                                        }
                                         _typeAheadController.clear();
                                         setState(() {});
                                       },
@@ -420,7 +439,13 @@ class _WallPapersState extends State<WallPapers> {
                                   builder: (BuildContext context,
                                       AsyncSnapshot<List<SearchModel>> snapshot) {
                                     if (snapshot.hasError) {
-                                      return const Text("Something went wrong");
+                                      return Container(
+                                          color: Colors.white,
+                                          alignment: Alignment.centerLeft,
+                                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                                          padding: const EdgeInsets.symmetric(vertical: 10).copyWith(left: 30),
+                                          child: const Text("Something went wrong",style: TextStyle(color: Color(0xFF5d318c)),)
+                                      );
                                     }
                                     if (snapshot.connectionState == ConnectionState.done) {
                                       return Container(
@@ -443,7 +468,7 @@ class _WallPapersState extends State<WallPapers> {
                                                       snapshot.data![index].name!,
                                                     )),
                                               );
-
+                                              ishow = false;
                                             }),
                                             child: Padding(
                                                 padding: const EdgeInsets.only(
@@ -547,7 +572,7 @@ class _WallPapersState extends State<WallPapers> {
                       ? SizedBox(
                           height: 43,
                           width: MediaQuery.of(context).size.width,
-                          child: TypeAheadField<HydraMember?>(
+                          child: TypeAheadField<SearchModel?>(
                               suggestionsBoxDecoration:
                                   const SuggestionsBoxDecoration(
                                       color: Color(0xFF4d047d)),
@@ -594,7 +619,7 @@ class _WallPapersState extends State<WallPapers> {
                                 ),
                               ),
                               itemBuilder:
-                                  (context, HydraMember? suggestion) {
+                                  (context, SearchModel? suggestion) {
                                 final wallpapers = suggestion!;
                                 return GestureDetector(
                                     onTap: (() {
@@ -657,7 +682,7 @@ class _WallPapersState extends State<WallPapers> {
                                           ));
                               },
                               onSuggestionSelected:
-                                  (HydraMember? suggestion) {},
+                                  (SearchModel? suggestion) {},
                               noItemsFoundBuilder: (context) => const Center(
                                     child: Text(
                                       "No Found",
@@ -739,10 +764,11 @@ class _WallPapersState extends State<WallPapers> {
                     }
                   },
                   header: CustomHeader(builder: (context, mode) => Container()),
-                  footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                  footer: CustomFooter(builder: (context, mode) => isDataLoad && totalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
                   child: isLoading
                       ? const LoadingPage()
                       : CustomScrollView(
+                    controller: scrollController,
                     slivers: [
                       const SliverToBoxAdapter(
                         child: SizedBox(
@@ -821,12 +847,9 @@ class _WallPapersState extends State<WallPapers> {
                                         padding:
                                             const EdgeInsets.only(right: 12),
                                         child: WallpaperCategoryCard(
-                                          id: state.categories!
-                                              .hydraMember![index].id!,
-                                          image: state.categories
-                                              ?.hydraMember?[index].image,
-                                          name: state.categories
-                                              ?.hydraMember?[index].name,
+                                          id: state.categories![index].id!,
+                                          image: state.categories![index].image,
+                                          name: state.categories![index].name,
                                         ),
                                       );
                                     },

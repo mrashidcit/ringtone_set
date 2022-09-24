@@ -14,3 +14,14 @@ class LoadingPage extends StatelessWidget {
     );
   }
 }
+
+showMessage(BuildContext context,
+    {@required String? message,
+      Color textColor = Colors.white}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      backgroundColor: const Color(0xFF4d047d).withOpacity(0.8),
+      content: Text(message!,style: const TextStyle(fontWeight: FontWeight.w600,fontSize: 15)),
+    ),
+  );
+}

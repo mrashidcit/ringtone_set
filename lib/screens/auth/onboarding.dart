@@ -59,14 +59,14 @@ class OnBoardingState extends State<OnBoarding> {
                   ),
                 ),
                 const SizedBox(height: 70),
-                const AppSocialMediaButton(image: 'assets/google.svg',color: Color(0XFF0764E3), text: 'Google'),
+                AppSocialMediaButton(image: 'assets/google.svg',color: Color(0XFF0764E3), text: 'Google',onTap: (){}),
                 const SizedBox(height: 20),
-                const AppSocialMediaButton(image: 'assets/facebook.svg',color: Color(0XFF4267B2), text: 'Facebook'),
+                AppSocialMediaButton(image: 'assets/facebook.svg',color: Color(0XFF4267B2), text: 'Facebook',onTap: (){}),
                 const SizedBox(height: 20),
                 AppSocialMediaButton(
                   color: Colors.white,
                   text: 'e-mail',
-                  onTap: () => Navigator.of(context).pushReplacement(
+                  onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const Login()),
                   ),
                 ),

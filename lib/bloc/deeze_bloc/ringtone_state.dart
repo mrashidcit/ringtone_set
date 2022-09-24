@@ -13,7 +13,7 @@ class LoadingRingtone extends RingtoneState {
 
 // ignore: must_be_immutable
 class LoadedRingtone extends RingtoneState {
-  Deeze? deeze;
+  List<DeezeItemModel>? deeze;
   LoadedRingtone({this.deeze});
 }
 

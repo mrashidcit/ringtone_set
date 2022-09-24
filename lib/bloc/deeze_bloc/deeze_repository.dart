@@ -27,7 +27,7 @@ class DeezeRepository {
 
       if (response.statusCode == 200) {
         print(response.body);
-        var rawResponse = deezeFromJson(response.body);
+        var rawResponse = deezeItemModelFromJson(response.body);
         return LoadedRingtone(deeze: rawResponse);
       } else {
         return const RingtoneError();
@@ -57,7 +57,7 @@ class DeezeRepository {
 
       if (response.statusCode == 200) {
         print(response.body);
-        var rawResponse = deezeFromJson(response.body);
+        var rawResponse = deezeItemModelFromJson(response.body);
         return WallpaperLoaded(deeze: rawResponse);
       } else {
         return WallpaperError();

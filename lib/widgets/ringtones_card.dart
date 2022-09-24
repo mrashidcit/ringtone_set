@@ -10,7 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/deeze_model.dart';
 
 class RingtonesCard extends StatefulWidget {
-  final List<HydraMember> listHydra;
+  final List<DeezeItemModel> listHydra;
   final int index;
   final String ringtoneName;
   final String file;

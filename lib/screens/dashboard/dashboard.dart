@@ -49,6 +49,14 @@ class _DashbaordState extends State<Dashbaord> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+        setState(() {
+          isDataLoad = true;
+        });
+      }
+    });
+    addTrendingList();
     context.read<CategoryBloc>().add(LoadCategory());
     audioPlayer.onPlayerStateChanged.listen((state) {
       setState(() {
@@ -67,6 +75,13 @@ class _DashbaordState extends State<Dashbaord> {
     });
   }
 
+  addTrendingList() async {
+    if(_searchServices.trendingSearchItems.isEmpty){
+      await _searchServices.trendingSearch();
+    }
+  }
+
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -77,17 +92,19 @@ class _DashbaordState extends State<Dashbaord> {
   }
 
   int page = 1;
-  late int totalPage;
+  int? totalPage;
   final RefreshController _refreshController =
       RefreshController(initialRefresh: true);
+  ScrollController scrollController = ScrollController();
+  bool isDataLoad = false;
 
-  List<HydraMember> hydraMember = [];
+  List<DeezeItemModel> hydraMember = [];
 
   Future<bool> fetchRingtone({bool isRefresh = false}) async {
     if (isRefresh) {
       page = 1;
     } else {
-      if (page >= totalPage) {
+      if (totalPage == 0) {
         _refreshController.loadNoData();
         return false;
       }
@@ -113,16 +130,22 @@ class _DashbaordState extends State<Dashbaord> {
 
       if (response.statusCode == 200) {
         print(response.body);
-        var rawResponse = deezeFromJson(response.body);
+        var rawResponse = deezeItemModelFromJson(response.body);
         if (isRefresh) {
-          hydraMember = rawResponse.hydraMember!;
+          hydraMember = rawResponse;
         } else {
-          hydraMember.addAll(rawResponse.hydraMember!);
+          hydraMember.addAll(rawResponse);
         }
 
         page++;
-        totalPage = rawResponse.hydraTotalItems!;
-        setState(() => isLoading = false);
+        totalPage = rawResponse.length;
+        setState(() {
+          isLoading = false;
+          if(isDataLoad && totalPage == 0){
+            showMessage(context, message: 'No data available!');
+          }
+          isDataLoad = false;
+        });
         return true;
       } else {
         return false;
@@ -181,7 +204,7 @@ class _DashbaordState extends State<Dashbaord> {
                     }
                   },
                   header: CustomHeader(builder: (context, mode) => Container()),
-                  footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                  footer: CustomFooter(builder: (context, mode) => isDataLoad && totalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
                   child: SafeArea(
                     child: Stack(
                       children: [
@@ -272,16 +295,9 @@ class _DashbaordState extends State<Dashbaord> {
                                                   padding: const EdgeInsets.only(
                                                       right: 12),
                                                   child: RingtoneCategoryCard(
-                                                    id: state.categories!
-                                                        .hydraMember![index].id!,
-                                                    image: state
-                                                        .categories
-                                                        ?.hydraMember?[index]
-                                                        .image,
-                                                    name: state
-                                                        .categories
-                                                        ?.hydraMember?[index]
-                                                        .name,
+                                                    id: state.categories![index].id!,
+                                                    image: state.categories![index].image,
+                                                    name: state.categories![index].name,
                                                   ),
                                                 );
                                               },
@@ -317,6 +333,7 @@ class _DashbaordState extends State<Dashbaord> {
                             Expanded(
                               child: ListView.builder(
                                 shrinkWrap: true,
+                                controller: scrollController,
                                 itemCount: hydraMember.length,
                                 itemBuilder: (context, index) => Padding(
                                   padding:
@@ -459,6 +476,7 @@ class _DashbaordState extends State<Dashbaord> {
                                     );
                                   }
                                   _typeAheadController.clear();
+                                  ishow = false;
                                 },
                                 decoration: InputDecoration(
                                   hintText: "",
@@ -485,16 +503,21 @@ class _DashbaordState extends State<Dashbaord> {
                                   suffixIcon: GestureDetector(
                                     onTap: () {
                                       FocusScope.of(context).unfocus();
-                                      _typeAheadController.text.isEmpty ?
-                                      ishow = false
-                                          : Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => SearchScreen(
-                                              searchText:
-                                              _typeAheadController.text,
-                                            )),
-                                      );
+                                      if(_typeAheadController.text.isEmpty){
+                                        ishow = false;
+                                      }
+                                      else{
+                                        _typeAheadController.clear();
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => SearchScreen(
+                                                searchText:
+                                                _typeAheadController.text,
+                                              )),
+                                        );
+                                        ishow = false;
+                                      }
                                       _typeAheadController.clear();
                                       setState(() {});
                                     },
@@ -534,6 +557,7 @@ class _DashbaordState extends State<Dashbaord> {
                                             : snapshot.data!.length,
                                         itemBuilder: (context, index) => GestureDetector(
                                           onTap: (() {
+                                            _typeAheadController.clear();
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
@@ -542,6 +566,7 @@ class _DashbaordState extends State<Dashbaord> {
                                                     snapshot.data![index].name!,
                                                   )),
                                             );
+                                            ishow = false;
                                           }),
                                           child: Padding(
                                               padding: const EdgeInsets.only(
@@ -860,12 +885,13 @@ class _DashbaordState extends State<Dashbaord> {
                     }
                   },
                   header: CustomHeader(builder: (context, mode) => Container()),
-                  footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                  footer: CustomFooter(builder: (context, mode) => isDataLoad && totalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
                   child: isLoading
                       ? const LoadingPage()
                       : ListView.builder(
                     itemCount: hydraMember.length,
                     scrollDirection: Axis.vertical,
+                    controller: scrollController,
                     itemBuilder: (context, index) {
                       if (index == 0) {
                         return SizedBox(
@@ -956,16 +982,9 @@ class _DashbaordState extends State<Dashbaord> {
                                                 padding: const EdgeInsets.only(
                                                     right: 12),
                                                 child: RingtoneCategoryCard(
-                                                  id: state.categories!
-                                                      .hydraMember![index].id!,
-                                                  image: state
-                                                      .categories
-                                                      ?.hydraMember?[index]
-                                                      .image,
-                                                  name: state
-                                                      .categories
-                                                      ?.hydraMember?[index]
-                                                      .name,
+                                                  id: state.categories![index].id!,
+                                                  image: state.categories![index].image,
+                                                  name: state.categories![index].name,
                                                 ),
                                               );
                                             },

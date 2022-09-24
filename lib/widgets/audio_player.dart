@@ -11,7 +11,7 @@ import 'audio_select_dialog.dart';
 import 'more_audio_dialog.dart';
 
 class CustomAudioPlayer extends StatefulWidget {
-  final List<HydraMember> listHydra;
+  final List<DeezeItemModel> listHydra;
   final int index;
 
   const CustomAudioPlayer({

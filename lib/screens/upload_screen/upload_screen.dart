@@ -41,9 +41,9 @@ class UploadScreenState extends State<UploadScreen> {
   bool isShow = false;
   bool isLoading = false;
   int page = 1;
-  late int totalPage;
+  int? totalPage;
 
-  List<HydraMember> hydraMember = [];
+  List<DeezeItemModel> hydraMember = [];
 
   final TextEditingController _typeAheadController = TextEditingController();
   final SearchServices _searchServices = SearchServices();
@@ -53,7 +53,7 @@ class UploadScreenState extends State<UploadScreen> {
     if (isRefresh) {
       page = 1;
     } else {
-      if (page >= totalPage) {
+      if (totalPage == 0) {
         _refreshController.loadNoData();
         return false;
       }
@@ -79,15 +79,15 @@ class UploadScreenState extends State<UploadScreen> {
 
       if (response.statusCode == 200) {
         print(response.body);
-        var rawResponse = deezeFromJson(response.body);
+        var rawResponse = deezeItemModelFromJson(response.body);
         if (isRefresh) {
-          hydraMember = rawResponse.hydraMember!;
+          hydraMember = rawResponse;
         } else {
-          hydraMember.addAll(rawResponse.hydraMember!);
+          hydraMember.addAll(rawResponse);
         }
 
         page++;
-        totalPage = rawResponse.hydraTotalItems!;
+        totalPage = rawResponse.length;
         setState(() => isLoading = false);
         return true;
       } else {
@@ -102,400 +102,7 @@ class UploadScreenState extends State<UploadScreen> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    return isShow ? WillPopScope(
-      onWillPop: ()async{
-        isShow = false;
-        setState(() {});
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: const Color(0xFF4d047d),
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: <Color>[
-                  Color(0xFF4d047d),
-                  Color(0xFF17131F),
-                  Color(0xFF17131F),
-                  Color(0xFF17131F),
-                  Color(0xFF17131F),
-                  Color(0xFF17131F),
-                  Color(0xFF17131F),
-                ]),
-          ),
-          child: SmartRefresher(
-            enablePullUp: true,
-            controller: _refreshController,
-            onRefresh: () async {
-              final result = await fetchWallpapers(isRefresh: true);
-              if (result) {
-                _refreshController.refreshCompleted();
-              } else {
-                _refreshController.refreshFailed();
-              }
-            },
-            onLoading: () async {
-              final result = await fetchWallpapers();
-              if (result) {
-                _refreshController.loadComplete();
-              } else {
-                _refreshController.loadFailed();
-              }
-            },
-            header: CustomHeader(builder: (context, mode) => Container()),
-            footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
-            child: SafeArea(
-              child: Stack(
-                children: [
-                  CustomScrollView(
-                    slivers: [
-                      const SliverToBoxAdapter(
-                        child: SizedBox(height: 70),
-                      ),
-                      SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 17),
-                        sliver: SliverToBoxAdapter(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Categories",
-                                style: GoogleFonts.archivo(
-                                  fontStyle: FontStyle.normal,
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  wordSpacing: 0.19,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                          const Categories(
-                                            isRingtone: false,
-                                          )));
-                                },
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      "View All",
-                                      style: GoogleFonts.archivo(
-                                        fontStyle: FontStyle.normal,
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        wordSpacing: 0.16,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    const Icon(
-                                      Icons.arrow_forward,
-                                      color: Colors.white,
-                                      size: 15,
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 20,
-                        ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 60,
-                          width: screenWidth,
-                          child: BlocConsumer<CategoryBloc, CategoryState>(
-                            listener: (context, state) {
-                              // TODO: implement listener
-                            },
-                            builder: (context, state) {
-                              if (state is CategoryInitial) {
-                                return const Center(
-                                    child: CircularProgressIndicator());
-                              }
-                              if (state is LoadedCategory) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(left: 17),
-                                  child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: 4,
-                                    itemBuilder: (context, index) {
-                                      return Padding(
-                                        padding:
-                                        const EdgeInsets.only(right: 12),
-                                        child: WallpaperCategoryCard(
-                                          id: state.categories!
-                                              .hydraMember![index].id!,
-                                          image: state.categories
-                                              ?.hydraMember?[index].image,
-                                          name: state.categories
-                                              ?.hydraMember?[index].name,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                );
-                              }
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            },
-                          ),
-                        ),
-                      ),
-                      const SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 20,
-                        ),
-                      ),
-                      SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 17),
-                        sliver: SliverToBoxAdapter(
-                          child: Text(
-                            "Popular",
-                            style: GoogleFonts.archivo(
-                              fontStyle: FontStyle.normal,
-                              color: Colors.white,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 15,
-                        ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 33,
-                          width: screenWidth,
-                          child: const Tags(),
-                        ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 15)),
-                      SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        sliver: SliverGrid(
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            mainAxisSpacing: 5.0,
-                            crossAxisSpacing: 5.0,
-                            childAspectRatio: 3 / 6,
-                          ),
-                          delegate: SliverChildBuilderDelegate(
-                                (BuildContext context, int index) {
-                              return CategoryCard(
-                                index: index,
-                                listHydra: hydraMember,
-                                image: hydraMember[index].file!,
-                                name: hydraMember[index].name!,
-                              );
-                            },
-                            childCount: hydraMember.length,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 16),
-                          height: 46,
-                          width: MediaQuery.of(context).size.width,
-                          child: TextFormField(
-                            controller: _typeAheadController,
-                            onChanged: (data) => setState(() {}),
-                            onFieldSubmitted: (val){
-                              FocusScope.of(context).unfocus();
-                              if(_typeAheadController.text.isNotEmpty){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SearchScreen(
-                                        searchText:
-                                        _typeAheadController.text,
-                                      )),
-                                );
-                              }
-                              _typeAheadController.clear();
-                            },
-                            decoration: InputDecoration(
-                              hintText: "",
-                              hintStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                              ),
-                              fillColor: Colors.white,
-                              filled: true,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 5,
-                                horizontal: 20,
-                              ),
-                              focusedBorder: const OutlineInputBorder(
-                                borderRadius: BorderRadius.only(topRight: Radius.circular(7),topLeft: Radius.circular(7)),
-                                borderSide:
-                                BorderSide(color: Color(0xFF5d318c), width: 0),
-                              ),
-                              enabledBorder: const OutlineInputBorder(
-                                borderRadius: BorderRadius.only(topRight: Radius.circular(7),topLeft: Radius.circular(7)),
-                                borderSide:
-                                BorderSide(color: Color(0xFF5d318c), width: 0.0),
-                              ),
-                              suffixIcon: GestureDetector(
-                                onTap: () {
-                                  FocusScope.of(context).unfocus();
-                                  _typeAheadController.text.isEmpty ?
-                                  isShow = false
-                                      : Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => SearchScreen(
-                                          searchText:
-                                          _typeAheadController.text,
-                                        )),
-                                  );
-                                  _typeAheadController.clear();
-                                  setState(() {});
-                                },
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 12),
-                                  child: AppImageAsset(
-                                    image: 'assets/search.svg',
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        FutureBuilder<List<SearchModel>>(
-                            future: _searchServices.search(_typeAheadController.text.trim()),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<List<SearchModel>> snapshot) {
-                              if (snapshot.hasError) {
-                                return Container(
-                                    color: Colors.white,
-                                    alignment: Alignment.centerLeft,
-                                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                                    padding: const EdgeInsets.symmetric(vertical: 10).copyWith(left: 30),
-                                    child: const Text("Something went wrong",style: TextStyle(color: Color(0xFF5d318c)),)
-                                );
-                              }
-                              if (snapshot.connectionState == ConnectionState.done) {
-                                return Container(
-                                  color: Colors.white,
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: snapshot.data!.length > 4
-                                        ? 4
-                                        : snapshot.data!.length,
-                                    itemBuilder: (context, index) => GestureDetector(
-                                      onTap: (() {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => SearchScreen(
-                                                searchText:
-                                                snapshot.data![index].name!,
-                                              )),
-                                        );
-                                      }),
-                                      child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 30, top: 10, bottom: 10),
-                                          child: Text(
-                                            "${snapshot.data![index].name}",
-                                            style: GoogleFonts.archivo(
-                                              fontStyle: FontStyle.normal,
-                                              color: const Color(0xFF5d318c),
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          )),
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                return Container();
-                              }
-                            }),
-                        Container(
-                          width: MediaQuery.of(context).size.width,
-                          margin: const EdgeInsets.symmetric(horizontal: 16),
-                          padding: const EdgeInsets.all(30).copyWith(top: 10),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(10),
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Trending search',
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16),
-                              ),
-                              const SizedBox(height: 10),
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 10,
-                                children: List.generate(
-                                  _searchServices
-                                      .trendingSearchItems.length,
-                                      (index) => Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8, horizontal: 10),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: const Color(0XFFE1E1E1)),
-                                      borderRadius:
-                                      BorderRadius.circular(10),
-                                    ),
-                                    child: Text(
-                                      _searchServices
-                                          .trendingSearchItems[index],
-                                      style: const TextStyle(
-                                          color: Colors.black),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    ) :
-    Scaffold(
+    return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size(0, 60),
         child: AppBar(
@@ -523,15 +130,15 @@ class UploadScreenState extends State<UploadScreen> {
               wordSpacing: 0.34,
             ),
           ),
-          actions:  [
-            GestureDetector(
-              onTap: () => setState(() => isShow = true),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                child: const AppImageAsset(image: 'assets/search.svg'),
-              ),
-            ),
-          ],
+          // actions:  [
+          //   GestureDetector(
+          //     onTap: () => setState(() => isShow = true),
+          //     child: const Padding(
+          //       padding: EdgeInsets.symmetric(horizontal: 12),
+          //       child: const AppImageAsset(image: 'assets/search.svg'),
+          //     ),
+          //   ),
+          // ],
         ),
       ),
       body: Container(

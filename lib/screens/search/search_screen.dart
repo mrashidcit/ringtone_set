@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:deeze_app/models/search_model.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:flutter/material.dart';
@@ -32,12 +33,26 @@ class _SearchScreenState extends State<SearchScreen> {
   Duration position = Duration.zero;
   Duration pauseDuration = Duration.zero;
   Duration pausePosition = Duration.zero;
+  bool isRingtoneDataLoad = false;
+  bool isWallPaperDataLoad = false;
+  ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    scrollController.addListener(() {
+      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+        setState(() {
+          if(isWallpaper){
+            isWallPaperDataLoad = true;
+          }
+          else if(isRingtone){
+            isRingtoneDataLoad = true;
+          }
+        });
+      }
+    });
     liseten();
     audioPlayer.onDurationChanged.listen((state) {
       setState(() {
@@ -70,20 +85,20 @@ class _SearchScreenState extends State<SearchScreen> {
 
   final TextEditingController _typeAheadController = TextEditingController();
   int ringtonePage = 1;
-  late int ringtoneTotalPage;
+  int? ringtoneTotalPage;
   final RefreshController _ringtoneRefreshController =
       RefreshController(initialRefresh: true);
   bool isWallpaper = false;
   bool isNotification = false;
   bool isRingtone = true;
   bool isLoading = false;
-  List<HydraMember> ringtonelist = [];
+  List<DeezeItemModel> ringtonelist = [];
 
   Future<bool> fetchRingtone({bool isRefresh = false}) async {
     if (isRefresh) {
       ringtonePage = 1;
     } else {
-      if (ringtonePage >= ringtoneTotalPage) {
+      if (ringtoneTotalPage == 0) {
         _ringtoneRefreshController.loadNoData();
         return false;
       }
@@ -110,16 +125,22 @@ class _SearchScreenState extends State<SearchScreen> {
 
       if (response.statusCode == 200) {
         print(response.body);
-        var rawResponse = deezeFromJson(response.body);
+        var rawResponse = deezeItemModelFromJson(response.body);
         if (isRefresh) {
-          ringtonelist = rawResponse.hydraMember!;
+          ringtonelist = rawResponse;
         } else {
-          ringtonelist.addAll(rawResponse.hydraMember!);
+          ringtonelist.addAll(rawResponse);
         }
 
         ringtonePage++;
-        ringtoneTotalPage = rawResponse.hydraTotalItems!;
-        setState(() => isLoading = false);
+        ringtoneTotalPage = rawResponse.length;
+        setState(() {
+          isLoading = false;
+          if(isRingtoneDataLoad && ringtoneTotalPage == 0){
+            showMessage(context, message: 'No data available!');
+          }
+          isRingtoneDataLoad = false;
+        });
         return true;
       } else {
         return false;
@@ -132,17 +153,17 @@ class _SearchScreenState extends State<SearchScreen> {
 ///////////////////////
 
   int wallpaperPage = 1;
-  late int wallpaperTotalPage;
+  int? wallpaperTotalPage;
   final RefreshController _wallpaperRefreshController =
       RefreshController(initialRefresh: true);
 
-  List<HydraMember> wallpaperList = [];
+  List<DeezeItemModel> wallpaperList = [];
 
   Future<bool> fetchWallpaper({bool isRefresh = false}) async {
     if (isRefresh) {
       wallpaperPage = 1;
     } else {
-      if (wallpaperPage >= wallpaperTotalPage) {
+      if (wallpaperTotalPage == 0) {
         _wallpaperRefreshController.loadNoData();
         return false;
       }
@@ -169,16 +190,22 @@ class _SearchScreenState extends State<SearchScreen> {
 
       if (response.statusCode == 200) {
         print(response.body);
-        var rawResponse = deezeFromJson(response.body);
+        var rawResponse = deezeItemModelFromJson(response.body);
         if (isRefresh) {
-          wallpaperList = rawResponse.hydraMember!;
+          wallpaperList = rawResponse;
         } else {
-          wallpaperList.addAll(rawResponse.hydraMember!);
+          wallpaperList.addAll(rawResponse);
         }
 
         wallpaperPage++;
-        wallpaperTotalPage = rawResponse.hydraTotalItems!;
-        setState(() => isLoading = false);
+        wallpaperTotalPage = rawResponse.length;
+        setState(() {
+          isLoading = false;
+          if(isWallPaperDataLoad && wallpaperTotalPage == 0){
+            showMessage(context, message: 'No data available!');
+          }
+          isWallPaperDataLoad = false;
+        });
         return true;
       } else {
         return false;
@@ -201,7 +228,7 @@ class _SearchScreenState extends State<SearchScreen> {
             title: SizedBox(
               height: 43,
               width: MediaQuery.of(context).size.width,
-              child: TypeAheadFormField<HydraMember?>(
+              child: TypeAheadFormField<SearchModel?>(
                   suggestionsBoxVerticalOffset: 0,
                   suggestionsBoxDecoration:
                       const SuggestionsBoxDecoration(color: Colors.white),
@@ -246,7 +273,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
                   ),
-                  itemBuilder: (context, HydraMember? suggestion) {
+                  itemBuilder: (context, SearchModel? suggestion) {
                     final ringtone = suggestion!;
                     return GestureDetector(
                       onTap: (() {
@@ -272,7 +299,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           )),
                     );
                   },
-                  onSuggestionSelected: (HydraMember? suggestion) {},
+                  onSuggestionSelected: (SearchModel? suggestion) {},
                   noItemsFoundBuilder: (context) => Center(
                         child: Text(
                           "No Found",
@@ -517,11 +544,12 @@ class _SearchScreenState extends State<SearchScreen> {
                           }
                         },
                         header: CustomHeader(builder: (context, mode) => Container()),
-                        footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                        footer: CustomFooter(builder: (context, mode) => isWallPaperDataLoad && wallpaperTotalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
                         child: isLoading
                             ? const LoadingPage()
                             : GridView.builder(
                             itemCount: wallpaperList.length,
+                            controller: scrollController,
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 3,
@@ -562,13 +590,14 @@ class _SearchScreenState extends State<SearchScreen> {
                         }
                       },
                       header: CustomHeader(builder: (context, mode) => Container()),
-                      footer: CustomFooter(builder: (context, mode) => const LoadingPage()),
+                      footer: CustomFooter(builder: (context, mode) => isRingtoneDataLoad && ringtoneTotalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
                       child: isLoading
                           ? const LoadingPage()
                           : Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: ListView.builder(
                           itemCount: ringtonelist.length,
+                          controller: scrollController,
                           scrollDirection: Axis.vertical,
                           itemBuilder: (context, index) {
                             return selectedIndex == index

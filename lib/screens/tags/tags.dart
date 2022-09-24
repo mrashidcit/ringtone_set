@@ -19,16 +19,16 @@ class Tags extends StatefulWidget {
 
 class _TagsState extends State<Tags> {
   int page = 1;
-  late int totalPage;
+  int? totalPage;
   final RefreshController _refreshController =
       RefreshController(initialRefresh: true);
 
-  List<HydraMember> hydraMember = [];
+  List<TagModel> hydraMember = [];
   Future<bool> fetchtags({bool isRefresh = false}) async {
     if (isRefresh) {
       page = 1;
     } else {
-      if (page >= totalPage) {
+      if (totalPage == 0) {
         _refreshController.loadNoData();
         return false;
       }
@@ -51,15 +51,15 @@ class _TagsState extends State<Tags> {
 
       if (response.statusCode == 200) {
         print(response.body);
-        var rawResponse = tagsFromJson(response.body);
+        var rawResponse = tagModelFromJson(response.body);
         if (isRefresh) {
-          hydraMember = rawResponse.hydraMember!;
+          hydraMember = rawResponse;
         } else {
-          hydraMember.addAll(rawResponse.hydraMember!);
+          hydraMember.addAll(rawResponse);
         }
 
         page++;
-        totalPage = rawResponse.hydraTotalItems!;
+        totalPage = rawResponse.length;
         setState(() {});
         return true;
       } else {

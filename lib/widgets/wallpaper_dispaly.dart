@@ -18,7 +18,7 @@ import 'package:path_provider/path_provider.dart';
 import '../models/deeze_model.dart';
 
 class WallPaperSlider extends StatefulWidget {
-  final List<HydraMember>? listHydra;
+  final List<DeezeItemModel>? listHydra;
   final int? index;
   const WallPaperSlider({Key? key, this.listHydra, this.index})
       : super(key: key);
@@ -107,10 +107,10 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                             index: index,
                             userName: widget.listHydra![index].user!.firstName!,
                             userProfileUrl: widget.listHydra![index].user!.image,
-                            isFavourite: widget.listHydra![index].isFavourite,
+                            // isFavourite: widget.listHydra![index].isFavourite,
                             onTap: () {
                               setState(() {
-                                widget.listHydra![index].isFavourite = !widget.listHydra![index].isFavourite;
+                                // widget.listHydra![index].isFavourite = !widget.listHydra![index].isFavourite;
                               });
                             },
                           ),

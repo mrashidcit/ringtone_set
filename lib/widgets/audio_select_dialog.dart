@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:ringtone_set/ringtone_set.dart';
 
 class AudioSelectDialog extends StatefulWidget {
@@ -26,23 +28,26 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {}
-  Future<bool> downloadFile(String url) async {
-    final appStorage = await getApplicationDocumentsDirectory();
-    final file = File("${appStorage.path}/video.mp3");
-    try {
-      final response = await Dio().get(url,
-          options: Options(
-              responseType: ResponseType.bytes,
-              followRedirects: false,
-              receiveTimeout: 0));
-      final raf = file.openSync(mode: FileMode.write);
-      raf.writeFromSync(response.data);
-      raf.close();
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
+  // Future<bool> downloadFile(String url) async {
+  //   final appStorage = await getApplicationDocumentsDirectory();
+  //   final file = File("${appStorage.path}/video.mp3");
+  //   try {
+  //       await Dio().download(url, file);
+  //
+  //
+  //     // final response = await Dio().get(url,
+  //     //     options: Options(
+  //     //         responseType: ResponseType.bytes,
+  //     //         followRedirects: false,
+  //     //         receiveTimeout: 0));
+  //     // final raf = file.openSync(mode: FileMode.write);
+  //     // raf.writeFromSync(response.data);
+  //     // raf.close();
+  //     return true;
+  //   } catch (e) {
+  //     return false;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +88,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     bool success = false;
                     ProgressDialog pd = ProgressDialog(
                       context,
+                      dismissable: false,
                       message: Text(
                         "Please Wait!",
                         style: GoogleFonts.archivo(
@@ -93,22 +99,17 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     );
                     pd.show();
                     try {
-                      success =
-                          await RingtoneSet.setRingtoneFromNetwork(widget.file);
+                      success = await RingtoneSet.setRingtoneFromNetwork(widget.file);
+                      pd.dismiss();
                     } on PlatformException {
                       success = false;
                     }
-                    var snackBar;
                     if (success) {
-                      snackBar = const SnackBar(
-                        content: Text("Ringtone set successfully!"),
-                      );
-                      Navigator.of(context).pop();
+                      showMessage(context, message: "Ringtone set successfully!");
                     } else {
-                      snackBar = const SnackBar(content: Text("Error"));
-                      Navigator.of(context).pop();
+                      showMessage(context, message: "Error");
                     }
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    Navigator.pop(context);
                   },
                   child: Container(
                     width: 180,
@@ -143,6 +144,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     bool success = false;
                     ProgressDialog pd = ProgressDialog(
                       context,
+                      dismissable: false,
                       message: Text(
                         "Please Wait!",
                         style: GoogleFonts.archivo(
@@ -153,22 +155,17 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     );
                     pd.show();
                     try {
-                      success = await RingtoneSet.setNotificationFromNetwork(
-                          widget.file);
+                      success = await RingtoneSet.setNotificationFromNetwork(widget.file);
+                      pd.dismiss();
                     } on PlatformException {
                       success = false;
                     }
-                    var snackBar;
                     if (success) {
-                      snackBar = const SnackBar(
-                        content: Text("Notifications sound  set successfully!"),
-                      );
-                      Navigator.of(context).pop();
+                      showMessage(context, message: "Notifications sound  set successfully!");
                     } else {
-                      snackBar = const SnackBar(content: Text("Error"));
-                      Navigator.of(context).pop();
+                      showMessage(context, message: "Error");
                     }
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    Navigator.pop(context);
                   },
                   child: Container(
                     width: 180,
@@ -203,6 +200,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     bool success = false;
                     ProgressDialog pd = ProgressDialog(
                       context,
+                      dismissable: false,
                       message: Text(
                         "Please Wait!",
                         style: GoogleFonts.archivo(
@@ -215,20 +213,17 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                     try {
                       success =
                           await RingtoneSet.setAlarmFromNetwork(widget.file);
+                      pd.dismiss();
                     } on PlatformException {
                       success = false;
                     }
-                    var snackBar;
+
                     if (success) {
-                      snackBar = const SnackBar(
-                        content: Text("Alarm sound  set successfully!"),
-                      );
-                      Navigator.of(context).pop();
+                      showMessage(context, message: "set to contact successfully!");
                     } else {
-                      snackBar = const SnackBar(content: Text("Error"));
-                      Navigator.of(context).pop();
+                      showMessage(context, message: "Error");
                     }
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    Navigator.pop(context);
                   },
                   child: Container(
                     width: 180,
@@ -258,37 +253,12 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                   ),
                 ),
                 const SizedBox(height: 22),
-                Container(
-                  width: 180,
-                  alignment: Alignment.center,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const SizedBox(
-                        width: 20,
-                        child: AppImageAsset(
-                          image: 'assets/person.svg',
-                          height: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Text(
-                        'SET TO CONTACT',
-                        style: GoogleFonts.archivo(
-                          fontStyle: FontStyle.normal,
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                InkWell(
+                GestureDetector(
                   onTap: () async {
+                    bool success = false;
                     ProgressDialog pd = ProgressDialog(
                       context,
+                      dismissable: false,
                       message: Text(
                         "Please Wait!",
                         style: GoogleFonts.archivo(
@@ -298,15 +268,80 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                       ),
                     );
                     pd.show();
-                    final sucess = await downloadFile(widget.file);
-                    var snackBar;
-                    if (sucess) {
-                      print("sucess");
-                      snackBar = const SnackBar(
-                        content: Text("Your File  successfully Downloaded"),
-                      );
-                      Navigator.of(context).pop();
+                    try {
+                      success =
+                      await RingtoneSet.setAlarmFromNetwork(widget.file);
+                      pd.dismiss();
+                    } on PlatformException {
+                      success = false;
                     }
+
+                    if (success) {
+                      showMessage(context, message: "Alarm sound  set successfully!");
+                    } else {
+                      showMessage(context, message: "Error");
+                    }
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: 180,
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          width: 20,
+                          child: AppImageAsset(
+                            image: 'assets/person.svg',
+                            height: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Text(
+                          'SET TO CONTACT',
+                          style: GoogleFonts.archivo(
+                            fontStyle: FontStyle.normal,
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                InkWell(
+                  onTap: () async {
+                    bool success = false;
+
+                    ProgressDialog pd = ProgressDialog(
+                      context,
+                      dismissable: false,
+                      message: Text(
+                        "Please Wait!",
+                        style: GoogleFonts.archivo(
+                          fontStyle: FontStyle.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    );
+                    pd.show();
+
+                    try {
+                      success = await downloadFile(widget.file,'${DateTime.now().microsecondsSinceEpoch}.mp3');
+                      pd.dismiss();
+                    } on PlatformException {
+                      success = false;
+                    }
+
+                    if (success) {
+                      showMessage(context, message: "Your File  successfully Downloaded");
+                    } else {
+                      showMessage(context, message: "Try again!");
+                    }
+                    Navigator.pop(context);
+
                   },
                   child: Stack(
                     clipBehavior: Clip.none,
@@ -357,5 +392,86 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
         ),
       ),
     );
+  }
+  Future<bool> _requestPermission() async {
+
+      PermissionStatus storageStatus = await Permission.storage.status;
+
+      PermissionStatus externalStorageStatus = await Permission.manageExternalStorage.status;
+
+
+    if((storageStatus.isDenied || storageStatus.isPermanentlyDenied || externalStorageStatus.isDenied || externalStorageStatus.isPermanentlyDenied)){
+
+      if(storageStatus.isDenied){
+        await Permission.storage.request();
+      }
+      if(externalStorageStatus.isDenied){
+        await Permission.manageExternalStorage.request();
+      }
+
+      PermissionStatus permissionStorageStatus = await Permission.storage.status;
+      PermissionStatus permissionExternalStatus = await Permission.manageExternalStorage.status;
+
+      if(permissionStorageStatus.isDenied || permissionExternalStatus.isDenied){
+        openAppSettings();
+      }
+      if(storageStatus.isGranted || storageStatus.isLimited && externalStorageStatus.isGranted || externalStorageStatus.isLimited){
+        return true;
+      }
+      return false;
+    }
+    else if(storageStatus.isGranted || storageStatus.isLimited && externalStorageStatus.isGranted || externalStorageStatus.isLimited){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+
+  Future<bool> downloadFile(String url, String fileName) async {
+    Directory directory;
+    try {
+
+        if (await _requestPermission()) {
+          directory = (await getExternalStorageDirectory())!;
+          String newPath = "";
+
+          print(directory);
+          List<String> paths = directory.path.split("/");
+          for (int x = 1; x < paths.length; x++) {
+            String folder = paths[x];
+            if (folder != "Android") {
+              newPath += "/" + folder;
+            } else {
+              break;
+            }
+          }
+          newPath = newPath + "/DeezePlayer";
+          directory = Directory(newPath);
+
+        } else {
+          return false;
+        }
+
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+      if (await directory.exists()) {
+        File saveFile = File(directory.path + "/$fileName");
+        print("saveFile => $saveFile");
+        print("direc => $directory");
+        await Dio().download(url, saveFile.path);
+        return true;
+      }
+      if (await directory.exists()) {
+        File saveFile = File(directory.path + "/$fileName");
+        print("saveFile => $saveFile");
+        await Dio().download(url, saveFile.path);
+        return true;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return false;
   }
 }

@@ -6,7 +6,7 @@ abstract class CategoryState {}
 class CategoryInitial extends CategoryState {}
 
 class LoadedCategory extends CategoryState {
-  Categories? categories;
+  List<CategoriesModel>? categories;
   LoadedCategory({this.categories});
 }
 
