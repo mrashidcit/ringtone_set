@@ -8,12 +8,12 @@ import 'ringtone_state.dart';
 
 class DeezeRepository {
   Future<RingtoneState> getRingtone() async {
-    var url = getDeezeAppUrlContent;
+    var url = getDeezeAppHpUrlContent;
 
     Uri uri = Uri.parse(url).replace(queryParameters: {
       "page": "1",
       "itemsPerPage": "10",
-      "enabled": "true",
+      // "enabled": "true",
       "type": "RINGTONE"
     });
     try {
@@ -38,12 +38,12 @@ class DeezeRepository {
   }
 
   Future<WallpaperState> getWallPapers() async {
-    var url = getDeezeAppUrlContent;
+    var url = getDeezeAppHpUrlContent;
 
     Uri uri = Uri.parse(url).replace(queryParameters: {
       "page": "1",
       "itemsPerPage": "10",
-      "enabled": "true",
+      // "enabled": "true",
       "type": "WALLPAPER"
     });
     try {

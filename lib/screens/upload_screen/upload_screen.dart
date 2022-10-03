@@ -59,12 +59,12 @@ class UploadScreenState extends State<UploadScreen> {
       }
     }
 
-    var url = getDeezeAppUrlContent;
+    var url = getDeezeAppHpUrlContent;
 
     Uri uri = Uri.parse(url).replace(queryParameters: {
       "page": "$page",
       "itemsPerPage": "10",
-      "enabled": "true",
+      // "enabled": "true",
       "type": "WALLPAPER"
     });
     try {
