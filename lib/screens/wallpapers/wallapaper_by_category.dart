@@ -39,7 +39,8 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
     // TODO: implement initState
     super.initState();
     scrollController.addListener(() {
-      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
         setState(() {
           isDataLoad = true;
         });
@@ -110,7 +111,7 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
         totalPage = rawResponse.length;
         setState(() {
           isLoading = false;
-          if(isDataLoad && totalPage == 0){
+          if (isDataLoad && totalPage == 0) {
             showMessage(context, message: 'No data available!');
           }
           isDataLoad = false;
@@ -133,13 +134,13 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
     double screenWidth = MediaQuery.of(context).size.width;
     return ishow
         ? WillPopScope(
-           onWillPop: ()async{
-           setState(() {
-            ishow = false;
-           });
-           return ishow;
-         },
-          child: Scaffold(
+            onWillPop: () async {
+              setState(() {
+                ishow = false;
+              });
+              return ishow;
+            },
+            child: Scaffold(
               appBar: PreferredSize(
                 preferredSize: Size(0, 60),
                 child: AppBar(
@@ -162,16 +163,16 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                               // hideSuggestionsOnKeyboardHide: false,
                               textFieldConfiguration: TextFieldConfiguration(
                                 controller: _typeAheadController,
-                                onSubmitted: (val){
+                                onSubmitted: (val) {
                                   FocusScope.of(context).unfocus();
-                                  if(_typeAheadController.text.isNotEmpty){
+                                  if (_typeAheadController.text.isNotEmpty) {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => SearchScreen(
-                                            searchText:
-                                            _typeAheadController.text,
-                                          )),
+                                                searchText:
+                                                    _typeAheadController.text,
+                                              )),
                                     );
                                   }
                                   _typeAheadController.clear();
@@ -206,17 +207,18 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                                     onTap: () {
                                       FocusScope.of(context).unfocus();
 
-                                      if(_typeAheadController.text.isEmpty){
+                                      if (_typeAheadController.text.isEmpty) {
                                         ishow = false;
-                                      }
-                                      else{
+                                      } else {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) => SearchScreen(
-                                                searchText:
-                                                _typeAheadController.text,
-                                              )),
+                                              builder: (context) =>
+                                                  SearchScreen(
+                                                    searchText:
+                                                        _typeAheadController
+                                                            .text,
+                                                  )),
                                         );
                                         ishow = false;
                                       }
@@ -224,7 +226,8 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                                       setState(() {});
                                     },
                                     child: const Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 12),
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 12),
                                       child: AppImageAsset(
                                         image: 'assets/search.svg',
                                         color: Colors.black,
@@ -358,27 +361,33 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                                   _refreshController.loadFailed();
                                 }
                               },
-                              header: CustomHeader(builder: (context, mode) => Container()),
-                              footer: CustomFooter(builder: (context, mode) => isDataLoad && totalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
+                              header: CustomHeader(
+                                  builder: (context, mode) => Container()),
+                              footer: CustomFooter(
+                                  builder: (context, mode) =>
+                                      isDataLoad && totalPage != 0
+                                          ? const LoadingPage()
+                                          : const SizedBox()),
                               child: isLoading
                                   ? const LoadingPage()
                                   : GridView.builder(
-                                  itemCount: hydraMember.length,
-                                  controller: scrollController,
-                                  gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 3,
-                                      childAspectRatio: 3 / 6,
-                                      crossAxisSpacing: 5,
-                                      mainAxisSpacing: 5),
-                                  itemBuilder: (context, index) {
-                                    return CategoryCard(
-                                      index: index,
-                                      listHydra: hydraMember,
-                                      image: hydraMember[index].file!,
-                                      name: hydraMember[index].name!,
-                                    );
-                                  }),
+                                      itemCount: hydraMember.length,
+                                      controller: scrollController,
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 3,
+                                              childAspectRatio: 3 / 6,
+                                              crossAxisSpacing: 5,
+                                              mainAxisSpacing: 5),
+                                      itemBuilder: (context, index) {
+                                        return CategoryCard(
+                                          id: hydraMember[index].id.toString(),
+                                          index: index,
+                                          listHydra: hydraMember,
+                                          image: hydraMember[index].file!,
+                                          name: hydraMember[index].name!,
+                                        );
+                                      }),
                             ),
                           ),
                         ),
@@ -386,12 +395,12 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                     ),
                   )),
             ),
-        )
+          )
         : WillPopScope(
-          onWillPop: ()async{
-            return true;
-          },
-          child: Scaffold(
+            onWillPop: () async {
+              return true;
+            },
+            child: Scaffold(
               appBar: PreferredSize(
                 preferredSize: Size(0, 60),
                 child: AppBar(
@@ -450,7 +459,8 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                                   suffixIcon: GestureDetector(
                                     onTap: () => setState(() => ishow = false),
                                     child: const Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 12),
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 12),
                                       child: AppImageAsset(
                                         image: 'assets/search.svg',
                                         color: Colors.black,
@@ -613,27 +623,33 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                                   _refreshController.loadFailed();
                                 }
                               },
-                              header: CustomHeader(builder: (context, mode) => Container()),
-                              footer: CustomFooter(builder: (context, mode) => isDataLoad && totalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
+                              header: CustomHeader(
+                                  builder: (context, mode) => Container()),
+                              footer: CustomFooter(
+                                  builder: (context, mode) =>
+                                      isDataLoad && totalPage != 0
+                                          ? const LoadingPage()
+                                          : const SizedBox()),
                               child: isLoading
                                   ? const LoadingPage()
                                   : GridView.builder(
-                                  itemCount: hydraMember.length,
-                                  controller: scrollController,
-                                  gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 3,
-                                          childAspectRatio: 3 / 6,
-                                          crossAxisSpacing: 5,
-                                          mainAxisSpacing: 5),
-                                  itemBuilder: (context, index) {
-                                    return CategoryCard(
-                                      index: index,
-                                      listHydra: hydraMember,
-                                      image: hydraMember[index].file!,
-                                      name: hydraMember[index].name!,
-                                    );
-                                  }),
+                                      itemCount: hydraMember.length,
+                                      controller: scrollController,
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 3,
+                                              childAspectRatio: 3 / 6,
+                                              crossAxisSpacing: 5,
+                                              mainAxisSpacing: 5),
+                                      itemBuilder: (context, index) {
+                                        return CategoryCard(
+                                          id: hydraMember[index].id.toString(),
+                                          index: index,
+                                          listHydra: hydraMember,
+                                          image: hydraMember[index].file!,
+                                          name: hydraMember[index].name!,
+                                        );
+                                      }),
                             ),
                           ),
                         ),
@@ -672,7 +688,8 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                             padding: const EdgeInsets.only(left: 40),
                             child: Row(
                               children: [
-                                const AppImageAsset(image: 'assets/ringtone.svg'),
+                                const AppImageAsset(
+                                    image: 'assets/ringtone.svg'),
                                 const SizedBox(
                                   width: 26,
                                 ),
@@ -710,7 +727,8 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                             padding: const EdgeInsets.only(left: 40),
                             child: Row(
                               children: [
-                                const AppImageAsset(image: "assets/wallpaper.svg"),
+                                const AppImageAsset(
+                                    image: "assets/wallpaper.svg"),
                                 const SizedBox(
                                   width: 26,
                                 ),
@@ -760,7 +778,9 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                           padding: const EdgeInsets.only(left: 40),
                           child: Row(
                             children: [
-                              const AppImageAsset(image: 'assets/favourite_fill.svg', color: Colors.white),
+                              const AppImageAsset(
+                                  image: 'assets/favourite_fill.svg',
+                                  color: Colors.white),
                               const SizedBox(
                                 width: 29,
                               ),
@@ -904,6 +924,6 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                 ),
               ),
             ),
-        );
+          );
   }
 }

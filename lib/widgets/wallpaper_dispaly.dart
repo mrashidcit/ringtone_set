@@ -1,12 +1,14 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
-import 'dart:ui';
 import 'dart:math' as math;
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:http/http.dart' as http;
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
@@ -14,8 +16,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:platform_device_id/platform_device_id.dart';
 
+import 'package:deeze_app/widgets/app_image_assets.dart';
+
+import '../db_services/favorite_database.dart';
 import '../models/deeze_model.dart';
+import '../models/favorite.dart';
+import '../uitilities/end_points.dart';
 
 class WallPaperSlider extends StatefulWidget {
   final List<DeezeItemModel>? listHydra;
@@ -30,10 +38,10 @@ class WallPaperSlider extends StatefulWidget {
 
 class _WallPaperSliderState extends State<WallPaperSlider> {
   final CarouselController _controller = CarouselController();
-  late int activeIndex = widget.index!;
+  late int activeIndex = 0;
   String file = "";
   animateToSilde(int index) => _controller.animateToPage(
-        index,
+        0,
         duration: Duration(milliseconds: 100),
         curve: Curves.linear,
       );
@@ -41,10 +49,45 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    widget.listHydra!.removeRange(0, widget.index!);
     WidgetsBinding.instance
         .addPostFrameCallback((timeStamp) => animateToSilde(widget.index!));
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => loadData());
-    file = widget.listHydra![widget.index!].file!;
+    file = widget.listHydra![0].file!;
+  }
+
+  int page = 1;
+  Future<bool> fetchWallaper() async {
+    var url = getDeezeAppHpUrlContent;
+
+    Uri uri = Uri.parse(url).replace(queryParameters: {
+      "page": "$page",
+      "itemsPerPage": "10",
+      // "enabled": "true",
+      "type": "WALLPAPER"
+    });
+    try {
+      http.Response response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      print('${response.statusCode} : ${response.request}');
+
+      if (response.statusCode == 200) {
+        print(response.body);
+        var rawResponse = deezeItemModelFromJson(response.body);
+
+        widget.listHydra!.addAll(rawResponse);
+
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
   }
 
   Future loadData() async {
@@ -84,7 +127,10 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
         ),
         child: Stack(
           children: [
-            const AppImageAsset(image: 'assets/drop_shadow.png', height: double.infinity, fit: BoxFit.cover),
+            const AppImageAsset(
+                image: 'assets/drop_shadow.png',
+                height: double.infinity,
+                fit: BoxFit.cover),
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
               child: Column(
@@ -102,70 +148,73 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          buildImage(
+                          BuildImage(
                             urlImage: urlImage,
-                            index: index,
+                            index: activeIndex,
                             userName: widget.listHydra![index].user!.firstName!,
-                            userProfileUrl: widget.listHydra![index].user!.image,
+                            userProfileUrl:
+                                widget.listHydra![index].user!.image,
                             // isFavourite: widget.listHydra![index].isFavourite,
-                            onTap: () {
-                              setState(() {
-                                // widget.listHydra![index].isFavourite = !widget.listHydra![index].isFavourite;
-                              });
-                            },
+                            file: widget.listHydra![index].file!,
+                            id: widget.listHydra![index].id!,
+                            name: widget.listHydra![index].name!,
                           ),
                           if (activeIndex == index) const SizedBox(height: 10),
                           if (activeIndex == index)
                             Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  widget.listHydra![activeIndex].user!.image != null
-                                      ? CircleAvatar(
-                                          radius: 15,
-                                          backgroundImage: NetworkImage(
-                                            widget.listHydra![activeIndex].user!.image!,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    widget.listHydra![activeIndex].user!
+                                                .image !=
+                                            null
+                                        ? CircleAvatar(
+                                            radius: 15,
+                                            backgroundImage: NetworkImage(
+                                              widget.listHydra![activeIndex]
+                                                  .user!.image!,
+                                            ),
+                                          )
+                                        : const CircleAvatar(
+                                            backgroundColor: Colors.grey,
+                                            radius: 15,
                                           ),
-                                        )
-                                      : const CircleAvatar(
-                                          backgroundColor: Colors.grey,
-                                          radius: 15,
-                                        ),
-                                  const SizedBox(width: 15),
-                                  Text(
-                                    widget.listHydra![activeIndex].user!.firstName!,
-                                    style: GoogleFonts.archivo(
-                                      fontStyle: FontStyle.normal,
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                      wordSpacing: -0.05,
-                                      fontWeight: FontWeight.w400,
+                                    const SizedBox(width: 15),
+                                    Text(
+                                      widget.listHydra![activeIndex].user!
+                                          .firstName!,
+                                      style: GoogleFonts.archivo(
+                                        fontStyle: FontStyle.normal,
+                                        color: Colors.white,
+                                        fontSize: 15,
+                                        wordSpacing: -0.05,
+                                        fontWeight: FontWeight.w400,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  const AppImageAsset(
-                                    image: 'assets/arrow.svg',
-                                    height: 8,
-                                    width: 8,
-                                    fit: BoxFit.fill,
-                                  ),
-                                  const SizedBox(width: 2),
-                                  Text(
-                                    "23k",
-                                    style: GoogleFonts.archivo(
-                                      fontSize: 11,
-                                      fontStyle: FontStyle.normal,
-                                      color: Colors.white,
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    const AppImageAsset(
+                                      image: 'assets/arrow.svg',
+                                      height: 8,
+                                      width: 8,
+                                      fit: BoxFit.fill,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      "23k",
+                                      style: GoogleFonts.archivo(
+                                        fontSize: 11,
+                                        fontStyle: FontStyle.normal,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                         ],
                       );
                     },
@@ -177,6 +226,10 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                       enlargeCenterPage: true,
                       onPageChanged: (index, reason) {
                         setState(() {
+                          page = index;
+                        });
+                        fetchWallaper();
+                        setState(() {
                           file = widget.listHydra![index].file!;
                           activeIndex = index;
                         });
@@ -186,20 +239,28 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const AppImageAsset(image: 'assets/dot.svg', color: Colors.white, height: 6),
+                      const AppImageAsset(
+                          image: 'assets/dot.svg',
+                          color: Colors.white,
+                          height: 6),
                       const SizedBox(width: 30),
                       GestureDetector(
                         onTap: () {
                           showCupertinoModalPopup(
                             context: context,
                             barrierColor: Colors.black.withOpacity(0.8),
-                            builder: (context) => WallpaperSelectDialog(file: file),
+                            builder: (context) =>
+                                WallpaperSelectDialog(file: file),
                           );
                         },
-                        child: const AppImageAsset(image: 'assets/wallpaper_down.svg', height: 50),
+                        child: const AppImageAsset(
+                            image: 'assets/wallpaper_down.svg', height: 50),
                       ),
                       const SizedBox(width: 30),
-                      const AppImageAsset(image: 'assets/share.svg', color: Colors.white, height: 18),
+                      const AppImageAsset(
+                          image: 'assets/share.svg',
+                          color: Colors.white,
+                          height: 18),
                     ],
                   ),
                 ],
@@ -210,15 +271,49 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
       ),
     );
   }
+}
 
-  Widget buildImage({
-    required String urlImage,
-    required int index,
-    required String userName,
-    String? userProfileUrl,
-    bool isFavourite= false,
-    required GestureTapCallback onTap
-  }) {
+class BuildImage extends StatefulWidget {
+  String urlImage;
+  int index;
+  String name;
+  String file;
+  int id;
+  String userName;
+  String? userProfileUrl;
+  BuildImage({
+    Key? key,
+    required this.urlImage,
+    required this.index,
+    required this.name,
+    required this.file,
+    required this.id,
+    required this.userName,
+    this.userProfileUrl,
+  }) : super(key: key);
+
+  @override
+  State<BuildImage> createState() => _BuildImageState();
+}
+
+class _BuildImageState extends State<BuildImage> {
+  List<Favorite> favoriteList = [];
+
+  refreshFavorite() async {
+    favoriteList = await FavoriteDataBase.instance
+        .readAllFavoriteOfCurrentMusic(widget.id.toString());
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    refreshFavorite();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       height: 500,
       child: Stack(
@@ -228,30 +323,51 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: AppImageAsset(
-                image: urlImage,
+                image: widget.urlImage,
                 isWebImage: true,
                 webFit: BoxFit.cover,
                 webWidth: double.infinity,
               ),
             ),
           ),
-          activeIndex == index
-              ? GestureDetector(
-                  onTap:  onTap,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 15, right: 15),
+          GestureDetector(
+            onTap: (() async {
+              String? deviceId = await PlatformDeviceId.getDeviceId;
+
+              Favorite favorite = Favorite(
+                  name: widget.name,
+                  currentDeviceId: deviceId!,
+                  path: widget.file,
+                  deezeId: widget.id.toString(),
+                  type: "WALLPAPER");
+              favoriteList.isEmpty
+                  ? await FavoriteDataBase.instance.addFavorite(favorite)
+                  : await FavoriteDataBase.instance
+                      .delete(favoriteList.first.deezeId);
+              refreshFavorite();
+            }),
+            child: favoriteList.isEmpty
+                ? const Padding(
+                    padding: EdgeInsets.all(8.0),
                     child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: !isFavourite
-                            ? const AppImageAsset(image: "assets/favourite.svg")
-                            : const AppImageAsset(
-                                image: "assets/favourite_fill.svg",
-                                height: 17,
-                                width: 17,
-                              )),
+                      alignment: Alignment.bottomRight,
+                      child: AppImageAsset(
+                          image: 'assets/favourite.svg', height: 16),
+                    ),
+                  )
+                : const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: AppImageAsset(
+                        image: "assets/favourite_fill.svg",
+                        color: Colors.red,
+                        height: 16,
+                        width: 16,
+                      ),
+                    ),
                   ),
-                )
-              : const SizedBox.shrink()
+          ),
         ],
       ),
     );
@@ -340,7 +456,8 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.14),
+        margin:
+            EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.14),
         alignment: Alignment.bottomCenter,
         child: Card(
           elevation: 10,
@@ -567,7 +684,7 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                       Navigator.of(context).pop();
                     }
                   },
-                  child :Stack(
+                  child: Stack(
                     clipBehavior: Clip.none,
                     children: [
                       Container(
@@ -588,7 +705,8 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const AppImageAsset(image: 'assets/save_down.svg', height: 14),
+                            const AppImageAsset(
+                                image: 'assets/save_down.svg', height: 14),
                             const SizedBox(width: 20),
                             Text(
                               'SAVE TO MEDIA',

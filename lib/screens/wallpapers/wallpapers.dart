@@ -22,6 +22,7 @@ import '../dashboard/dashboard.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../favourite/favourite_screen.dart';
 import '../search/search_screen.dart';
 
 class WallPapers extends StatefulWidget {
@@ -39,7 +40,8 @@ class _WallPapersState extends State<WallPapers> {
     // context.read<WallpaperBloc>().add(LoadWallpapers());
     context.read<CategoryBloc>().add(LoadCategory());
     scrollController.addListener(() {
-      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
         setState(() {
           isDataLoad = true;
         });
@@ -106,7 +108,7 @@ class _WallPapersState extends State<WallPapers> {
         totalPage = rawResponse.length;
         setState(() {
           isLoading = false;
-          if(isDataLoad && totalPage == 0){
+          if (isDataLoad && totalPage == 0) {
             showMessage(context, message: 'No data available!');
           }
           isDataLoad = false;
@@ -192,7 +194,10 @@ class _WallPapersState extends State<WallPapers> {
                     }
                   },
                   header: CustomHeader(builder: (context, mode) => Container()),
-                  footer: CustomFooter(builder: (context, mode) => isDataLoad && totalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
+                  footer: CustomFooter(
+                      builder: (context, mode) => isDataLoad && totalPage != 0
+                          ? const LoadingPage()
+                          : const SizedBox()),
                   child: SafeArea(
                     child: Stack(
                       children: [
@@ -203,10 +208,12 @@ class _WallPapersState extends State<WallPapers> {
                               child: SizedBox(height: 70),
                             ),
                             SliverPadding(
-                              padding: const EdgeInsets.symmetric(horizontal: 17),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 17),
                               sliver: SliverToBoxAdapter(
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "Categories",
@@ -224,9 +231,9 @@ class _WallPapersState extends State<WallPapers> {
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                const Categories(
-                                                  isRingtone: false,
-                                                )));
+                                                    const Categories(
+                                                      isRingtone: false,
+                                                    )));
                                       },
                                       child: Row(
                                         children: [
@@ -264,7 +271,8 @@ class _WallPapersState extends State<WallPapers> {
                               child: SizedBox(
                                 height: 60,
                                 width: screenWidth,
-                                child: BlocConsumer<CategoryBloc, CategoryState>(
+                                child:
+                                    BlocConsumer<CategoryBloc, CategoryState>(
                                   listener: (context, state) {
                                     // TODO: implement listener
                                   },
@@ -275,18 +283,22 @@ class _WallPapersState extends State<WallPapers> {
                                     }
                                     if (state is LoadedCategory) {
                                       return Padding(
-                                        padding: const EdgeInsets.only(left: 17),
+                                        padding:
+                                            const EdgeInsets.only(left: 17),
                                         child: ListView.builder(
                                           scrollDirection: Axis.horizontal,
                                           itemCount: 4,
                                           itemBuilder: (context, index) {
                                             return Padding(
-                                              padding:
-                                              const EdgeInsets.only(right: 12),
+                                              padding: const EdgeInsets.only(
+                                                  right: 12),
                                               child: WallpaperCategoryCard(
-                                                id: state.categories![index].id!,
-                                                image: state.categories![index].image,
-                                                name: state.categories![index].name,
+                                                id: state
+                                                    .categories![index].id!,
+                                                image: state
+                                                    .categories![index].image,
+                                                name: state
+                                                    .categories![index].name,
                                               ),
                                             );
                                           },
@@ -305,7 +317,8 @@ class _WallPapersState extends State<WallPapers> {
                               ),
                             ),
                             SliverPadding(
-                              padding: const EdgeInsets.symmetric(horizontal: 17),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 17),
                               sliver: SliverToBoxAdapter(
                                 child: Text(
                                   "Popular",
@@ -329,19 +342,23 @@ class _WallPapersState extends State<WallPapers> {
                                 child: const Tags(),
                               ),
                             ),
-                            const SliverToBoxAdapter(child: SizedBox(height: 15)),
+                            const SliverToBoxAdapter(
+                                child: SizedBox(height: 15)),
                             SliverPadding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
                               sliver: SliverGrid(
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 3,
                                   mainAxisSpacing: 5.0,
                                   crossAxisSpacing: 5.0,
                                   childAspectRatio: 3 / 6,
                                 ),
                                 delegate: SliverChildBuilderDelegate(
-                                      (BuildContext context, int index) {
+                                  (BuildContext context, int index) {
                                     return CategoryCard(
+                                      id: hydraMember[index].id.toString(),
                                       index: index,
                                       listHydra: hydraMember,
                                       image: hydraMember[index].file!,
@@ -359,23 +376,24 @@ class _WallPapersState extends State<WallPapers> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 16),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 16),
                                 height: 46,
                                 width: MediaQuery.of(context).size.width,
                                 child: TextFormField(
                                   controller: _typeAheadController,
                                   onChanged: (data) => setState(() {}),
-                                  onFieldSubmitted: (val){
+                                  onFieldSubmitted: (val) {
                                     FocusScope.of(context).unfocus();
-                                    if(_typeAheadController.text.isNotEmpty) {
+                                    if (_typeAheadController.text.isNotEmpty) {
                                       Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => SearchScreen(
-                                            searchText:
-                                            _typeAheadController.text,
-                                          )),
-                                    );
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => SearchScreen(
+                                                  searchText:
+                                                      _typeAheadController.text,
+                                                )),
+                                      );
                                     }
                                     _typeAheadController.clear();
                                     ishow = false;
@@ -393,30 +411,35 @@ class _WallPapersState extends State<WallPapers> {
                                       horizontal: 20,
                                     ),
                                     focusedBorder: const OutlineInputBorder(
-                                      borderRadius: BorderRadius.only(topRight: Radius.circular(7),topLeft: Radius.circular(7)),
-                                      borderSide:
-                                      BorderSide(color: Color(0xFF5d318c), width: 0),
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(7),
+                                          topLeft: Radius.circular(7)),
+                                      borderSide: BorderSide(
+                                          color: Color(0xFF5d318c), width: 0),
                                     ),
                                     enabledBorder: const OutlineInputBorder(
-                                      borderRadius: BorderRadius.only(topRight: Radius.circular(7),topLeft: Radius.circular(7)),
-                                      borderSide:
-                                      BorderSide(color: Color(0xFF5d318c), width: 0.0),
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(7),
+                                          topLeft: Radius.circular(7)),
+                                      borderSide: BorderSide(
+                                          color: Color(0xFF5d318c), width: 0.0),
                                     ),
                                     suffixIcon: GestureDetector(
                                       onTap: () {
                                         FocusScope.of(context).unfocus();
-                                        if(_typeAheadController.text.isEmpty){
+                                        if (_typeAheadController.text.isEmpty) {
                                           ishow = false;
-                                        }
-                                        else{
+                                        } else {
                                           _typeAheadController.clear();
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => SearchScreen(
-                                                  searchText:
-                                                  _typeAheadController.text,
-                                                )),
+                                                builder: (context) =>
+                                                    SearchScreen(
+                                                      searchText:
+                                                          _typeAheadController
+                                                              .text,
+                                                    )),
                                           );
                                           ishow = false;
                                         }
@@ -424,7 +447,8 @@ class _WallPapersState extends State<WallPapers> {
                                         setState(() {});
                                       },
                                       child: const Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 12),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 12),
                                         child: AppImageAsset(
                                           image: 'assets/search.svg',
                                           color: Colors.black,
@@ -435,49 +459,65 @@ class _WallPapersState extends State<WallPapers> {
                                 ),
                               ),
                               FutureBuilder<List<SearchModel>>(
-                                  future: _searchServices.search(_typeAheadController.text.trim()),
+                                  future: _searchServices
+                                      .search(_typeAheadController.text.trim()),
                                   builder: (BuildContext context,
-                                      AsyncSnapshot<List<SearchModel>> snapshot) {
+                                      AsyncSnapshot<List<SearchModel>>
+                                          snapshot) {
                                     if (snapshot.hasError) {
                                       return Container(
                                           color: Colors.white,
                                           alignment: Alignment.centerLeft,
-                                          margin: const EdgeInsets.symmetric(horizontal: 16),
-                                          padding: const EdgeInsets.symmetric(vertical: 10).copyWith(left: 30),
-                                          child: const Text("Something went wrong",style: TextStyle(color: Color(0xFF5d318c)),)
-                                      );
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 16),
+                                          padding: const EdgeInsets.symmetric(
+                                                  vertical: 10)
+                                              .copyWith(left: 30),
+                                          child: const Text(
+                                            "Something went wrong",
+                                            style: TextStyle(
+                                                color: Color(0xFF5d318c)),
+                                          ));
                                     }
-                                    if (snapshot.connectionState == ConnectionState.done) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.done) {
                                       return Container(
                                         color: Colors.white,
-                                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 16),
                                         child: ListView.builder(
                                           shrinkWrap: true,
                                           itemCount: snapshot.data!.length > 4
                                               ? 4
                                               : snapshot.data!.length,
-                                          itemBuilder: (context, index) => GestureDetector(
+                                          itemBuilder: (context, index) =>
+                                              GestureDetector(
                                             onTap: (() {
                                               FocusScope.of(context).unfocus();
                                               _typeAheadController.clear();
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                    builder: (context) => SearchScreen(
-                                                      searchText:
-                                                      snapshot.data![index].name!,
-                                                    )),
+                                                    builder: (context) =>
+                                                        SearchScreen(
+                                                          searchText: snapshot
+                                                              .data![index]
+                                                              .name!,
+                                                        )),
                                               );
                                               ishow = false;
                                             }),
                                             child: Padding(
                                                 padding: const EdgeInsets.only(
-                                                    left: 30, top: 10, bottom: 10),
+                                                    left: 30,
+                                                    top: 10,
+                                                    bottom: 10),
                                                 child: Text(
                                                   "${snapshot.data![index].name}",
                                                   style: GoogleFonts.archivo(
                                                     fontStyle: FontStyle.normal,
-                                                    color: const Color(0xFF5d318c),
+                                                    color:
+                                                        const Color(0xFF5d318c),
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.w500,
                                                   ),
@@ -491,8 +531,10 @@ class _WallPapersState extends State<WallPapers> {
                                   }),
                               Container(
                                 width: MediaQuery.of(context).size.width,
-                                margin: const EdgeInsets.symmetric(horizontal: 16),
-                                padding: const EdgeInsets.all(30).copyWith(top: 10),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                padding:
+                                    const EdgeInsets.all(30).copyWith(top: 10),
                                 decoration: const BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.only(
@@ -517,14 +559,14 @@ class _WallPapersState extends State<WallPapers> {
                                       children: List.generate(
                                         _searchServices
                                             .trendingSearchItems.length,
-                                            (index) => Container(
+                                        (index) => Container(
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 8, horizontal: 10),
                                           decoration: BoxDecoration(
                                             border: Border.all(
                                                 color: const Color(0XFFE1E1E1)),
                                             borderRadius:
-                                            BorderRadius.circular(10),
+                                                BorderRadius.circular(10),
                                           ),
                                           child: Text(
                                             _searchServices
@@ -609,7 +651,8 @@ class _WallPapersState extends State<WallPapers> {
                                   suffixIcon: GestureDetector(
                                     onTap: () => setState(() => ishow = false),
                                     child: const Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12),
                                       child: AppImageAsset(
                                         image: 'assets/search.svg',
                                         color: Colors.black,
@@ -618,16 +661,14 @@ class _WallPapersState extends State<WallPapers> {
                                   ),
                                 ),
                               ),
-                              itemBuilder:
-                                  (context, SearchModel? suggestion) {
+                              itemBuilder: (context, SearchModel? suggestion) {
                                 final wallpapers = suggestion!;
                                 return GestureDetector(
                                     onTap: (() {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              SingleWallpaper(
+                                          builder: (context) => SingleWallpaper(
                                             index: 0,
                                             urlImage: wallpapers.file!,
                                             userName:
@@ -653,10 +694,10 @@ class _WallPapersState extends State<WallPapers> {
                                             child: Align(
                                               alignment: Alignment.bottomLeft,
                                               child: Padding(
-                                                padding: const EdgeInsets
-                                                        .symmetric(
-                                                    horizontal: 10,
-                                                    vertical: 10),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 10),
                                                 child: Text(
                                                   wallpapers.name!,
                                                   style: const TextStyle(
@@ -674,9 +715,9 @@ class _WallPapersState extends State<WallPapers> {
                                               child: CachedNetworkImage(
                                                 fit: BoxFit.cover,
                                                 imageUrl: wallpapers.file!,
-                                                errorWidget: (context, url,
-                                                        error) =>
-                                                    const Icon(Icons.error),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        const Icon(Icons.error),
                                               ),
                                             ),
                                           ));
@@ -764,151 +805,171 @@ class _WallPapersState extends State<WallPapers> {
                     }
                   },
                   header: CustomHeader(builder: (context, mode) => Container()),
-                  footer: CustomFooter(builder: (context, mode) => isDataLoad && totalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
+                  footer: CustomFooter(
+                      builder: (context, mode) => isDataLoad && totalPage != 0
+                          ? const LoadingPage()
+                          : const SizedBox()),
                   child: isLoading
                       ? const LoadingPage()
                       : CustomScrollView(
-                    controller: scrollController,
-                    slivers: [
-                      const SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 20,
-                        ),
-                      ),
-                      SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 17),
-                        sliver: SliverToBoxAdapter(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Categories",
-                                style: GoogleFonts.archivo(
-                                  fontStyle: FontStyle.normal,
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  wordSpacing: 0.19,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                          controller: scrollController,
+                          slivers: [
+                            const SliverToBoxAdapter(
+                              child: SizedBox(
+                                height: 20,
                               ),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const Categories(
-                                                isRingtone: false,
-                                              )));
-                                },
+                            ),
+                            SliverPadding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 17),
+                              sliver: SliverToBoxAdapter(
                                 child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      "View All",
+                                      "Categories",
                                       style: GoogleFonts.archivo(
                                         fontStyle: FontStyle.normal,
                                         color: Colors.white,
-                                        fontSize: 10,
-                                        wordSpacing: 0.16,
-                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12,
+                                        wordSpacing: 0.19,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    const SizedBox(width: 10),
-                                    const AppImageAsset(image: 'assets/backward.svg', height: 10)
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const Categories(
+                                                      isRingtone: false,
+                                                    )));
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            "View All",
+                                            style: GoogleFonts.archivo(
+                                              fontStyle: FontStyle.normal,
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              wordSpacing: 0.16,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          const AppImageAsset(
+                                              image: 'assets/backward.svg',
+                                              height: 10)
+                                        ],
+                                      ),
+                                    )
                                   ],
                                 ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
-                      SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 60,
-                          width: screenWidth,
-                          child: BlocConsumer<CategoryBloc, CategoryState>(
-                            listener: (context, state) {
-                              // TODO: implement listener
-                            },
-                            builder: (context, state) {
-                              if (state is CategoryInitial) {
-                                return const Center(
-                                    child: CircularProgressIndicator());
-                              }
-                              if (state is LoadedCategory) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(left: 17),
-                                  child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: 4,
-                                    itemBuilder: (context, index) {
+                              ),
+                            ),
+                            const SliverToBoxAdapter(
+                                child: SizedBox(height: 20)),
+                            SliverToBoxAdapter(
+                              child: SizedBox(
+                                height: 60,
+                                width: screenWidth,
+                                child:
+                                    BlocConsumer<CategoryBloc, CategoryState>(
+                                  listener: (context, state) {
+                                    // TODO: implement listener
+                                  },
+                                  builder: (context, state) {
+                                    if (state is CategoryInitial) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    }
+                                    if (state is LoadedCategory) {
                                       return Padding(
                                         padding:
-                                            const EdgeInsets.only(right: 12),
-                                        child: WallpaperCategoryCard(
-                                          id: state.categories![index].id!,
-                                          image: state.categories![index].image,
-                                          name: state.categories![index].name,
+                                            const EdgeInsets.only(left: 17),
+                                        child: ListView.builder(
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: 4,
+                                          itemBuilder: (context, index) {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 12),
+                                              child: WallpaperCategoryCard(
+                                                id: state
+                                                    .categories![index].id!,
+                                                image: state
+                                                    .categories![index].image,
+                                                name: state
+                                                    .categories![index].name,
+                                              ),
+                                            );
+                                          },
                                         ),
                                       );
-                                    },
-                                  ),
-                                );
-                              }
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            },
-                          ),
-                        ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
-                      SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 17),
-                        sliver: SliverToBoxAdapter(
-                          child: Text(
-                            "Popular",
-                            style: GoogleFonts.archivo(
-                              fontStyle: FontStyle.normal,
-                              color: Colors.white,
-                              fontSize: 15,
+                                    }
+                                    return const Center(
+                                        child: CircularProgressIndicator());
+                                  },
+                                ),
+                              ),
                             ),
-                          ),
+                            const SliverToBoxAdapter(
+                                child: SizedBox(height: 20)),
+                            SliverPadding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 17),
+                              sliver: SliverToBoxAdapter(
+                                child: Text(
+                                  "Popular",
+                                  style: GoogleFonts.archivo(
+                                    fontStyle: FontStyle.normal,
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SliverToBoxAdapter(
+                                child: SizedBox(height: 15)),
+                            SliverToBoxAdapter(
+                              child: SizedBox(
+                                height: 33,
+                                width: screenWidth,
+                                child: const Tags(),
+                              ),
+                            ),
+                            const SliverToBoxAdapter(
+                                child: SizedBox(height: 15)),
+                            SliverPadding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              sliver: SliverGrid(
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  mainAxisSpacing: 5.0,
+                                  crossAxisSpacing: 5.0,
+                                  childAspectRatio: 3 / 6,
+                                ),
+                                delegate: SliverChildBuilderDelegate(
+                                  (BuildContext context, int index) {
+                                    return CategoryCard(
+                                      id: hydraMember[index].id.toString(),
+                                      index: index,
+                                      listHydra: hydraMember,
+                                      image: hydraMember[index].file!,
+                                      name: hydraMember[index].name!,
+                                    );
+                                  },
+                                  childCount: hydraMember.length,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 15)),
-                      SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 33,
-                          width: screenWidth,
-                          child: const Tags(),
-                        ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 15)),
-                      SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        sliver: SliverGrid(
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            mainAxisSpacing: 5.0,
-                            crossAxisSpacing: 5.0,
-                            childAspectRatio: 3 / 6,
-                          ),
-                          delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                              return CategoryCard(
-                                index: index,
-                                listHydra: hydraMember,
-                                image: hydraMember[index].file!,
-                                name: hydraMember[index].name!,
-                              );
-                            },
-                            childCount: hydraMember.length,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
               drawer: Drawer(
@@ -943,7 +1004,8 @@ class _WallPapersState extends State<WallPapers> {
                             padding: const EdgeInsets.only(left: 40),
                             child: Row(
                               children: [
-                                const AppImageAsset(image: 'assets/ringtone.svg'),
+                                const AppImageAsset(
+                                    image: 'assets/ringtone.svg'),
                                 const SizedBox(
                                   width: 26,
                                 ),
@@ -981,7 +1043,8 @@ class _WallPapersState extends State<WallPapers> {
                             padding: const EdgeInsets.only(left: 40),
                             child: Row(
                               children: [
-                                const AppImageAsset(image: "assets/wallpaper.svg"),
+                                const AppImageAsset(
+                                    image: "assets/wallpaper.svg"),
                                 const SizedBox(
                                   width: 26,
                                 ),
@@ -1027,25 +1090,40 @@ class _WallPapersState extends State<WallPapers> {
                         const SizedBox(
                           height: 30,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 40),
-                          child: Row(
-                            children: [
-                              const AppImageAsset(image: 'assets/favourite_fill.svg', color: Colors.white),
-                              const SizedBox(
-                                width: 29,
-                              ),
-                              Text(
-                                "Saved",
-                                style: GoogleFonts.archivo(
-                                  fontStyle: FontStyle.normal,
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  wordSpacing: -0.09,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const FavouriteScreen(
+                                        id: 9,
+                                        type: 'Favourites',
+                                      )),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 40),
+                            child: Row(
+                              children: [
+                                const AppImageAsset(
+                                    image: 'assets/favourite_fill.svg',
+                                    color: Colors.grey),
+                                const SizedBox(
+                                  width: 29,
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  "Favourite",
+                                  style: GoogleFonts.archivo(
+                                    fontStyle: FontStyle.normal,
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    wordSpacing: -0.09,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(
@@ -1065,7 +1143,7 @@ class _WallPapersState extends State<WallPapers> {
                             children: [
                               const Icon(
                                 Icons.info,
-                                color: Colors.white,
+                                color: Colors.grey,
                                 size: 20,
                               ),
                               const SizedBox(
@@ -1092,7 +1170,7 @@ class _WallPapersState extends State<WallPapers> {
                             children: [
                               const Icon(
                                 Icons.settings,
-                                color: Colors.white,
+                                color: Colors.grey,
                                 size: 20,
                               ),
                               const SizedBox(
@@ -1119,7 +1197,7 @@ class _WallPapersState extends State<WallPapers> {
                             children: [
                               const Icon(
                                 Icons.privacy_tip,
-                                color: Colors.white,
+                                color: Colors.grey,
                                 size: 20,
                               ),
                               const SizedBox(
@@ -1155,7 +1233,10 @@ class _WallPapersState extends State<WallPapers> {
                           padding: const EdgeInsets.only(left: 40),
                           child: Row(
                             children: [
-                              const AppImageAsset(image: "assets/facebook.svg"),
+                              const AppImageAsset(
+                                image: "assets/facebook.svg",
+                                color: Colors.grey,
+                              ),
                               const SizedBox(width: 30),
                               Text(
                                 "Join us on Facebook",

@@ -94,9 +94,12 @@
 
 import 'dart:convert';
 
-List<CategoriesModel> categoriesFromJson(String str) => List<CategoriesModel>.from(json.decode(str).map((x) => CategoriesModel.fromJson(x)));
+List<CategoriesModel> categoriesFromJson(String str) =>
+    List<CategoriesModel>.from(
+        json.decode(str).map((x) => CategoriesModel.fromJson(x)));
 
-String categoriesToJson(List<CategoriesModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String categoriesToJson(List<CategoriesModel> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class CategoriesModel {
   CategoriesModel({
@@ -111,18 +114,18 @@ class CategoriesModel {
   List<String>? items;
   String? image;
 
-  factory CategoriesModel.fromJson(Map<String, dynamic> json) => CategoriesModel(
-    id: json["id"],
-    name: json["name"],
-    items: List<String>.from(json["items"].map((x) => x)),
-    image: json["image"],
-  );
+  factory CategoriesModel.fromJson(Map<String, dynamic> json) =>
+      CategoriesModel(
+        id: json["id"],
+        name: json["name"],
+        items: List<String>.from(json["items"].map((x) => x)),
+        image: json["image"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "items": List<dynamic>.from(items!.map((x) => x)),
-    "image": image,
-  };
+        "id": id,
+        "name": name,
+        "items": List<dynamic>.from(items!.map((x) => x)),
+        "image": image,
+      };
 }
-

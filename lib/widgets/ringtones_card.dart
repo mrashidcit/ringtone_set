@@ -1,19 +1,21 @@
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:deeze_app/db_services/favorite_database.dart';
+import 'package:deeze_app/models/favorite.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
-import 'package:deeze_app/widgets/audio_player.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:platform_device_id/platform_device_id.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../models/deeze_model.dart';
 
 class RingtonesCard extends StatefulWidget {
-  final List<DeezeItemModel> listHydra;
+  final List<DeezeItemModel>? listHydra;
   final int index;
   final String ringtoneName;
   final String file;
+  final String auidoId;
   Duration? duration;
   Duration? position;
   final AudioPlayer audioPlayer;
@@ -26,6 +28,7 @@ class RingtonesCard extends StatefulWidget {
       required this.ringtoneName,
       required this.index,
       required this.file,
+      required this.auidoId,
       required this.onTap,
       required this.onNavigate,
       required this.onChange,
@@ -33,7 +36,7 @@ class RingtonesCard extends StatefulWidget {
       this.duration,
       this.isPlaying = false,
       this.position,
-      required this.listHydra})
+      this.listHydra})
       : super(key: key);
 
   @override
@@ -79,10 +82,26 @@ class _RingtonesCardState extends State<RingtonesCard> {
         ]),
   ];
   final _random = Random();
+  List<Favorite> favoriteList = [];
+
+  refreshFavorite() async {
+    favoriteList = await FavoriteDataBase.instance
+        .readAllFavoriteOfCurrentMusic(widget.auidoId);
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    refreshFavorite();
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     var element = mygradientList[_random.nextInt(mygradientList.length)];
+
     return GestureDetector(
       onTap: widget.onNavigate,
       child: SliderTheme(
@@ -154,15 +173,44 @@ class _RingtonesCardState extends State<RingtonesCard> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const AppImageAsset(image: 'assets/favourite.svg', height: 16),
+                          GestureDetector(
+                            onTap: (() async {
+                              String? deviceId =
+                                  await PlatformDeviceId.getDeviceId;
+
+                              Favorite favorite = Favorite(
+                                  name: widget.ringtoneName,
+                                  currentDeviceId: deviceId!,
+                                  path: widget.file,
+                                  deezeId: widget.auidoId,
+                                  type: "MUSIC");
+                              favoriteList.isEmpty
+                                  ? await FavoriteDataBase.instance
+                                      .addFavorite(favorite)
+                                  : await FavoriteDataBase.instance
+                                      .delete(favoriteList.first.deezeId);
+                              refreshFavorite();
+                            }),
+                            child: favoriteList.isEmpty
+                                ? const AppImageAsset(
+                                    image: 'assets/favourite.svg', height: 16)
+                                : const AppImageAsset(
+                                    image: "assets/favourite_fill.svg",
+                                    color: Colors.red,
+                                    height: 16,
+                                    width: 16,
+                                  ),
+                          ),
                           const SizedBox(height: 7),
                           Row(
-                            children: const [
-                              AppImageAsset(image: 'assets/save_down.svg', height: 10),
+                            // ignore: prefer_const_literals_to_create_immutables
+                            children: [
+                              const AppImageAsset(
+                                  image: 'assets/save_down.svg', height: 10),
                               SizedBox(width: 2),
                               Text(
-                                "23k",
-                                style: TextStyle(
+                                "23K",
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.white,
                                   wordSpacing: -0.07,

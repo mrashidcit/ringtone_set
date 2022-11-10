@@ -42,12 +42,12 @@ class _SearchScreenState extends State<SearchScreen> {
     // TODO: implement initState
     super.initState();
     scrollController.addListener(() {
-      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
         setState(() {
-          if(isWallpaper){
+          if (isWallpaper) {
             isWallPaperDataLoad = true;
-          }
-          else if(isRingtone){
+          } else if (isRingtone) {
             isRingtoneDataLoad = true;
           }
         });
@@ -136,7 +136,7 @@ class _SearchScreenState extends State<SearchScreen> {
         ringtoneTotalPage = rawResponse.length;
         setState(() {
           isLoading = false;
-          if(isRingtoneDataLoad && ringtoneTotalPage == 0){
+          if (isRingtoneDataLoad && ringtoneTotalPage == 0) {
             showMessage(context, message: 'No data available!');
           }
           isRingtoneDataLoad = false;
@@ -201,7 +201,7 @@ class _SearchScreenState extends State<SearchScreen> {
         wallpaperTotalPage = rawResponse.length;
         setState(() {
           isLoading = false;
-          if(isWallPaperDataLoad && wallpaperTotalPage == 0){
+          if (isWallPaperDataLoad && wallpaperTotalPage == 0) {
             showMessage(context, message: 'No data available!');
           }
           isWallPaperDataLoad = false;
@@ -543,27 +543,33 @@ class _SearchScreenState extends State<SearchScreen> {
                             _wallpaperRefreshController.loadFailed();
                           }
                         },
-                        header: CustomHeader(builder: (context, mode) => Container()),
-                        footer: CustomFooter(builder: (context, mode) => isWallPaperDataLoad && wallpaperTotalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
+                        header: CustomHeader(
+                            builder: (context, mode) => Container()),
+                        footer: CustomFooter(
+                            builder: (context, mode) =>
+                                isWallPaperDataLoad && wallpaperTotalPage != 0
+                                    ? const LoadingPage()
+                                    : const SizedBox()),
                         child: isLoading
                             ? const LoadingPage()
                             : GridView.builder(
-                            itemCount: wallpaperList.length,
-                            controller: scrollController,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    childAspectRatio: 3 / 6,
-                                    crossAxisSpacing: 5,
-                                    mainAxisSpacing: 5),
-                            itemBuilder: (context, index) {
-                              return CategoryCard(
-                                index: index,
-                                listHydra: wallpaperList,
-                                image: wallpaperList[index].file!,
-                                name: wallpaperList[index].name!,
-                              );
-                            }),
+                                itemCount: wallpaperList.length,
+                                controller: scrollController,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 3,
+                                        childAspectRatio: 3 / 6,
+                                        crossAxisSpacing: 5,
+                                        mainAxisSpacing: 5),
+                                itemBuilder: (context, index) {
+                                  return CategoryCard(
+                                    id: wallpaperList[index].id.toString(),
+                                    index: index,
+                                    listHydra: wallpaperList,
+                                    image: wallpaperList[index].file!,
+                                    name: wallpaperList[index].name!,
+                                  );
+                                }),
                       ),
                     ),
                   )
@@ -589,176 +595,190 @@ class _SearchScreenState extends State<SearchScreen> {
                           _ringtoneRefreshController.loadFailed();
                         }
                       },
-                      header: CustomHeader(builder: (context, mode) => Container()),
-                      footer: CustomFooter(builder: (context, mode) => isRingtoneDataLoad && ringtoneTotalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
+                      header:
+                          CustomHeader(builder: (context, mode) => Container()),
+                      footer: CustomFooter(
+                          builder: (context, mode) =>
+                              isRingtoneDataLoad && ringtoneTotalPage != 0
+                                  ? const LoadingPage()
+                                  : const SizedBox()),
                       child: isLoading
                           ? const LoadingPage()
                           : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: ListView.builder(
-                          itemCount: ringtonelist.length,
-                          controller: scrollController,
-                          scrollDirection: Axis.vertical,
-                          itemBuilder: (context, index) {
-                            return selectedIndex == index
-                                ? RingtonesCard(
-                                    onNavigate: () async {
-                                      await audioPlayer.pause();
-                                      // ignore: use_build_context_synchronously
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              CustomAudioPlayer(
-                                            listHydra: ringtonelist,
-                                            index: index,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    onChange: (value) async {
-                                      final myposition =
-                                          Duration(seconds: value.toInt());
-                                      await audioPlayer.seek(myposition);
-                                      await audioPlayer.resume();
-                                    },
-                                    onTap: (() async {
-                                      // if (isPlaying) {
-                                      // } else {}
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: ListView.builder(
+                                itemCount: ringtonelist.length,
+                                controller: scrollController,
+                                scrollDirection: Axis.vertical,
+                                itemBuilder: (context, index) {
+                                  return selectedIndex == index
+                                      ? RingtonesCard(
+                                          onNavigate: () async {
+                                            await audioPlayer.pause();
+                                            // ignore: use_build_context_synchronously
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CustomAudioPlayer(
+                                                  listHydra: ringtonelist,
+                                                  index: index,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          onChange: (value) async {
+                                            final myposition = Duration(
+                                                seconds: value.toInt());
+                                            await audioPlayer.seek(myposition);
+                                            await audioPlayer.resume();
+                                          },
+                                          onTap: (() async {
+                                            // if (isPlaying) {
+                                            // } else {}
 
-                                      setState(() {
-                                        selectedIndex = index;
-                                        position = Duration.zero;
-                                      });
+                                            setState(() {
+                                              selectedIndex = index;
+                                              position = Duration.zero;
+                                            });
 
-                                      if (isPlaying) {
-                                        await audioPlayer.pause();
-                                      } else {
-                                        await audioPlayer
-                                            .play(ringtonelist[index].file!);
-                                      }
-                                    }),
-                                    audioPlayer: selectedIndex == index
-                                        ? audioPlayer
-                                        : pausePlayer,
-                                    isPlaying: selectedIndex == index
-                                        ? isPlaying
-                                        : false,
-                                    duration: selectedIndex == index
-                                        ? duration
-                                        : pauseDuration,
-                                    position: selectedIndex == index
-                                        ? position
-                                        : pausePosition,
-                                    index: index,
-                                    listHydra: ringtonelist,
-                                    ringtoneName: ringtonelist[index].name!,
-                                    file: ringtonelist[index].file!,
-                                  )
-                                : RingtonesCard(
-                                    onNavigate: () async {
-                                      await audioPlayer.pause();
-                                      // ignore: use_build_context_synchronously
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              CustomAudioPlayer(
-                                            listHydra: ringtonelist,
-                                            index: index,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    onChange: (value) async {
-                                      final myposition =
-                                          Duration(seconds: value.toInt());
-                                      await audioPlayer.seek(myposition);
-                                      await audioPlayer.resume();
-                                    },
-                                    onTap: (() async {
-                                      // if (isPlaying) {
-                                      // } else {}
+                                            if (isPlaying) {
+                                              await audioPlayer.pause();
+                                            } else {
+                                              await audioPlayer.play(
+                                                  ringtonelist[index].file!);
+                                            }
+                                          }),
+                                          audioPlayer: selectedIndex == index
+                                              ? audioPlayer
+                                              : pausePlayer,
+                                          isPlaying: selectedIndex == index
+                                              ? isPlaying
+                                              : false,
+                                          duration: selectedIndex == index
+                                              ? duration
+                                              : pauseDuration,
+                                          position: selectedIndex == index
+                                              ? position
+                                              : pausePosition,
+                                          index: index,
+                                          listHydra: ringtonelist,
+                                          ringtoneName:
+                                              ringtonelist[index].name!,
+                                          auidoId: ringtonelist[index]
+                                              .id!
+                                              .toString(),
+                                          file: ringtonelist[index].file!,
+                                        )
+                                      : RingtonesCard(
+                                          onNavigate: () async {
+                                            await audioPlayer.pause();
+                                            // ignore: use_build_context_synchronously
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CustomAudioPlayer(
+                                                  listHydra: ringtonelist,
+                                                  index: index,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          onChange: (value) async {
+                                            final myposition = Duration(
+                                                seconds: value.toInt());
+                                            await audioPlayer.seek(myposition);
+                                            await audioPlayer.resume();
+                                          },
+                                          onTap: (() async {
+                                            // if (isPlaying) {
+                                            // } else {}
 
-                                      setState(() {
-                                        selectedIndex = index;
-                                        position = Duration.zero;
-                                        isPlaying = false;
-                                      });
-                                      await audioPlayer.pause();
-                                      if (isPlaying) {
-                                        await audioPlayer.pause();
-                                      } else {
-                                        await audioPlayer
-                                            .play(ringtonelist[index].file!);
-                                      }
-                                    }),
-                                    audioPlayer: selectedIndex == index
-                                        ? audioPlayer
-                                        : pausePlayer,
-                                    isPlaying: selectedIndex == index
-                                        ? isPlaying
-                                        : false,
-                                    duration: selectedIndex == index
-                                        ? duration
-                                        : pauseDuration,
-                                    position: selectedIndex == index
-                                        ? position
-                                        : pausePosition,
-                                    index: index,
-                                    listHydra: ringtonelist,
-                                    ringtoneName: ringtonelist[index].name!,
-                                    file: ringtonelist[index].file!,
-                                  );
-                          },
-                        ),
-                      ),
+                                            setState(() {
+                                              selectedIndex = index;
+                                              position = Duration.zero;
+                                              isPlaying = false;
+                                            });
+                                            await audioPlayer.pause();
+                                            if (isPlaying) {
+                                              await audioPlayer.pause();
+                                            } else {
+                                              await audioPlayer.play(
+                                                  ringtonelist[index].file!);
+                                            }
+                                          }),
+                                          audioPlayer: selectedIndex == index
+                                              ? audioPlayer
+                                              : pausePlayer,
+                                          isPlaying: selectedIndex == index
+                                              ? isPlaying
+                                              : false,
+                                          duration: selectedIndex == index
+                                              ? duration
+                                              : pauseDuration,
+                                          position: selectedIndex == index
+                                              ? position
+                                              : pausePosition,
+                                          index: index,
+                                          listHydra: ringtonelist,
+                                          ringtoneName:
+                                              ringtonelist[index].name!,
+                                          auidoId: ringtonelist[index]
+                                              .id!
+                                              .toString(),
+                                          file: ringtonelist[index].file!,
+                                        );
+                                },
+                              ),
+                            ),
                     ),
                   )
                 : const SizedBox.shrink(),
             isNotification
                 ? Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const AppImageAsset(
-                        image: 'assets/no_result.svg',
-                        height: 80,
-                        width: 80,
-                        fit: BoxFit.fill,
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      const Text('No Results Found',
-                          style: TextStyle(color: Colors.white)),
-                      Container(
-                        height: 40,
-                        width: 95,
-                        margin: const EdgeInsets.only(top: 50,bottom: 70),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8)),
-                        child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              AppImageAsset(
-                                image: 'assets/arrow_top.svg',
-                                height: 17,
-                                width: 17,
-                                fit: BoxFit.fill,
-                              ),
-                              SizedBox(
-                                width: 7,
-                              ),
-                              Text('Home', style: TextStyle()),
-                            ]),
-                      ),
-                    ],
-                  ),
-                )
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const AppImageAsset(
+                          image: 'assets/no_result.svg',
+                          height: 80,
+                          width: 80,
+                          fit: BoxFit.fill,
+                        ),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        const Text('No Results Found',
+                            style: TextStyle(color: Colors.white)),
+                        Container(
+                          height: 40,
+                          width: 95,
+                          margin: const EdgeInsets.only(top: 50, bottom: 70),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8)),
+                          child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                AppImageAsset(
+                                  image: 'assets/arrow_top.svg',
+                                  height: 17,
+                                  width: 17,
+                                  fit: BoxFit.fill,
+                                ),
+                                SizedBox(
+                                  width: 7,
+                                ),
+                                Text('Home', style: TextStyle()),
+                              ]),
+                        ),
+                      ],
+                    ),
+                  )
                 : const SizedBox.shrink(),
           ],
         ),

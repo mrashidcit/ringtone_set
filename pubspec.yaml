@@ -59,6 +59,8 @@ dependencies:
   dotted_border: ^2.0.0+2
   image_picker: ^0.8.5+3
   permission_handler:
+  platform_device_id: ^1.0.1
+  just_audio: ^0.9.30
 
 dev_dependencies:
   flutter_test:

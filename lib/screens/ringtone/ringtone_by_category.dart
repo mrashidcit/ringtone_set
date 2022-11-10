@@ -46,7 +46,8 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
   void initState() {
     // TODO: implement initState
     scrollController.addListener(() {
-      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
         setState(() {
           isDataLoad = true;
         });
@@ -132,7 +133,7 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
         totalPage = rawResponse.length;
         setState(() {
           isLoading = false;
-          if(isDataLoad && totalPage == 0){
+          if (isDataLoad && totalPage == 0) {
             showMessage(context, message: 'No data available!');
           }
           isDataLoad = false;
@@ -156,13 +157,13 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
     double screenWidth = MediaQuery.of(context).size.width;
     return ishow
         ? WillPopScope(
-        onWillPop: ()async{
-         setState(() {
-           ishow = false;
-         });
-          return ishow;
-         },
-          child: Scaffold(
+            onWillPop: () async {
+              setState(() {
+                ishow = false;
+              });
+              return ishow;
+            },
+            child: Scaffold(
               appBar: PreferredSize(
                 preferredSize: Size(0, 60),
                 child: AppBar(
@@ -185,16 +186,16 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                               // hideSuggestionsOnKeyboardHide: false,
                               textFieldConfiguration: TextFieldConfiguration(
                                 controller: _typeAheadController,
-                                onSubmitted: (val){
+                                onSubmitted: (val) {
                                   FocusScope.of(context).unfocus();
-                                  if(_typeAheadController.text.isNotEmpty){
+                                  if (_typeAheadController.text.isNotEmpty) {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => SearchScreen(
-                                            searchText:
-                                            _typeAheadController.text,
-                                          )),
+                                                searchText:
+                                                    _typeAheadController.text,
+                                              )),
                                     );
                                   }
                                   _typeAheadController.clear();
@@ -229,17 +230,18 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                                     onTap: () {
                                       FocusScope.of(context).unfocus();
 
-                                      if(_typeAheadController.text.isEmpty){
+                                      if (_typeAheadController.text.isEmpty) {
                                         ishow = false;
-                                      }
-                                      else{
+                                      } else {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) => SearchScreen(
-                                                searchText:
-                                                _typeAheadController.text,
-                                              )),
+                                              builder: (context) =>
+                                                  SearchScreen(
+                                                    searchText:
+                                                        _typeAheadController
+                                                            .text,
+                                                  )),
                                         );
                                         ishow = false;
                                       }
@@ -247,7 +249,8 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                                       setState(() {});
                                     },
                                     child: const Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 12),
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 12),
                                       child: AppImageAsset(
                                         image: 'assets/search.svg',
                                         color: Colors.black,
@@ -363,7 +366,8 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                             enablePullUp: true,
                             controller: _refreshController,
                             onRefresh: () async {
-                              final result = await fetchRingtone(isRefresh: true);
+                              final result =
+                                  await fetchRingtone(isRefresh: true);
                               if (result) {
                                 _refreshController.refreshCompleted();
                               } else {
@@ -378,139 +382,158 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                                 _refreshController.loadFailed();
                               }
                             },
-                            header: CustomHeader(builder: (context, mode) => Container()),
-                            footer: CustomFooter(builder: (context, mode) => isDataLoad && totalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
+                            header: CustomHeader(
+                                builder: (context, mode) => Container()),
+                            footer: CustomFooter(
+                                builder: (context, mode) =>
+                                    isDataLoad && totalPage != 0
+                                        ? const LoadingPage()
+                                        : const SizedBox()),
                             child: isLoading
                                 ? const LoadingPage()
                                 : ListView.builder(
-                              itemCount: hydraMember.length,
-                              scrollDirection: Axis.vertical,
-                              controller: scrollController,
-                              itemBuilder: (context, index) {
-                                return selectedIndex == index
-                                    ? RingtonesCard(
-                                        onNavigate: () async {
-                                          await audioPlayer.pause();
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CustomAudioPlayer(
-                                                listHydra: hydraMember,
-                                                index: index,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        onChange: (value) async {
-                                          final myposition =
-                                              Duration(seconds: value.toInt());
-                                          await audioPlayer.seek(myposition);
-                                          await audioPlayer.resume();
-                                        },
-                                        onTap: (() async {
-                                          // if (isPlaying) {
-                                          // } else {}
+                                    itemCount: hydraMember.length,
+                                    scrollDirection: Axis.vertical,
+                                    controller: scrollController,
+                                    itemBuilder: (context, index) {
+                                      return selectedIndex == index
+                                          ? RingtonesCard(
+                                              onNavigate: () async {
+                                                await audioPlayer.pause();
+                                                // ignore: use_build_context_synchronously
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CustomAudioPlayer(
+                                                      listHydra: hydraMember,
+                                                      index: index,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              onChange: (value) async {
+                                                final myposition = Duration(
+                                                    microseconds:
+                                                        value.toInt());
+                                                await audioPlayer
+                                                    .seek(myposition);
+                                                await audioPlayer.resume();
+                                              },
+                                              onTap: (() async {
+                                                // if (isPlaying) {
+                                                // } else {}
 
-                                          setState(() {
-                                            selectedIndex = index;
-                                            position = Duration.zero;
-                                          });
+                                                setState(() {
+                                                  selectedIndex = index;
+                                                  position = Duration.zero;
+                                                });
 
-                                          if (isPlaying) {
-                                            await audioPlayer.pause();
-                                          } else {
-                                            await audioPlayer
-                                                .play(hydraMember[index].file!);
-                                          }
-                                        }),
-                                        audioPlayer: selectedIndex == index
-                                            ? audioPlayer
-                                            : pausePlayer,
-                                        isPlaying: selectedIndex == index
-                                            ? isPlaying
-                                            : false,
-                                        duration: selectedIndex == index
-                                            ? duration
-                                            : pauseDuration,
-                                        position: selectedIndex == index
-                                            ? position
-                                            : pausePosition,
-                                        index: index,
-                                        listHydra: hydraMember,
-                                        ringtoneName: hydraMember[index].name!,
-                                        file: hydraMember[index].file!,
-                                      )
-                                    : RingtonesCard(
-                                        onNavigate: () async {
-                                          await audioPlayer.pause();
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CustomAudioPlayer(
-                                                listHydra: hydraMember,
-                                                index: index,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        onChange: (value) async {
-                                          final myposition =
-                                              Duration(seconds: value.toInt());
-                                          await audioPlayer.seek(myposition);
-                                          await audioPlayer.resume();
-                                        },
-                                        onTap: (() async {
-                                          // if (isPlaying) {
-                                          // } else {}
+                                                if (isPlaying) {
+                                                  await audioPlayer.pause();
+                                                } else {
+                                                  await audioPlayer.play(
+                                                      hydraMember[index].file!);
+                                                }
+                                              }),
+                                              audioPlayer:
+                                                  selectedIndex == index
+                                                      ? audioPlayer
+                                                      : pausePlayer,
+                                              isPlaying: selectedIndex == index
+                                                  ? isPlaying
+                                                  : false,
+                                              duration: selectedIndex == index
+                                                  ? duration
+                                                  : pauseDuration,
+                                              position: selectedIndex == index
+                                                  ? position
+                                                  : pausePosition,
+                                              index: index,
+                                              listHydra: hydraMember,
+                                              ringtoneName:
+                                                  hydraMember[index].name!,
+                                              auidoId: hydraMember[index]
+                                                  .id!
+                                                  .toString(),
+                                              file: hydraMember[index].file!,
+                                            )
+                                          : RingtonesCard(
+                                              onNavigate: () async {
+                                                await audioPlayer.pause();
+                                                // ignore: use_build_context_synchronously
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CustomAudioPlayer(
+                                                      listHydra: hydraMember,
+                                                      index: index,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              onChange: (value) async {
+                                                final myposition = Duration(
+                                                    microseconds:
+                                                        value.toInt());
+                                                await audioPlayer
+                                                    .seek(myposition);
+                                                await audioPlayer.resume();
+                                              },
+                                              onTap: (() async {
+                                                // if (isPlaying) {
+                                                // } else {}
 
-                                          setState(() {
-                                            selectedIndex = index;
-                                            position = Duration.zero;
-                                            isPlaying = false;
-                                          });
-                                          await audioPlayer.pause();
-                                          if (isPlaying) {
-                                            await audioPlayer.pause();
-                                          } else {
-                                            await audioPlayer
-                                                .play(hydraMember[index].file!);
-                                          }
-                                        }),
-                                        audioPlayer: selectedIndex == index
-                                            ? audioPlayer
-                                            : pausePlayer,
-                                        isPlaying: selectedIndex == index
-                                            ? isPlaying
-                                            : false,
-                                        duration: selectedIndex == index
-                                            ? duration
-                                            : pauseDuration,
-                                        position: selectedIndex == index
-                                            ? position
-                                            : pausePosition,
-                                        index: index,
-                                        listHydra: hydraMember,
-                                        ringtoneName: hydraMember[index].name!,
-                                        file: hydraMember[index].file!,
-                                      );
-                              },
-                            ),
+                                                setState(() {
+                                                  selectedIndex = index;
+                                                  position = Duration.zero;
+                                                  isPlaying = false;
+                                                });
+                                                await audioPlayer.pause();
+                                                if (isPlaying) {
+                                                  await audioPlayer.pause();
+                                                } else {
+                                                  await audioPlayer.play(
+                                                      hydraMember[index].file!);
+                                                }
+                                              }),
+                                              audioPlayer:
+                                                  selectedIndex == index
+                                                      ? audioPlayer
+                                                      : pausePlayer,
+                                              isPlaying: selectedIndex == index
+                                                  ? isPlaying
+                                                  : false,
+                                              duration: selectedIndex == index
+                                                  ? duration
+                                                  : pauseDuration,
+                                              position: selectedIndex == index
+                                                  ? position
+                                                  : pausePosition,
+                                              index: index,
+                                              listHydra: hydraMember,
+                                              auidoId: hydraMember[index]
+                                                  .id!
+                                                  .toString(),
+                                              ringtoneName:
+                                                  hydraMember[index].name!,
+                                              file: hydraMember[index].file!,
+                                            );
+                                    },
+                                  ),
                           ),
                         ),
                       ],
                     ),
                   )),
             ),
-        )
+          )
         : WillPopScope(
-          onWillPop: ()async{
-            return true;
-          },
-          child: Scaffold(
+            onWillPop: () async {
+              return true;
+            },
+            child: Scaffold(
               appBar: PreferredSize(
                 preferredSize: Size(0, 60),
                 child: AppBar(
@@ -572,7 +595,8 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                                   suffixIcon: GestureDetector(
                                     onTap: () => setState(() => ishow = false),
                                     child: Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 12),
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 12),
                                       child: const AppImageAsset(
                                         image: 'assets/search.svg',
                                         color: Colors.black,
@@ -639,7 +663,10 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                                             ),
                                             Column(
                                               children: [
-                                                const AppImageAsset(image: 'assets/favourite_fill.svg', height: 30),
+                                                const AppImageAsset(
+                                                    image:
+                                                        'assets/favourite_fill.svg',
+                                                    height: 30),
                                                 Row(
                                                   children: const [
                                                     Icon(
@@ -769,7 +796,8 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                             enablePullUp: true,
                             controller: _refreshController,
                             onRefresh: () async {
-                              final result = await fetchRingtone(isRefresh: true);
+                              final result =
+                                  await fetchRingtone(isRefresh: true);
                               if (result) {
                                 _refreshController.refreshCompleted();
                               } else {
@@ -784,127 +812,146 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                                 _refreshController.loadFailed();
                               }
                             },
-                            header: CustomHeader(builder: (context, mode) => Container()),
-                            footer: CustomFooter(builder: (context, mode) => isDataLoad && totalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
+                            header: CustomHeader(
+                                builder: (context, mode) => Container()),
+                            footer: CustomFooter(
+                                builder: (context, mode) =>
+                                    isDataLoad && totalPage != 0
+                                        ? const LoadingPage()
+                                        : const SizedBox()),
                             child: isLoading
                                 ? const LoadingPage()
                                 : ListView.builder(
-                              itemCount: hydraMember.length,
-                              scrollDirection: Axis.vertical,
-                              controller: scrollController,
-                              itemBuilder: (context, index) {
-                                return selectedIndex == index
-                                    ? RingtonesCard(
-                                        onNavigate: () async {
-                                          await audioPlayer.pause();
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CustomAudioPlayer(
-                                                listHydra: hydraMember,
-                                                index: index,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        onChange: (value) async {
-                                          final myposition =
-                                              Duration(seconds: value.toInt());
-                                          await audioPlayer.seek(myposition);
-                                          await audioPlayer.resume();
-                                        },
-                                        onTap: (() async {
-                                          // if (isPlaying) {
-                                          // } else {}
+                                    itemCount: hydraMember.length,
+                                    scrollDirection: Axis.vertical,
+                                    controller: scrollController,
+                                    itemBuilder: (context, index) {
+                                      return selectedIndex == index
+                                          ? RingtonesCard(
+                                              onNavigate: () async {
+                                                await audioPlayer.pause();
+                                                // ignore: use_build_context_synchronously
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CustomAudioPlayer(
+                                                      listHydra: hydraMember,
+                                                      index: index,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              onChange: (value) async {
+                                                final myposition = Duration(
+                                                    microseconds:
+                                                        value.toInt());
+                                                await audioPlayer
+                                                    .seek(myposition);
+                                                await audioPlayer.resume();
+                                              },
+                                              onTap: (() async {
+                                                // if (isPlaying) {
+                                                // } else {}
 
-                                          setState(() {
-                                            selectedIndex = index;
-                                            position = Duration.zero;
-                                          });
+                                                setState(() {
+                                                  selectedIndex = index;
+                                                  position = Duration.zero;
+                                                });
 
-                                          if (isPlaying) {
-                                            await audioPlayer.pause();
-                                          } else {
-                                            await audioPlayer
-                                                .play(hydraMember[index].file!);
-                                          }
-                                        }),
-                                        audioPlayer: selectedIndex == index
-                                            ? audioPlayer
-                                            : pausePlayer,
-                                        isPlaying: selectedIndex == index
-                                            ? isPlaying
-                                            : false,
-                                        duration: selectedIndex == index
-                                            ? duration
-                                            : pauseDuration,
-                                        position: selectedIndex == index
-                                            ? position
-                                            : pausePosition,
-                                        index: index,
-                                        listHydra: hydraMember,
-                                        ringtoneName: hydraMember[index].name!,
-                                        file: hydraMember[index].file!,
-                                      )
-                                    : RingtonesCard(
-                                        onNavigate: () async {
-                                          await audioPlayer.pause();
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CustomAudioPlayer(
-                                                listHydra: hydraMember,
-                                                index: index,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        onChange: (value) async {
-                                          final myposition =
-                                              Duration(seconds: value.toInt());
-                                          await audioPlayer.seek(myposition);
-                                          await audioPlayer.resume();
-                                        },
-                                        onTap: (() async {
-                                          // if (isPlaying) {
-                                          // } else {}
+                                                if (isPlaying) {
+                                                  await audioPlayer.pause();
+                                                } else {
+                                                  await audioPlayer.play(
+                                                      hydraMember[index].file!);
+                                                }
+                                              }),
+                                              audioPlayer:
+                                                  selectedIndex == index
+                                                      ? audioPlayer
+                                                      : pausePlayer,
+                                              isPlaying: selectedIndex == index
+                                                  ? isPlaying
+                                                  : false,
+                                              duration: selectedIndex == index
+                                                  ? duration
+                                                  : pauseDuration,
+                                              position: selectedIndex == index
+                                                  ? position
+                                                  : pausePosition,
+                                              index: index,
+                                              listHydra: hydraMember,
+                                              ringtoneName:
+                                                  hydraMember[index].name!,
+                                              auidoId: hydraMember[index]
+                                                  .id!
+                                                  .toString(),
+                                              file: hydraMember[index].file!,
+                                            )
+                                          : RingtonesCard(
+                                              auidoId: hydraMember[index]
+                                                  .id!
+                                                  .toString(),
+                                              onNavigate: () async {
+                                                await audioPlayer.pause();
+                                                // ignore: use_build_context_synchronously
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CustomAudioPlayer(
+                                                      listHydra: hydraMember,
+                                                      index: index,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              onChange: (value) async {
+                                                final myposition = Duration(
+                                                    microseconds:
+                                                        value.toInt());
+                                                await audioPlayer
+                                                    .seek(myposition);
+                                                await audioPlayer.resume();
+                                              },
+                                              onTap: (() async {
+                                                // if (isPlaying) {
+                                                // } else {}
 
-                                          setState(() {
-                                            selectedIndex = index;
-                                            position = Duration.zero;
-                                            isPlaying = false;
-                                          });
-                                          await audioPlayer.pause();
-                                          if (isPlaying) {
-                                            await audioPlayer.pause();
-                                          } else {
-                                            await audioPlayer
-                                                .play(hydraMember[index].file!);
-                                          }
-                                        }),
-                                        audioPlayer: selectedIndex == index
-                                            ? audioPlayer
-                                            : pausePlayer,
-                                        isPlaying: selectedIndex == index
-                                            ? isPlaying
-                                            : false,
-                                        duration: selectedIndex == index
-                                            ? duration
-                                            : pauseDuration,
-                                        position: selectedIndex == index
-                                            ? position
-                                            : pausePosition,
-                                        index: index,
-                                        listHydra: hydraMember,
-                                        ringtoneName: hydraMember[index].name!,
-                                        file: hydraMember[index].file!,
-                                      );
-                              },
-                            ),
+                                                setState(() {
+                                                  selectedIndex = index;
+                                                  position = Duration.zero;
+                                                  isPlaying = false;
+                                                });
+                                                await audioPlayer.pause();
+                                                if (isPlaying) {
+                                                  await audioPlayer.pause();
+                                                } else {
+                                                  await audioPlayer.play(
+                                                      hydraMember[index].file!);
+                                                }
+                                              }),
+                                              audioPlayer:
+                                                  selectedIndex == index
+                                                      ? audioPlayer
+                                                      : pausePlayer,
+                                              isPlaying: selectedIndex == index
+                                                  ? isPlaying
+                                                  : false,
+                                              duration: selectedIndex == index
+                                                  ? duration
+                                                  : pauseDuration,
+                                              position: selectedIndex == index
+                                                  ? position
+                                                  : pausePosition,
+                                              index: index,
+                                              listHydra: hydraMember,
+                                              ringtoneName:
+                                                  hydraMember[index].name!,
+                                              file: hydraMember[index].file!,
+                                            );
+                                    },
+                                  ),
                           ),
                         ),
                       ],
@@ -942,7 +989,8 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                             padding: const EdgeInsets.only(left: 40),
                             child: Row(
                               children: [
-                                const AppImageAsset(image: 'assets/ringtone.svg'),
+                                const AppImageAsset(
+                                    image: 'assets/ringtone.svg'),
                                 const SizedBox(
                                   width: 26,
                                 ),
@@ -980,7 +1028,8 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                             padding: const EdgeInsets.only(left: 40),
                             child: Row(
                               children: [
-                                const AppImageAsset(image: "assets/wallpaper.svg"),
+                                const AppImageAsset(
+                                    image: "assets/wallpaper.svg"),
                                 const SizedBox(
                                   width: 26,
                                 ),
@@ -1030,7 +1079,9 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                           padding: const EdgeInsets.only(left: 40),
                           child: Row(
                             children: [
-                              const AppImageAsset(image: 'assets/favourite_fill.svg', color: Colors.white),
+                              const AppImageAsset(
+                                  image: 'assets/favourite_fill.svg',
+                                  color: Colors.white),
                               const SizedBox(
                                 width: 29,
                               ),
@@ -1174,6 +1225,6 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                 ),
               ),
             ),
-        );
+          );
   }
 }

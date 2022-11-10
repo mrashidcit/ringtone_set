@@ -2,19 +2,25 @@ import 'dart:ui';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:deeze_app/uitilities/end_points.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:platform_device_id/platform_device_id.dart';
+import '../db_services/favorite_database.dart';
 import '../models/deeze_model.dart';
+import '../models/favorite.dart';
+import 'app_loader.dart';
 import 'audio_select_dialog.dart';
 import 'more_audio_dialog.dart';
+import 'package:http/http.dart' as http;
 
 class CustomAudioPlayer extends StatefulWidget {
-  final List<DeezeItemModel> listHydra;
+  List<DeezeItemModel> listHydra;
   final int index;
 
-  const CustomAudioPlayer({
+  CustomAudioPlayer({
     Key? key,
     required this.listHydra,
     required this.index,
@@ -27,11 +33,53 @@ class CustomAudioPlayer extends StatefulWidget {
 class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   final CarouselController _controller = CarouselController();
 
-  animateToSilde(int index) => _controller.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.linear,
+  animateToSilde(int index) {
+    return _controller.animateToPage(
+      0,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.linear,
+    );
+  }
+
+  int page = 1;
+  int? totalPage;
+
+  ScrollController scrollController = ScrollController();
+  bool isDataLoad = false;
+  bool isLoading = false;
+
+  Future<bool> fetchRingtone() async {
+    var url = getDeezeAppHpUrlContent;
+
+    Uri uri = Uri.parse(url).replace(queryParameters: {
+      "page": "$page",
+      "itemsPerPage": "10",
+      // "enabled": "true",
+      "type": "RINGTONE"
+    });
+    try {
+      http.Response response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       );
+      print('${response.statusCode} : ${response.request}');
+
+      if (response.statusCode == 200) {
+        print(response.body);
+        var rawResponse = deezeItemModelFromJson(response.body);
+
+        widget.listHydra.addAll(rawResponse);
+
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
 
   final AudioPlayer audioPlayer = AudioPlayer();
   final AudioPlayer pausePlayer = AudioPlayer();
@@ -45,6 +93,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    widget.listHydra.removeRange(0, widget.index);
     WidgetsBinding.instance
         .addPostFrameCallback((timeStamp) => animateToSilde(widget.index));
     audioPlayer.onPlayerStateChanged.listen((state) {
@@ -68,6 +117,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+
     audioPlayer.dispose();
     isPlaying = false;
     PlayerState.STOPPED;
@@ -130,7 +180,10 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
           filter: ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
           child: Stack(
             children: [
-              const AppImageAsset(image: 'assets/drop_shadow.png', height: double.infinity, fit: BoxFit.cover),
+              const AppImageAsset(
+                  image: 'assets/drop_shadow.png',
+                  height: double.infinity,
+                  fit: BoxFit.cover),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -160,51 +213,62 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                           const SizedBox(height: 30),
                           activeIndex == index
                               ? BuildPlay(
-                            onChange: (value) async {
-                              final myposition = Duration(microseconds: value.toInt());
-                              await audioPlayer.seek(myposition);
-                              await audioPlayer.resume();
-                            },
-                            onTap: (() async {
-                              // if (isPlaying) {
-                              // } else {}
-
-                              setState(() {
-                                position = Duration.zero;
-                              });
-                              await audioPlayer.pause();
-                              if (isPlaying) {
-                                await audioPlayer.pause();
-                              } else {
-                                await audioPlayer
-                                    .play(widget.listHydra[index].file!);
-                              }
-                            }),
-                            onTapFavourite: () {
-                              setState(() {
-                                widget.listHydra[index].isFavourite =
-                                !widget.listHydra[index].isFavourite;
-                              });
-                            },
-                            isFavourite: widget.listHydra[index].isFavourite,
-                            audioPlayer: activeIndex == index
-                                ? audioPlayer
-                                : pausePlayer,
-                            isPlaying: activeIndex == index ? isPlaying : false,
-                            duration:
-                            activeIndex == index ? duration : pauseDuration,
-                            position:
-                            activeIndex == index ? position : pausePosition,
-                            activeIndex: activeIndex,
-                            file: file!,
-                            index: index,
-                            name: name!,
-                            userName: widget.listHydra[index].user!.firstName!,
-                            userProfileUrl: widget.listHydra[index].user!.image,
-                          )
-                              : BuildPlay(
+                                  audioId:
+                                      widget.listHydra[index].id.toString(),
                                   onChange: (value) async {
-                                    final myposition = Duration(microseconds: value.toInt());
+                                    final myposition =
+                                        Duration(microseconds: value.toInt());
+                                    await audioPlayer.seek(myposition);
+                                    await audioPlayer.resume();
+                                  },
+                                  onTap: (() async {
+                                    // if (isPlaying) {
+                                    // } else {}
+
+                                    setState(() {
+                                      position = Duration.zero;
+                                    });
+                                    await audioPlayer.pause();
+                                    if (isPlaying) {
+                                      await audioPlayer.pause();
+                                    } else {
+                                      await audioPlayer
+                                          .play(widget.listHydra[index].file!);
+                                    }
+                                  }),
+                                  onTapFavourite: () {
+                                    setState(() {
+                                      widget.listHydra[index].isFavourite =
+                                          !widget.listHydra[index].isFavourite;
+                                    });
+                                  },
+                                  isFavourite:
+                                      widget.listHydra[index].isFavourite,
+                                  audioPlayer: activeIndex == index
+                                      ? audioPlayer
+                                      : pausePlayer,
+                                  isPlaying: isPlaying,
+                                  duration: activeIndex == index
+                                      ? duration
+                                      : pauseDuration,
+                                  position: activeIndex == index
+                                      ? position
+                                      : pausePosition,
+                                  activeIndex: activeIndex,
+                                  file: file!,
+                                  index: index,
+                                  name: name!,
+                                  userName:
+                                      widget.listHydra[index].user!.firstName!,
+                                  userProfileUrl:
+                                      widget.listHydra[index].user!.image,
+                                )
+                              : BuildPlay(
+                                  audioId:
+                                      widget.listHydra[index].id.toString(),
+                                  onChange: (value) async {
+                                    final myposition =
+                                        Duration(microseconds: value.toInt());
                                     await audioPlayer.seek(myposition);
                                     await audioPlayer.resume();
                                   },
@@ -220,44 +284,51 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                                     // if (isPlaying) {
                                     // } else {}
 
-                              if (isPlaying) {
-                                await audioPlayer.pause();
-                              } else {
-                                await audioPlayer
-                                    .play(widget.listHydra[index].file!);
-                              }
-                            }),
-                            audioPlayer: activeIndex == index
-                                ? audioPlayer
-                                : pausePlayer,
-                            isPlaying: activeIndex == index ? isPlaying : false,
-                            duration:
-                            activeIndex == index ? duration : pauseDuration,
-                            position:
-                            activeIndex == index ? position : pausePosition,
-                            activeIndex: activeIndex,
-                            file: file!,
-                            index: index,
-                            name: name!,
-                            userName: widget.listHydra[index].user!.firstName!,
-                            userProfileUrl: widget.listHydra[index].user!.image,
-                          ),
+                                    if (isPlaying) {
+                                      await audioPlayer.pause();
+                                    } else {
+                                      await audioPlayer
+                                          .play(widget.listHydra[index].file!);
+                                    }
+                                  }),
+                                  audioPlayer: activeIndex == index
+                                      ? audioPlayer
+                                      : pausePlayer,
+                                  isPlaying: isPlaying,
+                                  duration: activeIndex == index
+                                      ? duration
+                                      : pauseDuration,
+                                  position: activeIndex == index
+                                      ? position
+                                      : pausePosition,
+                                  activeIndex: activeIndex,
+                                  file: file!,
+                                  index: index,
+                                  name: name!,
+                                  userName:
+                                      widget.listHydra[index].user!.firstName!,
+                                  userProfileUrl:
+                                      widget.listHydra[index].user!.image,
+                                ),
                           const SizedBox(height: 10),
                           if (activeIndex == index)
                             Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: screenWidth * 0.05),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
-                                      widget.listHydra[activeIndex].user?.image != null
+                                      widget.listHydra[activeIndex].user
+                                                  ?.image !=
+                                              null
                                           ? CircleAvatar(
                                               radius: 17,
                                               backgroundImage: NetworkImage(
-                                                widget.listHydra[activeIndex].user!
-                                                    .image!,
+                                                widget.listHydra[activeIndex]
+                                                    .user!.image!,
                                               ),
                                             )
                                           : const CircleAvatar(
@@ -266,7 +337,8 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                                             ),
                                       const SizedBox(width: 12),
                                       Text(
-                                        widget.listHydra[activeIndex].user!.firstName!,
+                                        widget.listHydra[activeIndex].user!
+                                            .firstName!,
                                         style: GoogleFonts.archivo(
                                           fontStyle: FontStyle.normal,
                                           color: Colors.white,
@@ -310,6 +382,10 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                       enlargeCenterPage: true,
                       enableInfiniteScroll: false,
                       onPageChanged: (index, reason) async {
+                        setState(() {
+                          page = index;
+                        });
+                        fetchRingtone();
                         if (isPlaying) {
                           await audioPlayer.pause();
                           await audioPlayer.play(widget.listHydra[index].file!);
@@ -346,8 +422,10 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                                 return MoreAudioDialog(
                                   file: myfile,
                                   fileName: widget.listHydra[activeIndex].name!,
-                                  userName: widget.listHydra[activeIndex].user!.firstName!,
-                                  userImage: widget.listHydra[activeIndex].user!.image!,
+                                  userName: widget
+                                      .listHydra[activeIndex].user!.firstName!,
+                                  userImage: widget
+                                      .listHydra[activeIndex].user!.image!,
                                 );
                               },
                             );
@@ -366,7 +444,8 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                           showCupertinoModalPopup(
                             context: context,
                             barrierColor: Colors.black.withOpacity(0.8),
-                            builder: (context) => AudioSelectDialog(file: myfile),
+                            builder: (context) =>
+                                AudioSelectDialog(file: myfile),
                           );
                         },
                         child: Container(
@@ -406,6 +485,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
 
 class BuildPlay extends StatefulWidget {
   final String file;
+  final String audioId;
   final String name;
   final String userName;
   final String? userProfileUrl;
@@ -426,6 +506,7 @@ class BuildPlay extends StatefulWidget {
       this.position,
       required this.audioPlayer,
       required this.isPlaying,
+      required this.audioId,
       required this.onTap,
       required this.onTapFavourite,
       required this.onChange,
@@ -443,6 +524,14 @@ class BuildPlay extends StatefulWidget {
 }
 
 class _BuildPlayState extends State<BuildPlay> {
+  List<Favorite> favoriteList = [];
+
+  refreshFavorite() async {
+    favoriteList = await FavoriteDataBase.instance
+        .readAllFavoriteOfCurrentMusic(widget.audioId);
+    setState(() {});
+  }
+
   List myGradientList = const [
     LinearGradient(
       begin: Alignment.centerRight,
@@ -485,6 +574,12 @@ class _BuildPlayState extends State<BuildPlay> {
       ],
     ),
   ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    refreshFavorite();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -533,26 +628,39 @@ class _BuildPlayState extends State<BuildPlay> {
               ),
             ),
             Align(
-              alignment: Alignment.centerRight,
-              child: widget.activeIndex == widget.index
-                  ? GestureDetector(
-                      onTap: widget.onTapFavourite,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 15, right: 15),
-                        child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: !widget.isFavourite
-                                ? const AppImageAsset(
-                                    image: "assets/favourite.svg")
-                                : const AppImageAsset(
-                                    image: "assets/favourite_fill.svg",
-                                    height: 17,
-                                    width: 17,
-                                  )),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
+                alignment: Alignment.centerRight,
+                child: GestureDetector(
+                  onTap: (() async {
+                    String? deviceId = await PlatformDeviceId.getDeviceId;
+
+                    Favorite favorite = Favorite(
+                        name: widget.name,
+                        currentDeviceId: deviceId!,
+                        path: widget.file,
+                        deezeId: widget.audioId,
+                        type: "MUSIC");
+                    favoriteList.isEmpty
+                        ? await FavoriteDataBase.instance.addFavorite(favorite)
+                        : await FavoriteDataBase.instance
+                            .delete(favoriteList.first.deezeId);
+                    refreshFavorite();
+                  }),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 15, right: 15),
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: favoriteList.isEmpty
+                          ? const AppImageAsset(
+                              image: 'assets/favourite.svg', height: 16)
+                          : const AppImageAsset(
+                              image: "assets/favourite_fill.svg",
+                              color: Colors.red,
+                              height: 16,
+                              width: 16,
+                            ),
+                    ),
+                  ),
+                )),
           ],
         ),
       ),

@@ -59,9 +59,17 @@ class OnBoardingState extends State<OnBoarding> {
                   ),
                 ),
                 const SizedBox(height: 70),
-                AppSocialMediaButton(image: 'assets/google.svg',color: Color(0XFF0764E3), text: 'Google',onTap: (){}),
+                AppSocialMediaButton(
+                    image: 'assets/google.svg',
+                    color: Color(0XFF0764E3),
+                    text: 'Google',
+                    onTap: () {}),
                 const SizedBox(height: 20),
-                AppSocialMediaButton(image: 'assets/facebook.svg',color: Color(0XFF4267B2), text: 'Facebook',onTap: (){}),
+                AppSocialMediaButton(
+                    image: 'assets/facebook.svg',
+                    color: Color(0XFF4267B2),
+                    text: 'Facebook',
+                    onTap: () {}),
                 const SizedBox(height: 20),
                 AppSocialMediaButton(
                   color: Colors.white,
@@ -73,18 +81,23 @@ class OnBoardingState extends State<OnBoarding> {
                 const SizedBox(height: 36),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children:  [
-                      Text("New here?    Sign Up",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.archivo(
-                            color: Colors.white,
-                            fontStyle: FontStyle.normal,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          )
-                      ),
-                      const SizedBox(width: 5,),
-                      const Icon(Icons.arrow_forward_ios_rounded,color: Colors.white,size: 12,)
+                  children: [
+                    Text("New here?    Sign Up",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.archivo(
+                          color: Colors.white,
+                          fontStyle: FontStyle.normal,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        )),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: Colors.white,
+                      size: 12,
+                    )
                   ],
                 ),
                 const Spacer(),

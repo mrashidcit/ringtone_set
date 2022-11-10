@@ -9,7 +9,7 @@ import '../db_services/favorite_database.dart';
 import '../models/deeze_model.dart';
 import '../models/favorite.dart';
 
-class CategoryCard extends StatefulWidget {
+class CategoryCard extends StatelessWidget {
   final List<DeezeItemModel>? listHydra;
   final int? index;
   final bool iscategory;
@@ -17,7 +17,7 @@ class CategoryCard extends StatefulWidget {
   final VoidCallback? onRefresh;
   final image;
   final name;
-  const CategoryCard(
+  CategoryCard(
       {Key? key,
       this.image,
       this.onRefresh,
@@ -27,31 +27,17 @@ class CategoryCard extends StatefulWidget {
       this.index,
       this.iscategory = false})
       : super(key: key);
-
-  @override
-  State<CategoryCard> createState() => _CategoryCardState();
-}
-
-class _CategoryCardState extends State<CategoryCard> {
   List<Favorite> favoriteList = [];
-
-  refreshFavorite() async {
-    favoriteList = await FavoriteDataBase.instance
-        .readAllFavoriteOfCurrentMusic(widget.id);
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    refreshFavorite();
-  }
+  // refreshFavorite() async {
+  //   favoriteList =
+  //       await FavoriteDataBase.instance.readAllFavoriteOfCurrentMusic(id);
+  // }
 
   @override
   Widget build(BuildContext context) {
+    // refreshFavorite();
     double screenWidth = MediaQuery.of(context).size.width;
-    return widget.image == ""
+    return image == ""
         ? Container(
             width: screenWidth * 0.4,
             decoration: BoxDecoration(
@@ -68,7 +54,7 @@ class _CategoryCardState extends State<CategoryCard> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 child: Text(
-                  widget.name,
+                  name,
                   style: const TextStyle(
                     fontSize: 20,
                   ),
@@ -78,14 +64,14 @@ class _CategoryCardState extends State<CategoryCard> {
           )
         : GestureDetector(
             onTap: (() {
-              widget.iscategory
+              iscategory
                   ? null
                   : Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => WallPaperSlider(
-                          listHydra: widget.listHydra,
-                          index: widget.index,
+                          listHydra: listHydra,
+                          index: index,
                         ),
                       ),
                     );
@@ -100,7 +86,7 @@ class _CategoryCardState extends State<CategoryCard> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(6),
                       child: AppImageAsset(
-                        image: widget.image,
+                        image: image,
                         isWebImage: true,
                         webFit: BoxFit.cover,
                       ),
@@ -110,41 +96,22 @@ class _CategoryCardState extends State<CategoryCard> {
                     onTap: (() async {
                       String? deviceId = await PlatformDeviceId.getDeviceId;
 
-                      Favorite favorite = Favorite(
-                          name: widget.name,
-                          currentDeviceId: deviceId!,
-                          path: widget.image,
-                          deezeId: widget.id,
-                          type: "WALLPAPER");
-                      favoriteList.isEmpty
-                          ? await FavoriteDataBase.instance
-                              .addFavorite(favorite)
-                          : await FavoriteDataBase.instance
-                              .delete(favoriteList.first.deezeId);
-                      refreshFavorite();
-                      widget.iscategory ? widget.onRefresh!() : null;
+                      await FavoriteDataBase.instance.delete(id);
+
+                      iscategory ? onRefresh!() : null;
                     }),
-                    child: favoriteList.isEmpty
-                        ? const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Align(
-                              alignment: Alignment.bottomRight,
-                              child: AppImageAsset(
-                                  image: 'assets/favourite.svg', height: 16),
-                            ),
-                          )
-                        : const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Align(
-                              alignment: Alignment.bottomRight,
-                              child: AppImageAsset(
-                                image: "assets/favourite_fill.svg",
-                                color: Colors.red,
-                                height: 16,
-                                width: 16,
-                              ),
-                            ),
-                          ),
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: AppImageAsset(
+                          image: "assets/favourite_fill.svg",
+                          color: Colors.red,
+                          height: 16,
+                          width: 16,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
