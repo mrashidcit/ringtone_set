@@ -4,9 +4,11 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:deeze_app/uitilities/end_points.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:deeze_app/widgets/internet_checkor_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import '../db_services/favorite_database.dart';
 import '../models/deeze_model.dart';
@@ -169,6 +171,33 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   ];
   Gradient? gradient;
 
+  // void performPlayAndPauseOperation(int index) async {
+  //   // if (isPlaying) {
+  //   // } else {}
+
+  //   setState(() {
+  //     position = Duration.zero;
+  //   });
+  //   await audioPlayer.pause();
+  //   if (isPlaying) {
+  //     await audioPlayer.pause();
+  //   } else {
+  //     bool hasInternet = await InternetConnectionChecker().hasConnection;
+  //     print('>> hasInternet : $hasInternet');
+  //     if (!await InternetConnectionChecker().hasConnection) {
+  //       showCupertinoModalPopup(
+  //         context: context,
+  //         barrierDismissible: false,
+  //         builder: (context) => InternetCheckerDialog(onRetryTap: () {
+  //           performPlayAndPauseOperation(index);
+  //         }),
+  //       );
+  //     } else {
+  //       await audioPlayer.play(widget.listHydra[index].file!);
+  //     }
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -221,21 +250,8 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                                     await audioPlayer.seek(myposition);
                                     await audioPlayer.resume();
                                   },
-                                  onTap: (() async {
-                                    // if (isPlaying) {
-                                    // } else {}
-
-                                    setState(() {
-                                      position = Duration.zero;
-                                    });
-                                    await audioPlayer.pause();
-                                    if (isPlaying) {
-                                      await audioPlayer.pause();
-                                    } else {
-                                      await audioPlayer
-                                          .play(widget.listHydra[index].file!);
-                                    }
-                                  }),
+                                  onTap: () => performPlayAndPauseOperation(
+                                      context, index),
                                   onTapFavourite: () {
                                     setState(() {
                                       widget.listHydra[index].isFavourite =
@@ -280,17 +296,8 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                                   },
                                   isFavourite:
                                       widget.listHydra[index].isFavourite,
-                                  onTap: (() async {
-                                    // if (isPlaying) {
-                                    // } else {}
-
-                                    if (isPlaying) {
-                                      await audioPlayer.pause();
-                                    } else {
-                                      await audioPlayer
-                                          .play(widget.listHydra[index].file!);
-                                    }
-                                  }),
+                                  onTap: () =>
+                                      performIsFavorite(context, index),
                                   audioPlayer: activeIndex == index
                                       ? audioPlayer
                                       : pausePlayer,
@@ -480,6 +487,62 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
         ),
       ),
     );
+  }
+
+  Future<void> performIsFavorite(BuildContext context, int index) async {
+    {
+      // if (isPlaying) {
+      // } else {}
+
+      if (isPlaying) {
+        await audioPlayer.pause();
+      } else {
+        bool hasInternet = await InternetConnectionChecker().hasConnection;
+        print('>> hasInternet : $hasInternet');
+        if (!await InternetConnectionChecker().hasConnection) {
+          showCupertinoModalPopup(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => InternetCheckerDialog(
+                onRetryTap: () => performIsFavorite(context, index)),
+          );
+        } else {
+          await audioPlayer.play(widget.listHydra[index].file!);
+        }
+        // await audioPlayer
+        //     .play(widget.listHydra[index].file!);
+      }
+    }
+  }
+
+  Future<void> performPlayAndPauseOperation(
+      BuildContext context, int index) async {
+    {
+      // if (isPlaying) {
+      // } else {}
+
+      setState(() {
+        position = Duration.zero;
+      });
+      await audioPlayer.pause();
+      if (isPlaying) {
+        await audioPlayer.pause();
+      } else {
+        bool hasInternet = await InternetConnectionChecker().hasConnection;
+        print('>> hasInternet : $hasInternet');
+        if (!await InternetConnectionChecker().hasConnection) {
+          showCupertinoModalPopup(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => InternetCheckerDialog(onRetryTap: () {
+              performPlayAndPauseOperation(context, index);
+            }),
+          );
+        } else {
+          await audioPlayer.play(widget.listHydra[index].file!);
+        }
+      }
+    }
   }
 }
 
