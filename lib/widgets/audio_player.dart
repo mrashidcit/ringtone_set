@@ -4,6 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:deeze_app/uitilities/end_points.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:deeze_app/widgets/child_widgets/build_play.dart';
 import 'package:deeze_app/widgets/internet_checkor_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -86,6 +87,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   final AudioPlayer audioPlayer = AudioPlayer();
   final AudioPlayer pausePlayer = AudioPlayer();
   bool isPlaying = false;
+  bool isBuffering = false;
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
   Duration pauseDuration = Duration.zero;
@@ -99,11 +101,26 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     WidgetsBinding.instance
         .addPostFrameCallback((timeStamp) => animateToSilde(widget.index));
     audioPlayer.onPlayerStateChanged.listen((state) {
-      setState(() {
-        isPlaying = state == PlayerState.PLAYING;
-      });
+      print(
+          '>> audioPlayer.onPlayerStateChanged - state , mounted = ${state.name} , ${mounted}');
+      if (state == PlayerState.PAUSED) {
+        isPlaying = false;
+      } else if (state == PlayerState.COMPLETED) {
+        isPlaying = false;
+        isBuffering = false;
+      }
+      if (mounted) {
+        setState(() {
+          // isPlaying = state == PlayerState.PLAYING;
+        });
+      }
     });
     audioPlayer.onDurationChanged.listen((state) {
+      isBuffering = false;
+      isPlaying = true;
+      print(
+          '>> audioPlayer.onDurationChanged - _isBuffering , isPlaying : $isBuffering , $isPlaying ');
+
       setState(() {
         duration = state;
       });
@@ -122,7 +139,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
 
     audioPlayer.dispose();
     isPlaying = false;
-    PlayerState.STOPPED;
+    // PlayerState.STOPPED;
   }
 
   late int activeIndex = widget.index;
@@ -171,35 +188,9 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   ];
   Gradient? gradient;
 
-  // void performPlayAndPauseOperation(int index) async {
-  //   // if (isPlaying) {
-  //   // } else {}
-
-  //   setState(() {
-  //     position = Duration.zero;
-  //   });
-  //   await audioPlayer.pause();
-  //   if (isPlaying) {
-  //     await audioPlayer.pause();
-  //   } else {
-  //     bool hasInternet = await InternetConnectionChecker().hasConnection;
-  //     print('>> hasInternet : $hasInternet');
-  //     if (!await InternetConnectionChecker().hasConnection) {
-  //       showCupertinoModalPopup(
-  //         context: context,
-  //         barrierDismissible: false,
-  //         builder: (context) => InternetCheckerDialog(onRetryTap: () {
-  //           performPlayAndPauseOperation(index);
-  //         }),
-  //       );
-  //     } else {
-  //       await audioPlayer.play(widget.listHydra[index].file!);
-  //     }
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
+    // print('>> build - CustomAudioPlayer - activeIndex = $activeIndex');
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Container(
@@ -222,9 +213,9 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                     itemBuilder: (context, index, realIndex) {
                       final file = widget.listHydra[index].file;
                       final name = widget.listHydra[index].name;
-                      // myfile = index == 0
-                      //     ? widget.listHydra[0].file!
-                      //     : widget.listHydra[index - 1].file!;
+                      myfile = index == 0
+                          ? widget.listHydra[0].file!
+                          : widget.listHydra[index - 1].file!;
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
@@ -241,82 +232,9 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                           ),
                           const SizedBox(height: 30),
                           activeIndex == index
-                              ? BuildPlay(
-                                  audioId:
-                                      widget.listHydra[index].id.toString(),
-                                  onChange: (value) async {
-                                    final myposition =
-                                        Duration(microseconds: value.toInt());
-                                    await audioPlayer.seek(myposition);
-                                    await audioPlayer.resume();
-                                  },
-                                  onTap: () => performPlayAndPauseOperation(
-                                      context, index),
-                                  onTapFavourite: () {
-                                    setState(() {
-                                      widget.listHydra[index].isFavourite =
-                                          !widget.listHydra[index].isFavourite;
-                                    });
-                                  },
-                                  isFavourite:
-                                      widget.listHydra[index].isFavourite,
-                                  audioPlayer: activeIndex == index
-                                      ? audioPlayer
-                                      : pausePlayer,
-                                  isPlaying: isPlaying,
-                                  duration: activeIndex == index
-                                      ? duration
-                                      : pauseDuration,
-                                  position: activeIndex == index
-                                      ? position
-                                      : pausePosition,
-                                  activeIndex: activeIndex,
-                                  file: file!,
-                                  index: index,
-                                  name: name!,
-                                  userName:
-                                      widget.listHydra[index].user!.firstName!,
-                                  userProfileUrl:
-                                      widget.listHydra[index].user!.image,
-                                )
-                              : BuildPlay(
-                                  audioId:
-                                      widget.listHydra[index].id.toString(),
-                                  onChange: (value) async {
-                                    final myposition =
-                                        Duration(microseconds: value.toInt());
-                                    await audioPlayer.seek(myposition);
-                                    await audioPlayer.resume();
-                                  },
-                                  onTapFavourite: () {
-                                    setState(() {
-                                      widget.listHydra[index].isFavourite =
-                                          !widget.listHydra[index].isFavourite;
-                                    });
-                                  },
-                                  isFavourite:
-                                      widget.listHydra[index].isFavourite,
-                                  onTap: () =>
-                                      performIsFavorite(context, index),
-                                  audioPlayer: activeIndex == index
-                                      ? audioPlayer
-                                      : pausePlayer,
-                                  isPlaying: isPlaying,
-                                  duration: activeIndex == index
-                                      ? duration
-                                      : pauseDuration,
-                                  position: activeIndex == index
-                                      ? position
-                                      : pausePosition,
-                                  activeIndex: activeIndex,
-                                  file: file!,
-                                  index: index,
-                                  name: name!,
-                                  userName:
-                                      widget.listHydra[index].user!.firstName!,
-                                  userProfileUrl:
-                                      widget.listHydra[index].user!.image,
-                                ),
+                              ? buildActiveBuildPlay(index, context, file, name)
+                              : buildNonActiveBuildPlay(
+                                  index, context, file, name),
                           const SizedBox(height: 10),
                           if (activeIndex == index)
                             Padding(
@@ -389,15 +307,20 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                       enlargeCenterPage: true,
                       enableInfiniteScroll: false,
                       onPageChanged: (index, reason) async {
+                        print(
+                            ">> CarouselOptions - onPageChanged - index : $index");
                         setState(() {
                           page = index;
                         });
-                        fetchRingtone();
+                        // fetchRingtone();
                         if (isPlaying) {
                           await audioPlayer.pause();
-                          await audioPlayer.play(widget.listHydra[index].file!);
+                          // await audioPlayer.play(widget.listHydra[index].file!);
+                        }
+                        if (audioPlayer.state == PlayerState.PAUSED) {
+                          await audioPlayer.release();
                         } else {
-                          await audioPlayer.pause();
+                          // await audioPlayer.pause();
                         }
                         setState(() {
                           gradient = (index % 4 == 0)
@@ -410,6 +333,8 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                           position = Duration.zero;
                           myfile = widget.listHydra[index].file!;
                           activeIndex = index;
+                          print(
+                              '>> CarouselOptions - onPageChanged : activeIndex = $activeIndex');
                         });
                       },
                     ),
@@ -448,6 +373,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                       const SizedBox(width: 25),
                       GestureDetector(
                         onTap: () {
+                          print('>> onTap : myFile = $myfile');
                           showCupertinoModalPopup(
                             context: context,
                             barrierColor: Colors.black.withOpacity(0.8),
@@ -489,13 +415,90 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     );
   }
 
-  Future<void> performIsFavorite(BuildContext context, int index) async {
+  BuildPlay buildNonActiveBuildPlay(
+      int index, BuildContext context, String? file, String? name) {
+    return BuildPlay(
+      audioId: widget.listHydra[index].id.toString(),
+      onChange: (value) async {
+        final myposition = Duration(microseconds: value.toInt());
+        await audioPlayer.seek(myposition);
+        await audioPlayer.resume();
+      },
+      onTapFavourite: () {
+        setState(() {
+          widget.listHydra[index].isFavourite =
+              !widget.listHydra[index].isFavourite;
+        });
+      },
+      isFavourite: widget.listHydra[index].isFavourite,
+      onTap: () => nonActivePlayAndPauseAction(context, index),
+      audioPlayer: activeIndex == index ? audioPlayer : pausePlayer,
+      isPlaying: isPlaying,
+      isBuffering: isBuffering,
+      duration: activeIndex == index ? duration : pauseDuration,
+      position: activeIndex == index ? position : pausePosition,
+      // position: Duration(milliseconds: 0),
+      activeIndex: activeIndex,
+      file: file!,
+      index: index,
+      name: name!,
+      userName: widget.listHydra[index].user!.firstName!,
+      userProfileUrl: widget.listHydra[index].user!.image,
+    );
+  }
+
+  BuildPlay buildActiveBuildPlay(
+      int index, BuildContext context, String? file, String? name) {
+    return BuildPlay(
+      audioId: widget.listHydra[index].id.toString(),
+      onChange: (value) async {
+        final myposition = Duration(microseconds: value.toInt());
+        await audioPlayer.seek(myposition);
+        await audioPlayer.resume();
+      },
+      onTap: () => nonActivePlayAndPauseAction(context, index),
+      onTapFavourite: () {
+        setState(() {
+          widget.listHydra[index].isFavourite =
+              !widget.listHydra[index].isFavourite;
+        });
+      },
+      isFavourite: widget.listHydra[index].isFavourite,
+      audioPlayer: activeIndex == index ? audioPlayer : pausePlayer,
+      isPlaying: isPlaying,
+      isBuffering: isBuffering,
+      duration: activeIndex == index ? duration : pauseDuration,
+      position: activeIndex == index ? position : pausePosition,
+      // position: Duration(milliseconds: 0),
+      activeIndex: activeIndex,
+      file: file!,
+      index: index,
+      name: name!,
+      userName: widget.listHydra[index].user!.firstName!,
+      userProfileUrl: widget.listHydra[index].user!.image,
+    );
+  }
+
+  Future<void> nonActivePlayAndPauseAction(
+      BuildContext context, int index) async {
     {
       // if (isPlaying) {
       // } else {}
+      print(
+          '>> nonActivePlayAndPauseAction - audioPlayer.state : ${audioPlayer.state.name} ');
 
-      if (isPlaying) {
+      if (isPlaying || isBuffering) {
         await audioPlayer.pause();
+        setState(() {
+          isPlaying = false;
+          isBuffering = false;
+        });
+      } else if (audioPlayer.state == PlayerState.PAUSED) {
+        audioPlayer.resume();
+        setState(() {
+          isBuffering = false;
+          isPlaying = true;
+        });
       } else {
         bool hasInternet = await InternetConnectionChecker().hasConnection;
         print('>> hasInternet : $hasInternet');
@@ -504,9 +507,12 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
             context: context,
             barrierDismissible: false,
             builder: (context) => InternetCheckerDialog(
-                onRetryTap: () => performIsFavorite(context, index)),
+                onRetryTap: () => nonActivePlayAndPauseAction(context, index)),
           );
         } else {
+          setState(() {
+            isBuffering = true;
+          });
           await audioPlayer.play(widget.listHydra[index].file!);
         }
         // await audioPlayer
@@ -515,218 +521,44 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     }
   }
 
-  Future<void> performPlayAndPauseOperation(
-      BuildContext context, int index) async {
-    {
-      // if (isPlaying) {
-      // } else {}
+  // Future<void> activePlayAndPauseAction(BuildContext context, int index) async {
+  //   {
+  //     // if (isPlaying) {
+  //     // } else {}
 
-      setState(() {
-        position = Duration.zero;
-      });
-      await audioPlayer.pause();
-      if (isPlaying) {
-        await audioPlayer.pause();
-      } else {
-        bool hasInternet = await InternetConnectionChecker().hasConnection;
-        print('>> hasInternet : $hasInternet');
-        if (!await InternetConnectionChecker().hasConnection) {
-          showCupertinoModalPopup(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => InternetCheckerDialog(onRetryTap: () {
-              performPlayAndPauseOperation(context, index);
-            }),
-          );
-        } else {
-          await audioPlayer.play(widget.listHydra[index].file!);
-        }
-      }
-    }
-  }
-}
+  //     print(
+  //         '>> activePlayAndPauseAction : audioPlayer.state = ${audioPlayer.state}');
 
-class BuildPlay extends StatefulWidget {
-  final String file;
-  final String audioId;
-  final String name;
-  final String userName;
-  final String? userProfileUrl;
-  final int index;
-  final int activeIndex;
-  Duration? duration;
-  Duration? position;
-  final AudioPlayer audioPlayer;
-  bool isPlaying;
-  bool isFavourite;
-  final VoidCallback onTap;
-  final VoidCallback onTapFavourite;
-  final Function(double) onChange;
-
-  BuildPlay(
-      {Key? key,
-      this.duration,
-      this.position,
-      required this.audioPlayer,
-      required this.isPlaying,
-      required this.audioId,
-      required this.onTap,
-      required this.onTapFavourite,
-      required this.onChange,
-      required this.file,
-      required this.name,
-      required this.index,
-      required this.userName,
-      this.userProfileUrl,
-      required this.isFavourite,
-      required this.activeIndex})
-      : super(key: key);
-
-  @override
-  State<BuildPlay> createState() => _BuildPlayState();
-}
-
-class _BuildPlayState extends State<BuildPlay> {
-  List<Favorite> favoriteList = [];
-
-  refreshFavorite() async {
-    favoriteList = await FavoriteDataBase.instance
-        .readAllFavoriteOfCurrentMusic(widget.audioId);
-    setState(() {});
-  }
-
-  List myGradientList = const [
-    LinearGradient(
-      begin: Alignment.centerRight,
-      end: Alignment.centerLeft,
-      colors: [
-        Color(0xFF289987),
-        Color(0xFF727b64),
-      ],
-    ),
-    LinearGradient(
-      begin: Alignment.centerRight,
-      end: Alignment.centerLeft,
-      colors: [
-        Color(0xFF5951af),
-        Color(0xFF5f5b8c),
-      ],
-    ),
-    LinearGradient(
-      begin: Alignment.centerRight,
-      end: Alignment.centerLeft,
-      colors: [
-        Color(0xFF5d8897),
-        Color(0xFF4f4d7e),
-      ],
-    ),
-    LinearGradient(
-      begin: Alignment.centerLeft,
-      end: Alignment.centerRight,
-      colors: [
-        Color(0xFF5048dd),
-        Color(0xFF89c0d3),
-      ],
-    ),
-    LinearGradient(
-      begin: Alignment.centerRight,
-      end: Alignment.centerLeft,
-      colors: [
-        Color(0xFF5952af),
-        Color(0xFF5e5b8c),
-      ],
-    ),
-  ];
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    refreshFavorite();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SliderTheme(
-      data: SliderThemeData(
-        trackHeight: widget.activeIndex == widget.index ? 254 : 0,
-        thumbShape: SliderComponentShape.noOverlay,
-        overlayShape: SliderComponentShape.noOverlay,
-        valueIndicatorShape: SliderComponentShape.noOverlay,
-        trackShape: const RectangularSliderTrackShape(),
-      ),
-      child: Container(
-        height: 254,
-        width: 254,
-        decoration: BoxDecoration(
-          gradient: (widget.index % 4 == 0)
-              ? myGradientList[0]
-              : (widget.index % 3 == 0)
-                  ? myGradientList[3]
-                  : (widget.index % 2 == 0)
-                      ? myGradientList[4]
-                      : myGradientList[1],
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Stack(
-          children: [
-            Slider(
-              activeColor: Colors.white12,
-              inactiveColor: Colors.transparent,
-              min: 0,
-              max: widget.duration!.inMicroseconds.toDouble(),
-              value: widget.position!.inMicroseconds.toDouble(),
-              onChanged: (value) async {
-                // widget.onChange(value);
-              },
-            ),
-            GestureDetector(
-              onTap: widget.onTap,
-              child: Align(
-                alignment: Alignment.center,
-                child: AppImageAsset(
-                  image:
-                      widget.isPlaying ? 'assets/pause.svg' : 'assets/play.svg',
-                  height: 90,
-                ),
-              ),
-            ),
-            Align(
-                alignment: Alignment.centerRight,
-                child: GestureDetector(
-                  onTap: (() async {
-                    String? deviceId = await PlatformDeviceId.getDeviceId;
-
-                    Favorite favorite = Favorite(
-                        name: widget.name,
-                        currentDeviceId: deviceId!,
-                        path: widget.file,
-                        deezeId: widget.audioId,
-                        type: "MUSIC");
-                    favoriteList.isEmpty
-                        ? await FavoriteDataBase.instance.addFavorite(favorite)
-                        : await FavoriteDataBase.instance
-                            .delete(favoriteList.first.deezeId);
-                    refreshFavorite();
-                  }),
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 15, right: 15),
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: favoriteList.isEmpty
-                          ? const AppImageAsset(
-                              image: 'assets/favourite.svg', height: 16)
-                          : const AppImageAsset(
-                              image: "assets/favourite_fill.svg",
-                              color: Colors.red,
-                              height: 16,
-                              width: 16,
-                            ),
-                    ),
-                  ),
-                )),
-          ],
-        ),
-      ),
-    );
-  }
+  //     setState(() {
+  //       position = Duration.zero;
+  //     });
+  //     if (isPlaying || isBuffering) {
+  //       await audioPlayer.pause();
+  //       setState(() {
+  //         isPlaying = false;
+  //         isBuffering = false;
+  //       });
+  //     } else if (audioPlayer.state == PlayerState.PAUSED) {
+  //       audioPlayer.resume();
+  //     } else {
+  //       bool hasInternet = await InternetConnectionChecker().hasConnection;
+  //       print('>> hasInternet : $hasInternet');
+  //       if (!await InternetConnectionChecker().hasConnection) {
+  //         showCupertinoModalPopup(
+  //           context: context,
+  //           barrierDismissible: false,
+  //           builder: (context) => InternetCheckerDialog(onRetryTap: () {
+  //             print('>> onRetryTap');
+  //             activePlayAndPauseAction(context, index);
+  //           }),
+  //         );
+  //       } else {
+  //         setState(() {
+  //           isBuffering = true;
+  //         });
+  //         await audioPlayer.play(widget.listHydra[index].file!);
+  //       }
+  //     }
+  //   }
+  // }
 }

@@ -65,7 +65,7 @@ class InternetCheckerDialog extends StatelessWidget {
                         ),
                       ),
                       InkWell(
-                        onTap: () => onRetryTap ?? {},
+                        onTap: onRetryTap ?? () {},
                         child: Container(
                           height: 35,
                           width: 108,

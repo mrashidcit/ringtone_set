@@ -1,3 +1,4 @@
+import 'package:deeze_app/enums/enum_item_type.dart';
 import 'package:deeze_app/models/search_model.dart';
 import 'package:deeze_app/models/trending_search_model.dart';
 import 'package:http/http.dart' as http;
@@ -9,17 +10,21 @@ import '../uitilities/end_points.dart';
 class SearchServices {
   List<String> trendingSearchItems = [];
 
-  Future<List<SearchModel>> searchRingtone(String query) async {
-    var url = getDeezeAppUrlContent;
+  Future<List<SearchModel>> searchRingtone(
+      {String query = '', String type = 'RINGTONE'}) async {
+    print('>> searchRingtone');
+    var url = getDeezeAppSearchItemsUrl;
+    // var url = getDeezeAppUrlContent;
 
     Uri uri = Uri.parse(url).replace(queryParameters: {
       "page": "1",
       "itemsPerPage": "10",
-      "enabled": "true",
-      "type": "RINGTONE",
-      "name": query
+      // "enabled": "true",
+      "type": type,
+      "term": query
     });
 
+    print('>> searchRingtone - url = ${uri.toString()}');
     http.Response response = await http.get(
       uri,
       headers: {
@@ -28,10 +33,18 @@ class SearchServices {
     );
     print('${response.statusCode} : ${response.request}');
 
+    print('>> searchRingtone - response.statusCode = ${response.statusCode}');
     if (response.statusCode == 200) {
       print(response.body);
 
-      List<SearchModel> rawResponse = searchModelFromJson(response.body);
+      List<SearchModel> rawResponse = [];
+      try {
+        rawResponse = searchModelFromJson(response.body);
+      } catch (ex) {
+        print('>> searchRingtone - Exception = ${ex.toString()}');
+      }
+
+      print('>> searchRingtone - rawResponse.length = ${rawResponse.length}');
 
       return query.isEmpty ? [] : rawResponse;
     } else {
@@ -61,7 +74,7 @@ class SearchServices {
       print(response.body);
       List<SearchModel> rawResponse = searchModelFromJson(response.body);
 
-      return query.isEmpty ? [] : rawResponse ;
+      return query.isEmpty ? [] : rawResponse;
     } else {
       throw Exception();
     }
@@ -98,6 +111,7 @@ class SearchServices {
   }
 
   Future<void> trendingSearch() async {
+    print('>> trendingSearch ');
     var url = '$getDeezeAppUrlContent/search/trending';
 
     print("==> url = $url");
@@ -113,24 +127,26 @@ class SearchServices {
         'Content-Type': 'application/json',
       },
     );
-    print('==>${response.statusCode} : ${response.request}');
+    print('>> ${response.statusCode} : ${response.request}');
 
     if (response.statusCode == 200) {
       print(response.body);
 
-      TrendingSearchModel? rawResponse = trendingSearchModelFromJson(response.body);
+      TrendingSearchModel? rawResponse =
+          trendingSearchModelFromJson(response.body);
 
       print("===>${rawResponse.trendingTerms}");
 
-      if(rawResponse.trendingTerms != null && rawResponse.trendingTerms!.isNotEmpty){
+      if (rawResponse.trendingTerms != null &&
+          rawResponse.trendingTerms!.isNotEmpty) {
         for (TrendingSearch element in rawResponse.trendingTerms!) {
           trendingSearchItems.add(element.trendingName!);
         }
       }
-      
+      print(
+          '>> trendingSearch - trendingSearchItems.length = ${trendingSearchItems.length}');
     } else {
       throw Exception();
     }
   }
-
 }

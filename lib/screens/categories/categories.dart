@@ -1,4 +1,5 @@
 import 'package:deeze_app/models/search_model.dart';
+import 'package:deeze_app/uitilities/constants.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:flutter/material.dart';
@@ -28,14 +29,13 @@ class Categories extends StatefulWidget {
 }
 
 class _CategoriesState extends State<Categories> {
-
-
   @override
   void initState() {
     // TODO: implement initState
 
     scrollController.addListener(() {
-      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
         setState(() {
           isDataLoad = true;
         });
@@ -50,7 +50,7 @@ class _CategoriesState extends State<Categories> {
   final SearchServices _searchServices = SearchServices();
   final TextEditingController _typeAheadController = TextEditingController();
   bool ishow = false;
-  bool isLoading= false;
+  bool isLoading = false;
   int page = 1;
   int? totalPage;
   final RefreshController _refreshController =
@@ -96,7 +96,7 @@ class _CategoriesState extends State<Categories> {
         totalPage = rawResponse.length;
         setState(() {
           isLoading = false;
-          if(isDataLoad && totalPage == 0){
+          if (isDataLoad && totalPage == 0) {
             showMessage(context, message: 'No data available!');
           }
           isDataLoad = false;
@@ -115,13 +115,13 @@ class _CategoriesState extends State<Categories> {
     double screenWidth = MediaQuery.of(context).size.width;
     return ishow
         ? WillPopScope(
-          onWillPop: ()async{
-            setState(() {
-              ishow = false;
-            });
-            return ishow;
-          },
-          child: Scaffold(
+            onWillPop: () async {
+              setState(() {
+                ishow = false;
+              });
+              return ishow;
+            },
+            child: Scaffold(
               appBar: PreferredSize(
                 preferredSize: const Size(0, 60),
                 child: AppBar(
@@ -144,16 +144,18 @@ class _CategoriesState extends State<Categories> {
                               // hideSuggestionsOnKeyboardHide: false,
                               textFieldConfiguration: TextFieldConfiguration(
                                 controller: _typeAheadController,
-                                onSubmitted: (val){
+                                onSubmitted: (val) {
                                   FocusScope.of(context).unfocus();
-                                  if(_typeAheadController.text.isNotEmpty){
+                                  if (_typeAheadController.text.isNotEmpty) {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => SearchScreen(
-                                            searchText:
-                                            _typeAheadController.text,
-                                          )),
+                                                searchText:
+                                                    _typeAheadController.text,
+                                                itemType: Constants
+                                                    .ItemType_Ringtones,
+                                              )),
                                     );
                                   }
                                   _typeAheadController.clear();
@@ -187,18 +189,21 @@ class _CategoriesState extends State<Categories> {
                                   suffixIcon: GestureDetector(
                                     onTap: () {
                                       FocusScope.of(context).unfocus();
-                                      if(_typeAheadController.text.isEmpty){
+                                      if (_typeAheadController.text.isEmpty) {
                                         ishow = false;
-                                      }
-                                      else{
+                                      } else {
                                         _typeAheadController.clear();
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) => SearchScreen(
-                                                searchText:
-                                                _typeAheadController.text,
-                                              )),
+                                              builder: (context) =>
+                                                  SearchScreen(
+                                                    searchText:
+                                                        _typeAheadController
+                                                            .text,
+                                                    itemType: Constants
+                                                        .ItemType_Ringtones,
+                                                  )),
                                         );
                                         ishow = false;
                                       }
@@ -206,7 +211,8 @@ class _CategoriesState extends State<Categories> {
                                       setState(() {});
                                     },
                                     child: const Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 12),
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 12),
                                       child: AppImageAsset(
                                         image: 'assets/search.svg',
                                         color: Colors.black,
@@ -215,8 +221,7 @@ class _CategoriesState extends State<Categories> {
                                   ),
                                 ),
                               ),
-                              itemBuilder:
-                                  (context, SearchModel? suggestion) {
+                              itemBuilder: (context, SearchModel? suggestion) {
                                 final ringtone = suggestion!;
                                 return GestureDetector(
                                   onTap: (() {
@@ -225,6 +230,8 @@ class _CategoriesState extends State<Categories> {
                                       MaterialPageRoute(
                                         builder: (context) => SearchScreen(
                                           searchText: _typeAheadController.text,
+                                          itemType:
+                                              Constants.ItemType_Ringtones,
                                         ),
                                       ),
                                     );
@@ -330,45 +337,49 @@ class _CategoriesState extends State<Categories> {
                         _refreshController.loadFailed();
                       }
                     },
-                    header: CustomHeader(builder: (context, mode) => Container()),
-                    footer: CustomFooter(builder: (context, mode) => isDataLoad && totalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
+                    header:
+                        CustomHeader(builder: (context, mode) => Container()),
+                    footer: CustomFooter(
+                        builder: (context, mode) => isDataLoad && totalPage != 0
+                            ? const LoadingPage()
+                            : const SizedBox()),
                     child: isLoading
                         ? const LoadingPage()
                         : GridView.builder(
-                        itemCount: hydraMember.length,
-                        controller: scrollController,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 3 / 1.5,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 14,
-                        ),
-                        itemBuilder: (context, index) {
-                          return widget.isRingtone
-                              ? RingtoneCategoryCard(
-                                  isAllCategory: true,
-                                  id: hydraMember[index].id!,
-                                  image: hydraMember[index].image!,
-                                  name: hydraMember[index].name,
-                                )
-                              : WallpaperCategoryCard(
-                                  isAllCategory: true,
-                                  id: hydraMember[index].id!,
-                                  image: hydraMember[index].image,
-                                  name: hydraMember[index].name,
-                                );
-                        }),
+                            itemCount: hydraMember.length,
+                            controller: scrollController,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 3 / 1.5,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 14,
+                            ),
+                            itemBuilder: (context, index) {
+                              return widget.isRingtone
+                                  ? RingtoneCategoryCard(
+                                      isAllCategory: true,
+                                      id: hydraMember[index].id!,
+                                      image: hydraMember[index].image!,
+                                      name: hydraMember[index].name,
+                                    )
+                                  : WallpaperCategoryCard(
+                                      isAllCategory: true,
+                                      id: hydraMember[index].id!,
+                                      image: hydraMember[index].image,
+                                      name: hydraMember[index].name,
+                                    );
+                            }),
                   ),
                 ),
               ),
             ),
-        )
+          )
         : WillPopScope(
-          onWillPop: ()async{
-            return true;
-          },
-          child: Scaffold(
+            onWillPop: () async {
+              return true;
+            },
+            child: Scaffold(
               appBar: PreferredSize(
                 preferredSize: const Size(0, 60),
                 child: AppBar(
@@ -394,8 +405,10 @@ class _CategoriesState extends State<Categories> {
                               suggestionsBoxDecoration:
                                   const SuggestionsBoxDecoration(
                                       color: Color(0xFF4d047d)),
-                              suggestionsCallback:
-                                  _searchServices.searchRingtone,
+                              suggestionsCallback: (newValue) {
+                                return _searchServices.searchRingtone(
+                                    query: newValue);
+                              },
                               debounceDuration:
                                   const Duration(milliseconds: 500),
                               // hideSuggestionsOnKeyboardHide: false,
@@ -437,8 +450,7 @@ class _CategoriesState extends State<Categories> {
                                   ),
                                 ),
                               ),
-                              itemBuilder:
-                                  (context, SearchModel? suggestion) {
+                              itemBuilder: (context, SearchModel? suggestion) {
                                 final ringtone = suggestion!;
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 20),
@@ -496,7 +508,10 @@ class _CategoriesState extends State<Categories> {
                                             ),
                                             Column(
                                               children: [
-                                                const AppImageAsset(image: 'assets/favourite_fill.svg', height: 30),
+                                                const AppImageAsset(
+                                                    image:
+                                                        'assets/favourite_fill.svg',
+                                                    height: 30),
                                                 Row(
                                                   children: const [
                                                     Icon(
@@ -603,35 +618,39 @@ class _CategoriesState extends State<Categories> {
                         _refreshController.loadFailed();
                       }
                     },
-                    header: CustomHeader(builder: (context, mode) => Container()),
-                    footer: CustomFooter(builder: (context, mode) => isDataLoad && totalPage != 0 ?  const LoadingPage() :  const SizedBox() ),
+                    header:
+                        CustomHeader(builder: (context, mode) => Container()),
+                    footer: CustomFooter(
+                        builder: (context, mode) => isDataLoad && totalPage != 0
+                            ? const LoadingPage()
+                            : const SizedBox()),
                     child: isLoading
                         ? const LoadingPage()
                         : GridView.builder(
-                        itemCount: hydraMember.length,
-                        controller: scrollController,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 3 / 1.5,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 14,
-                        ),
-                        itemBuilder: (context, index) {
-                          return widget.isRingtone
-                              ? RingtoneCategoryCard(
-                                  isAllCategory: true,
-                                  id: hydraMember[index].id!,
-                                  image: hydraMember[index].image!,
-                                  name: hydraMember[index].name,
-                                )
-                              : WallpaperCategoryCard(
-                                  isAllCategory: true,
-                                  id: hydraMember[index].id!,
-                                  image: hydraMember[index].image,
-                                  name: hydraMember[index].name,
-                                );
-                        }),
+                            itemCount: hydraMember.length,
+                            controller: scrollController,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 3 / 1.5,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 14,
+                            ),
+                            itemBuilder: (context, index) {
+                              return widget.isRingtone
+                                  ? RingtoneCategoryCard(
+                                      isAllCategory: true,
+                                      id: hydraMember[index].id!,
+                                      image: hydraMember[index].image!,
+                                      name: hydraMember[index].name,
+                                    )
+                                  : WallpaperCategoryCard(
+                                      isAllCategory: true,
+                                      id: hydraMember[index].id!,
+                                      image: hydraMember[index].image,
+                                      name: hydraMember[index].name,
+                                    );
+                            }),
                   ),
                 ),
               ),
@@ -667,7 +686,8 @@ class _CategoriesState extends State<Categories> {
                             padding: const EdgeInsets.only(left: 40),
                             child: Row(
                               children: [
-                                const AppImageAsset(image: 'assets/ringtone.svg'),
+                                const AppImageAsset(
+                                    image: 'assets/ringtone.svg'),
                                 const SizedBox(
                                   width: 26,
                                 ),
@@ -705,7 +725,8 @@ class _CategoriesState extends State<Categories> {
                             padding: const EdgeInsets.only(left: 40),
                             child: Row(
                               children: [
-                                const AppImageAsset(image: "assets/wallpaper.svg"),
+                                const AppImageAsset(
+                                    image: "assets/wallpaper.svg"),
                                 const SizedBox(
                                   width: 26,
                                 ),
@@ -755,7 +776,9 @@ class _CategoriesState extends State<Categories> {
                           padding: const EdgeInsets.only(left: 40),
                           child: Row(
                             children: [
-                              const AppImageAsset(image: 'assets/favourite_fill.svg', color: Colors.white),
+                              const AppImageAsset(
+                                  image: 'assets/favourite_fill.svg',
+                                  color: Colors.white),
                               const SizedBox(
                                 width: 29,
                               ),
@@ -899,6 +922,6 @@ class _CategoriesState extends State<Categories> {
                 ),
               ),
             ),
-        );
+          );
   }
 }

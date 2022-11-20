@@ -22,8 +22,33 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    // InternetConnectionChecker().hasConnection.then((newValue) {
+    //   final hasInternet = newValue;
+    //   if (hasInternet) {
+    //     Timer(const Duration(seconds: 5), () {
+    //       Navigator.of(context).pushReplacement(
+    //         MaterialPageRoute(
+    //           builder: (_) => const Dashbaord(
+    //             type: "RINGTONE",
+    //           ),
+    //         ),
+    //       );
+    //     });
+    //   } else {
+    //     showCupertinoModalPopup(
+    //       context: context,
+    //       barrierDismissible: false,
+    //       builder: (context) => InternetCheckerDialog(),
+    //     );
+    //   }
+    // });
     InternetConnectionChecker().onStatusChange.listen((status) {
       final hasInternet = status == InternetConnectionStatus.connected;
+      print(
+          '>> InternetConnectionChecker().onStatusChange - splashScreen : mounted = $mounted');
+      if (!mounted) {
+        return;
+      }
       if (hasInternet) {
         Timer(const Duration(seconds: 5), () {
           Navigator.of(context).pushReplacement(
@@ -38,10 +63,16 @@ class _SplashScreenState extends State<SplashScreen> {
         showCupertinoModalPopup(
           context: context,
           barrierDismissible: false,
-          builder: (context) => const InternetCheckerDialog(),
+          builder: (context) => InternetCheckerDialog(),
         );
       }
     });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override

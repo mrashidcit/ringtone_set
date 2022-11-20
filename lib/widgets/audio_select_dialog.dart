@@ -2,10 +2,13 @@ import 'dart:io';
 
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
+import 'package:deeze_app/widgets/internet_checkor_dialog.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -53,12 +56,14 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.26),
+        margin:
+            EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.26),
         alignment: Alignment.bottomCenter,
         child: Card(
           elevation: 10,
           margin: const EdgeInsets.all(20),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Container(
             height: 400,
             alignment: Alignment.center,
@@ -84,33 +89,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                 ),
                 const SizedBox(height: 20),
                 GestureDetector(
-                  onTap: () async {
-                    bool success = false;
-                    ProgressDialog pd = ProgressDialog(
-                      context,
-                      dismissable: false,
-                      message: Text(
-                        "Please Wait!",
-                        style: GoogleFonts.archivo(
-                          fontStyle: FontStyle.normal,
-                          color: Colors.black,
-                        ),
-                      ),
-                    );
-                    pd.show();
-                    try {
-                      success = await RingtoneSet.setRingtoneFromNetwork(widget.file);
-                      pd.dismiss();
-                    } on PlatformException {
-                      success = false;
-                    }
-                    if (success) {
-                      showMessage(context, message: "Ringtone set successfully!");
-                    } else {
-                      showMessage(context, message: "Error");
-                    }
-                    Navigator.pop(context);
-                  },
+                  onTap: actionSetRingTone,
                   child: Container(
                     width: 180,
                     alignment: Alignment.center,
@@ -140,33 +119,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                 ),
                 const SizedBox(height: 22),
                 GestureDetector(
-                  onTap: () async {
-                    bool success = false;
-                    ProgressDialog pd = ProgressDialog(
-                      context,
-                      dismissable: false,
-                      message: Text(
-                        "Please Wait!",
-                        style: GoogleFonts.archivo(
-                          fontStyle: FontStyle.normal,
-                          color: Colors.black,
-                        ),
-                      ),
-                    );
-                    pd.show();
-                    try {
-                      success = await RingtoneSet.setNotificationFromNetwork(widget.file);
-                      pd.dismiss();
-                    } on PlatformException {
-                      success = false;
-                    }
-                    if (success) {
-                      showMessage(context, message: "Notifications sound  set successfully!");
-                    } else {
-                      showMessage(context, message: "Error");
-                    }
-                    Navigator.pop(context);
-                  },
+                  onTap: actionSetNotification,
                   child: Container(
                     width: 180,
                     alignment: Alignment.center,
@@ -196,35 +149,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                 ),
                 const SizedBox(height: 22),
                 GestureDetector(
-                  onTap: () async {
-                    bool success = false;
-                    ProgressDialog pd = ProgressDialog(
-                      context,
-                      dismissable: false,
-                      message: Text(
-                        "Please Wait!",
-                        style: GoogleFonts.archivo(
-                          fontStyle: FontStyle.normal,
-                          color: Colors.black,
-                        ),
-                      ),
-                    );
-                    pd.show();
-                    try {
-                      success =
-                          await RingtoneSet.setAlarmFromNetwork(widget.file);
-                      pd.dismiss();
-                    } on PlatformException {
-                      success = false;
-                    }
-
-                    if (success) {
-                      showMessage(context, message: "set to contact successfully!");
-                    } else {
-                      showMessage(context, message: "Error");
-                    }
-                    Navigator.pop(context);
-                  },
+                  onTap: actionSetAlarmSound,
                   child: Container(
                     width: 180,
                     alignment: Alignment.center,
@@ -254,35 +179,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                 ),
                 const SizedBox(height: 22),
                 GestureDetector(
-                  onTap: () async {
-                    bool success = false;
-                    ProgressDialog pd = ProgressDialog(
-                      context,
-                      dismissable: false,
-                      message: Text(
-                        "Please Wait!",
-                        style: GoogleFonts.archivo(
-                          fontStyle: FontStyle.normal,
-                          color: Colors.black,
-                        ),
-                      ),
-                    );
-                    pd.show();
-                    try {
-                      success =
-                      await RingtoneSet.setAlarmFromNetwork(widget.file);
-                      pd.dismiss();
-                    } on PlatformException {
-                      success = false;
-                    }
-
-                    if (success) {
-                      showMessage(context, message: "Alarm sound  set successfully!");
-                    } else {
-                      showMessage(context, message: "Error");
-                    }
-                    Navigator.pop(context);
-                  },
+                  onTap: actionSetToContact,
                   child: Container(
                     width: 180,
                     alignment: Alignment.center,
@@ -312,37 +209,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                 ),
                 const SizedBox(height: 30),
                 InkWell(
-                  onTap: () async {
-                    bool success = false;
-
-                    ProgressDialog pd = ProgressDialog(
-                      context,
-                      dismissable: false,
-                      message: Text(
-                        "Please Wait!",
-                        style: GoogleFonts.archivo(
-                          fontStyle: FontStyle.normal,
-                          color: Colors.black,
-                        ),
-                      ),
-                    );
-                    pd.show();
-
-                    try {
-                      success = await downloadFile(widget.file,'${DateTime.now().microsecondsSinceEpoch}.mp3');
-                      pd.dismiss();
-                    } on PlatformException {
-                      success = false;
-                    }
-
-                    if (success) {
-                      showMessage(context, message: "Your File  successfully Downloaded");
-                    } else {
-                      showMessage(context, message: "Try again!");
-                    }
-                    Navigator.pop(context);
-
-                  },
+                  onTap: actionSaveToMedia,
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
@@ -364,7 +231,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const AppImageAsset(image: 'assets/save_down.svg', height: 14),
+                            const AppImageAsset(
+                                image: 'assets/save_down.svg', height: 14),
                             const SizedBox(width: 20),
                             Text(
                               'SAVE TO MEDIA',
@@ -393,37 +261,260 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       ),
     );
   }
+
+  Future<void> actionSetRingTone() async {
+    if (!await InternetConnectionChecker().hasConnection) {
+      showCupertinoModalPopup(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => InternetCheckerDialog(
+          onRetryTap: () {
+            actionSetRingTone();
+            Navigator.pop(context); // Hide Internet Message Dialog
+          },
+        ),
+      );
+      return;
+    }
+
+    bool success = false;
+    ProgressDialog pd = ProgressDialog(
+      context,
+      dismissable: false,
+      message: Text(
+        "Please Wait!",
+        style: GoogleFonts.archivo(
+          fontStyle: FontStyle.normal,
+          color: Colors.black,
+        ),
+      ),
+    );
+    pd.show();
+    try {
+      print('>> widget.file = ${widget.file}');
+      success = await RingtoneSet.setRingtoneFromNetwork(widget.file);
+      pd.dismiss();
+    } on PlatformException {
+      success = false;
+    } catch (ex) {
+      print(ex);
+      success = false;
+    }
+    if (success) {
+      showMessage(context, message: "Ringtone set successfully!");
+    } else {
+      showMessage(context, message: "Unable to complete this action.");
+    }
+    Navigator.pop(context);
+  }
+
+  Future<void> actionSetNotification() async {
+    if (!await InternetConnectionChecker().hasConnection) {
+      showCupertinoModalPopup(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => InternetCheckerDialog(
+          onRetryTap: () {
+            actionSetNotification();
+            Navigator.pop(context); // Hide Internet Message Dialog
+          },
+        ),
+      );
+      return;
+    }
+    bool success = false;
+    ProgressDialog pd = ProgressDialog(
+      context,
+      dismissable: false,
+      message: Text(
+        "Please Wait!",
+        style: GoogleFonts.archivo(
+          fontStyle: FontStyle.normal,
+          color: Colors.black,
+        ),
+      ),
+    );
+    pd.show();
+    try {
+      success = await RingtoneSet.setNotificationFromNetwork(widget.file);
+      pd.dismiss();
+    } on PlatformException {
+      success = false;
+    }
+    if (success) {
+      showMessage(context, message: "Notifications sound  set successfully!");
+    } else {
+      showMessage(context, message: "Error");
+    }
+    Navigator.pop(context);
+  }
+
+  Future<void> actionSetAlarmSound() async {
+    if (!await InternetConnectionChecker().hasConnection) {
+      showCupertinoModalPopup(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => InternetCheckerDialog(
+          onRetryTap: () {
+            actionSetAlarmSound();
+            Navigator.pop(context); // Hide Internet Message Dialog
+          },
+        ),
+      );
+      return;
+    }
+    bool success = false;
+    ProgressDialog pd = ProgressDialog(
+      context,
+      dismissable: false,
+      message: Text(
+        "Please Wait!",
+        style: GoogleFonts.archivo(
+          fontStyle: FontStyle.normal,
+          color: Colors.black,
+        ),
+      ),
+    );
+    pd.show();
+    try {
+      success = await RingtoneSet.setAlarmFromNetwork(widget.file);
+      pd.dismiss();
+    } on PlatformException {
+      success = false;
+    }
+
+    if (success) {
+      showMessage(context, message: "Set to Alarm successfully!");
+    } else {
+      showMessage(context, message: "Error");
+    }
+    Navigator.pop(context);
+  }
+
+  Future<void> actionSetToContact() async {
+    if (!await InternetConnectionChecker().hasConnection) {
+      showCupertinoModalPopup(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => InternetCheckerDialog(
+          onRetryTap: () {
+            actionSetAlarmSound();
+            Navigator.pop(context); // Hide Internet Message Dialog
+          },
+        ),
+      );
+      return;
+    }
+    bool success = false;
+    ProgressDialog pd = ProgressDialog(
+      context,
+      dismissable: false,
+      message: Text(
+        "Please Wait!",
+        style: GoogleFonts.archivo(
+          fontStyle: FontStyle.normal,
+          color: Colors.black,
+        ),
+      ),
+    );
+    pd.show();
+    try {
+      success = await RingtoneSet.setAlarmFromNetwork(widget.file);
+      pd.dismiss();
+    } on PlatformException {
+      success = false;
+    }
+
+    if (success) {
+      showMessage(context, message: "Alarm sound  set successfully!");
+    } else {
+      showMessage(context, message: "Error");
+    }
+    Navigator.pop(context);
+  }
+
+  Future<void> actionSaveToMedia() async {
+    if (!await InternetConnectionChecker().hasConnection) {
+      showCupertinoModalPopup(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => InternetCheckerDialog(
+          onRetryTap: () {
+            actionSetAlarmSound();
+            Navigator.pop(context); // Hide Internet Message Dialog
+          },
+        ),
+      );
+      return;
+    }
+    bool success = false;
+
+    ProgressDialog pd = ProgressDialog(
+      context,
+      dismissable: false,
+      message: Text(
+        "Please Wait!",
+        style: GoogleFonts.archivo(
+          fontStyle: FontStyle.normal,
+          color: Colors.black,
+        ),
+      ),
+    );
+    pd.show();
+
+    try {
+      success = await downloadFile(
+          widget.file, '${DateTime.now().microsecondsSinceEpoch}.mp3');
+      pd.dismiss();
+    } on PlatformException {
+      success = false;
+    }
+
+    if (success) {
+      showMessage(context, message: "Your File  successfully Downloaded");
+    } else {
+      showMessage(context, message: "Try again!");
+    }
+    Navigator.pop(context);
+  }
+
   Future<bool> _requestPermission() async {
+    PermissionStatus storageStatus = await Permission.storage.status;
 
-      PermissionStatus storageStatus = await Permission.storage.status;
+    PermissionStatus externalStorageStatus =
+        await Permission.manageExternalStorage.status;
 
-      PermissionStatus externalStorageStatus = await Permission.manageExternalStorage.status;
-
-
-    if((storageStatus.isDenied || storageStatus.isPermanentlyDenied || externalStorageStatus.isDenied || externalStorageStatus.isPermanentlyDenied)){
-
-      if(storageStatus.isDenied){
+    if ((storageStatus.isDenied ||
+        storageStatus.isPermanentlyDenied ||
+        externalStorageStatus.isDenied ||
+        externalStorageStatus.isPermanentlyDenied)) {
+      if (storageStatus.isDenied) {
         await Permission.storage.request();
       }
-      if(externalStorageStatus.isDenied){
+      if (externalStorageStatus.isDenied) {
         await Permission.manageExternalStorage.request();
       }
 
-      PermissionStatus permissionStorageStatus = await Permission.storage.status;
-      PermissionStatus permissionExternalStatus = await Permission.manageExternalStorage.status;
+      PermissionStatus permissionStorageStatus =
+          await Permission.storage.status;
+      PermissionStatus permissionExternalStatus =
+          await Permission.manageExternalStorage.status;
 
-      if(permissionStorageStatus.isDenied || permissionExternalStatus.isDenied){
+      if (permissionStorageStatus.isDenied ||
+          permissionExternalStatus.isDenied) {
         openAppSettings();
       }
-      if(storageStatus.isGranted || storageStatus.isLimited && externalStorageStatus.isGranted || externalStorageStatus.isLimited){
+      if (storageStatus.isGranted ||
+          storageStatus.isLimited && externalStorageStatus.isGranted ||
+          externalStorageStatus.isLimited) {
         return true;
       }
       return false;
-    }
-    else if(storageStatus.isGranted || storageStatus.isLimited && externalStorageStatus.isGranted || externalStorageStatus.isLimited){
+    } else if (storageStatus.isGranted ||
+        storageStatus.isLimited && externalStorageStatus.isGranted ||
+        externalStorageStatus.isLimited) {
       return true;
-    }
-    else{
+    } else {
       return false;
     }
   }
@@ -431,27 +522,25 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
   Future<bool> downloadFile(String url, String fileName) async {
     Directory directory;
     try {
+      if (await _requestPermission()) {
+        directory = (await getExternalStorageDirectory())!;
+        String newPath = "";
 
-        if (await _requestPermission()) {
-          directory = (await getExternalStorageDirectory())!;
-          String newPath = "";
-
-          print(directory);
-          List<String> paths = directory.path.split("/");
-          for (int x = 1; x < paths.length; x++) {
-            String folder = paths[x];
-            if (folder != "Android") {
-              newPath += "/" + folder;
-            } else {
-              break;
-            }
+        print(directory);
+        List<String> paths = directory.path.split("/");
+        for (int x = 1; x < paths.length; x++) {
+          String folder = paths[x];
+          if (folder != "Android") {
+            newPath += "/" + folder;
+          } else {
+            break;
           }
-          newPath = newPath + "/DeezePlayer";
-          directory = Directory(newPath);
-
-        } else {
-          return false;
         }
+        newPath = newPath + "/DeezePlayer";
+        directory = Directory(newPath);
+      } else {
+        return false;
+      }
 
       if (!await directory.exists()) {
         await directory.create(recursive: true);

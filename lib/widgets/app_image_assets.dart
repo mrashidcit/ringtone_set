@@ -29,6 +29,8 @@ class AppImageAsset extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // print(
+    //     '>> AppImageAsset - build : height , width , image = $height , $width , $image');
     return isWebImage
         ? CachedNetworkImage(
             imageUrl: image!,

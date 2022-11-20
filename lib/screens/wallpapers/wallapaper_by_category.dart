@@ -3,6 +3,7 @@ import 'package:deeze_app/bloc/deeze_bloc/wallpaper_bloc/wallpaper_bloc.dart';
 import 'package:deeze_app/models/search_model.dart';
 import 'package:deeze_app/screens/tags/tags.dart';
 import 'package:deeze_app/screens/wallpapers/wallpapers.dart';
+import 'package:deeze_app/uitilities/constants.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/single_wallpaper.dart';
@@ -172,6 +173,8 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                                           builder: (context) => SearchScreen(
                                                 searchText:
                                                     _typeAheadController.text,
+                                                itemType: Constants
+                                                    .ItemType_Ringtones,
                                               )),
                                     );
                                   }
@@ -218,6 +221,8 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                                                     searchText:
                                                         _typeAheadController
                                                             .text,
+                                                    itemType: Constants
+                                                        .ItemType_Ringtones,
                                                   )),
                                         );
                                         ishow = false;
@@ -246,6 +251,8 @@ class _WallpaperByCategoryState extends State<WallpaperByCategory> {
                                           builder: (context) => SearchScreen(
                                                 searchText:
                                                     _typeAheadController.text,
+                                                itemType: Constants
+                                                    .ItemType_Ringtones,
                                               )),
                                     );
                                     ishow = false;

@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:deeze_app/models/search_model.dart';
+import 'package:deeze_app/uitilities/constants.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/ringtones_card.dart';
@@ -195,6 +196,8 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                                           builder: (context) => SearchScreen(
                                                 searchText:
                                                     _typeAheadController.text,
+                                                itemType: Constants
+                                                    .ItemType_Ringtones,
                                               )),
                                     );
                                   }
@@ -241,6 +244,8 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                                                     searchText:
                                                         _typeAheadController
                                                             .text,
+                                                    itemType: Constants
+                                                        .ItemType_Ringtones,
                                                   )),
                                         );
                                         ishow = false;
@@ -270,6 +275,8 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                                           builder: (context) => SearchScreen(
                                                 searchText:
                                                     _typeAheadController.text,
+                                                itemType: Constants
+                                                    .ItemType_Ringtones,
                                               )),
                                     );
                                     ishow = false;
@@ -562,8 +569,10 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                               suggestionsBoxDecoration:
                                   const SuggestionsBoxDecoration(
                                       color: Color(0xFF4d047d)),
-                              suggestionsCallback:
-                                  _searchServices.searchRingtone,
+                              suggestionsCallback: (newValue) {
+                                return _searchServices.searchRingtone(
+                                    query: newValue);
+                              },
                               debounceDuration:
                                   const Duration(milliseconds: 500),
                               // hideSuggestionsOnKeyboardHide: false,

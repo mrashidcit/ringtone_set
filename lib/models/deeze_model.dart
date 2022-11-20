@@ -282,9 +282,17 @@ import 'dart:convert';
 
 import 'dart:convert';
 
-List<DeezeItemModel> deezeItemModelFromJson(String str) => List<DeezeItemModel>.from(json.decode(str).map((x) => DeezeItemModel.fromJson(x)));
+List<DeezeItemModel> deezeItemModelFromSearchQueryJson(String str) =>
+    List<DeezeItemModel>.from(json
+        .decode(str)['items']
+        .map((x) => DeezeItemModel.fromSearchQueryJson(x)));
 
-String deezeItemModelToJson(List<DeezeItemModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+List<DeezeItemModel> deezeItemModelFromJson(String str) =>
+    List<DeezeItemModel>.from(
+        json.decode(str).map((x) => DeezeItemModel.fromJson(x)));
+
+String deezeItemModelToJson(List<DeezeItemModel> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class DeezeItemModel {
   DeezeItemModel({
@@ -303,23 +311,32 @@ class DeezeItemModel {
   User? user;
   bool isFavourite;
 
+  factory DeezeItemModel.fromSearchQueryJson(Map<String, dynamic> json) =>
+      DeezeItemModel(
+        id: json["id"],
+        name: json["name"],
+        type: json["type"],
+        file: json["file"],
+        user: User(),
+        isFavourite: false,
+      );
 
   factory DeezeItemModel.fromJson(Map<String, dynamic> json) => DeezeItemModel(
-    id: json["id"],
-    name: json["name"],
-    type: json["type"],
-    file: json["file"],
-    user: User.fromJson(json["user"]),
-    isFavourite: json["isFavourite"] ?? false,
-  );
+        id: json["id"],
+        name: json["name"],
+        type: json["type"],
+        file: json["file"],
+        user: User.fromJson(json["user"]),
+        isFavourite: json["isFavourite"] ?? false,
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "type": type,
-    "file": file,
-    "user": user!.toJson(),
-  };
+        "id": id,
+        "name": name,
+        "type": type,
+        "file": file,
+        "user": user!.toJson(),
+      };
 }
 
 class User {
@@ -336,17 +353,16 @@ class User {
   String? image;
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-    id: json["id"],
-    firstName: json["firstName"],
-    lastName: json["lastName"],
-    image: json["image"],
-  );
+        id: json["id"],
+        firstName: json["firstName"],
+        lastName: json["lastName"],
+        image: json["image"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "firstName": firstName,
-    "lastName": lastName,
-    "image": image,
-  };
+        "id": id,
+        "firstName": firstName,
+        "lastName": lastName,
+        "image": image,
+      };
 }
-

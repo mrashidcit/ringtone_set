@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:deeze_app/enums/enum_item_type.dart';
 import 'package:deeze_app/models/search_model.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
@@ -16,8 +17,13 @@ import '../../widgets/ringtones_card.dart';
 
 class SearchScreen extends StatefulWidget {
   final String searchText;
+  final String itemType;
 
-  const SearchScreen({Key? key, required this.searchText}) : super(key: key);
+  const SearchScreen({
+    Key? key,
+    required this.searchText,
+    required this.itemType,
+  }) : super(key: key);
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -33,14 +39,55 @@ class _SearchScreenState extends State<SearchScreen> {
   Duration position = Duration.zero;
   Duration pauseDuration = Duration.zero;
   Duration pausePosition = Duration.zero;
-  bool isRingtoneDataLoad = false;
-  bool isWallPaperDataLoad = false;
   ScrollController scrollController = ScrollController();
+
+  final TextEditingController _typeAheadController = TextEditingController();
+
+  bool isLoading = false;
+
+  // **Ringtone
+  bool isRingtone = false;
+  bool isRingtoneDataLoad = false;
+  int ringtonePage = 1;
+  int? ringtoneTotalPage;
+  final RefreshController _ringtoneRefreshController =
+      RefreshController(initialRefresh: true);
+
+  List<DeezeItemModel> ringtonelist = [];
+
+  // **Notifications
+  bool _isNotification = false;
+  bool _isNotificationDataLoad = false;
+  int _notificationPage = 1;
+  int? _notificationTotalPage;
+  final RefreshController _notificationRefreshController =
+      RefreshController(initialRefresh: true);
+  List<DeezeItemModel> _notificationList = [];
+
+  // **Wallpaper
+  bool isWallpaper = false;
+  int wallpaperPage = 1;
+  bool isWallPaperDataLoad = false;
+  int? wallpaperTotalPage;
+  final RefreshController _wallpaperRefreshController =
+      RefreshController(initialRefresh: true);
+  List<DeezeItemModel> wallpaperList = [];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    _typeAheadController.text = widget.searchText;
+
+    if (widget.itemType == ItemType.RINGTONE.name) {
+      isRingtone = true;
+    } else if (widget.itemType == ItemType.NOTIFICATION.name) {
+      _isNotification = true;
+    } else if (widget.itemType == ItemType.WALLPAPER.name) {
+      isWallpaper = true;
+    }
+
     scrollController.addListener(() {
       if (scrollController.position.pixels ==
           scrollController.position.maxScrollExtent) {
@@ -49,6 +96,8 @@ class _SearchScreenState extends State<SearchScreen> {
             isWallPaperDataLoad = true;
           } else if (isRingtone) {
             isRingtoneDataLoad = true;
+          } else if (_isNotification) {
+            _isNotificationDataLoad = true;
           }
         });
       }
@@ -83,17 +132,6 @@ class _SearchScreenState extends State<SearchScreen> {
     PlayerState.STOPPED;
   }
 
-  final TextEditingController _typeAheadController = TextEditingController();
-  int ringtonePage = 1;
-  int? ringtoneTotalPage;
-  final RefreshController _ringtoneRefreshController =
-      RefreshController(initialRefresh: true);
-  bool isWallpaper = false;
-  bool isNotification = false;
-  bool isRingtone = true;
-  bool isLoading = false;
-  List<DeezeItemModel> ringtonelist = [];
-
   Future<bool> fetchRingtone({bool isRefresh = false}) async {
     if (isRefresh) {
       ringtonePage = 1;
@@ -104,14 +142,15 @@ class _SearchScreenState extends State<SearchScreen> {
       }
     }
 
-    var url = getDeezeAppUrlContent;
+    // var url = getDeezeAppUrlContent;
+    var url = getDeezeAppSearchItemsUrl;
 
     Uri uri = Uri.parse(url).replace(queryParameters: {
       "page": "$ringtonePage",
       "itemsPerPage": "10",
-      "enabled": "true",
-      "name": widget.searchText,
-      "type": "RINGTONE"
+      // "enabled": "true",
+      "term": widget.searchText,
+      "type": ItemType.RINGTONE.name
     });
     try {
       if (isRefresh) setState(() => isLoading = true);
@@ -125,7 +164,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
       if (response.statusCode == 200) {
         print(response.body);
-        var rawResponse = deezeItemModelFromJson(response.body);
+        var rawResponse = deezeItemModelFromSearchQueryJson(response.body);
         if (isRefresh) {
           ringtonelist = rawResponse;
         } else {
@@ -150,14 +189,65 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+  Future<bool> fetchNotifications({bool isRefresh = false}) async {
+    if (isRefresh) {
+      _notificationPage = 1;
+    } else {
+      if (_notificationTotalPage == 0) {
+        _notificationRefreshController.loadNoData();
+        return false;
+      }
+    }
+
+    var url = getDeezeAppSearchItemsUrl;
+
+    Uri uri = Uri.parse(url).replace(queryParameters: {
+      "page": "$_notificationPage",
+      "itemsPerPage": "10",
+      // "enabled": "true",
+      "term": widget.searchText,
+      "type": ItemType.NOTIFICATION.name
+    });
+    try {
+      if (isRefresh) setState(() => isLoading = true);
+      http.Response response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      print(
+          '>> fetchNotifications - ${response.statusCode} : ${response.request}');
+
+      if (response.statusCode == 200) {
+        print('>> fetchNotifications - body : ${response.body}');
+        var rawResponse = deezeItemModelFromSearchQueryJson(response.body);
+        if (isRefresh) {
+          _notificationList = rawResponse;
+        } else {
+          _notificationList.addAll(rawResponse);
+        }
+
+        _notificationPage++;
+        _notificationTotalPage = rawResponse.length;
+        setState(() {
+          isLoading = false;
+          if (_isNotificationDataLoad && _notificationTotalPage == 0) {
+            showMessage(context, message: 'No data available!');
+          }
+          _isNotificationDataLoad = false;
+        });
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print('>> fetchNotifications - ${e.toString()}');
+      return false;
+    }
+  }
+
 ///////////////////////
-
-  int wallpaperPage = 1;
-  int? wallpaperTotalPage;
-  final RefreshController _wallpaperRefreshController =
-      RefreshController(initialRefresh: true);
-
-  List<DeezeItemModel> wallpaperList = [];
 
   Future<bool> fetchWallpaper({bool isRefresh = false}) async {
     if (isRefresh) {
@@ -169,14 +259,15 @@ class _SearchScreenState extends State<SearchScreen> {
       }
     }
 
-    var url = getDeezeAppUrlContent;
+    // var url = getDeezeAppUrlContent;
+    var url = getDeezeAppSearchItemsUrl;
 
     Uri uri = Uri.parse(url).replace(queryParameters: {
       "page": "$wallpaperPage",
       "itemsPerPage": "10",
-      "enabled": "true",
-      "name": widget.searchText,
-      "type": "WALLPAPER"
+      // "enabled": "true",
+      "term": widget.searchText,
+      "type": ItemType.WALLPAPER.name
     });
     try {
       if (isRefresh) setState(() => isLoading = true);
@@ -190,7 +281,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
       if (response.statusCode == 200) {
         print(response.body);
-        var rawResponse = deezeItemModelFromJson(response.body);
+        var rawResponse = deezeItemModelFromSearchQueryJson(response.body);
         if (isRefresh) {
           wallpaperList = rawResponse;
         } else {
@@ -282,6 +373,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           MaterialPageRoute(
                             builder: (context) => SearchScreen(
                               searchText: _typeAheadController.text,
+                              itemType: widget.itemType,
                             ),
                           ),
                         );
@@ -357,7 +449,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     onTap: (() {
                       setState(() {
                         isRingtone = true;
-                        isNotification = false;
+                        _isNotification = false;
                         isWallpaper = false;
                       });
                     }),
@@ -411,7 +503,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     onTap: (() {
                       setState(() {
                         isRingtone = false;
-                        isNotification = true;
+                        _isNotification = true;
                         isWallpaper = false;
                       });
                     }),
@@ -423,7 +515,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           alignment: Alignment.center,
                           // width: MediaQuery.of(context).size.width * 0.25,
                           decoration: BoxDecoration(
-                            color: isNotification
+                            color: _isNotification
                                 ? const Color(0xFF4e3d71)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(15),
@@ -450,7 +542,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: Text(
-                            "0",
+                            "${_notificationList.length}",
                             style: GoogleFonts.archivo(
                               fontStyle: FontStyle.normal,
                               color: Colors.white,
@@ -466,7 +558,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     onTap: (() {
                       setState(() {
                         isRingtone = false;
-                        isNotification = false;
+                        _isNotification = false;
                         isWallpaper = true;
                       });
                     }),
@@ -736,47 +828,168 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   )
                 : const SizedBox.shrink(),
-            isNotification
+            _isNotification
                 ? Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const AppImageAsset(
-                          image: 'assets/no_result.svg',
-                          height: 80,
-                          width: 80,
-                          fit: BoxFit.fill,
-                        ),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        const Text('No Results Found',
-                            style: TextStyle(color: Colors.white)),
-                        Container(
-                          height: 40,
-                          width: 95,
-                          margin: const EdgeInsets.only(top: 50, bottom: 70),
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8)),
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                AppImageAsset(
-                                  image: 'assets/arrow_top.svg',
-                                  height: 17,
-                                  width: 17,
-                                  fit: BoxFit.fill,
-                                ),
-                                SizedBox(
-                                  width: 7,
-                                ),
-                                Text('Home', style: TextStyle()),
-                              ]),
-                        ),
-                      ],
+                    child: SmartRefresher(
+                      enablePullUp: true,
+                      controller: _notificationRefreshController,
+                      onRefresh: () async {
+                        final result =
+                            await fetchNotifications(isRefresh: true);
+                        if (result) {
+                          _notificationRefreshController.refreshCompleted();
+                        } else {
+                          _notificationRefreshController.refreshFailed();
+                        }
+                      },
+                      onLoading: () async {
+                        final result = await fetchNotifications();
+                        if (result) {
+                          _notificationRefreshController.loadComplete();
+                        } else {
+                          _notificationRefreshController.loadFailed();
+                        }
+                      },
+                      header:
+                          CustomHeader(builder: (context, mode) => Container()),
+                      footer: CustomFooter(
+                          builder: (context, mode) => _isNotificationDataLoad &&
+                                  _notificationTotalPage != 0
+                              ? const LoadingPage()
+                              : const SizedBox()),
+                      child: isLoading
+                          ? const LoadingPage()
+                          : Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: ListView.builder(
+                                itemCount: _notificationList.length,
+                                controller: scrollController,
+                                scrollDirection: Axis.vertical,
+                                itemBuilder: (context, index) {
+                                  return selectedIndex == index
+                                      ? RingtonesCard(
+                                          onNavigate: () async {
+                                            await audioPlayer.pause();
+                                            // ignore: use_build_context_synchronously
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CustomAudioPlayer(
+                                                  listHydra: _notificationList,
+                                                  index: index,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          onChange: (value) async {
+                                            final myposition = Duration(
+                                                seconds: value.toInt());
+                                            await audioPlayer.seek(myposition);
+                                            await audioPlayer.resume();
+                                          },
+                                          onTap: (() async {
+                                            // if (isPlaying) {
+                                            // } else {}
+
+                                            setState(() {
+                                              selectedIndex = index;
+                                              position = Duration.zero;
+                                            });
+
+                                            if (isPlaying) {
+                                              await audioPlayer.pause();
+                                            } else {
+                                              await audioPlayer.play(
+                                                  _notificationList[index]
+                                                      .file!);
+                                            }
+                                          }),
+                                          audioPlayer: selectedIndex == index
+                                              ? audioPlayer
+                                              : pausePlayer,
+                                          isPlaying: selectedIndex == index
+                                              ? isPlaying
+                                              : false,
+                                          duration: selectedIndex == index
+                                              ? duration
+                                              : pauseDuration,
+                                          position: selectedIndex == index
+                                              ? position
+                                              : pausePosition,
+                                          index: index,
+                                          listHydra: _notificationList,
+                                          ringtoneName:
+                                              _notificationList[index].name!,
+                                          auidoId: _notificationList[index]
+                                              .id!
+                                              .toString(),
+                                          file: _notificationList[index].file!,
+                                        )
+                                      : RingtonesCard(
+                                          onNavigate: () async {
+                                            await audioPlayer.pause();
+                                            // ignore: use_build_context_synchronously
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CustomAudioPlayer(
+                                                  listHydra: _notificationList,
+                                                  index: index,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          onChange: (value) async {
+                                            final myposition = Duration(
+                                                seconds: value.toInt());
+                                            await audioPlayer.seek(myposition);
+                                            await audioPlayer.resume();
+                                          },
+                                          onTap: (() async {
+                                            // if (isPlaying) {
+                                            // } else {}
+
+                                            setState(() {
+                                              selectedIndex = index;
+                                              position = Duration.zero;
+                                              isPlaying = false;
+                                            });
+                                            await audioPlayer.pause();
+                                            if (isPlaying) {
+                                              await audioPlayer.pause();
+                                            } else {
+                                              await audioPlayer.play(
+                                                  _notificationList[index]
+                                                      .file!);
+                                            }
+                                          }),
+                                          audioPlayer: selectedIndex == index
+                                              ? audioPlayer
+                                              : pausePlayer,
+                                          isPlaying: selectedIndex == index
+                                              ? isPlaying
+                                              : false,
+                                          duration: selectedIndex == index
+                                              ? duration
+                                              : pauseDuration,
+                                          position: selectedIndex == index
+                                              ? position
+                                              : pausePosition,
+                                          index: index,
+                                          listHydra: _notificationList,
+                                          ringtoneName:
+                                              _notificationList[index].name!,
+                                          auidoId: _notificationList[index]
+                                              .id!
+                                              .toString(),
+                                          file: _notificationList[index].file!,
+                                        );
+                                },
+                              ),
+                            ),
                     ),
                   )
                 : const SizedBox.shrink(),

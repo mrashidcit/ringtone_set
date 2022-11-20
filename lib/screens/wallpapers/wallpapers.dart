@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deeze_app/models/search_model.dart';
 import 'package:deeze_app/screens/tags/tags.dart';
+import 'package:deeze_app/uitilities/constants.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/single_wallpaper.dart';
@@ -392,6 +393,8 @@ class _WallPapersState extends State<WallPapers> {
                                             builder: (context) => SearchScreen(
                                                   searchText:
                                                       _typeAheadController.text,
+                                                  itemType: Constants
+                                                      .ItemType_Ringtones,
                                                 )),
                                       );
                                     }
@@ -439,6 +442,8 @@ class _WallPapersState extends State<WallPapers> {
                                                       searchText:
                                                           _typeAheadController
                                                               .text,
+                                                      itemType: Constants
+                                                          .ItemType_Ringtones,
                                                     )),
                                           );
                                           ishow = false;
@@ -503,6 +508,8 @@ class _WallPapersState extends State<WallPapers> {
                                                           searchText: snapshot
                                                               .data![index]
                                                               .name!,
+                                                          itemType: Constants
+                                                              .ItemType_Ringtones,
                                                         )),
                                               );
                                               ishow = false;

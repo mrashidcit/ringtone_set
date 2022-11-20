@@ -4,6 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:deeze_app/db_services/favorite_database.dart';
 import 'package:deeze_app/models/favorite.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,6 +21,7 @@ class RingtonesCard extends StatefulWidget {
   Duration? position;
   final AudioPlayer audioPlayer;
   bool isPlaying;
+  bool isBuffering;
   final VoidCallback onTap;
   final VoidCallback onNavigate;
   final Function(double) onChange;
@@ -35,6 +37,7 @@ class RingtonesCard extends StatefulWidget {
       required this.audioPlayer,
       this.duration,
       this.isPlaying = false,
+      this.isBuffering = false,
       this.position,
       this.listHydra})
       : super(key: key);
@@ -134,7 +137,10 @@ class _RingtonesCardState extends State<RingtonesCard> {
                   inactiveColor: Colors.transparent,
                   min: 0,
                   max: widget.duration!.inMicroseconds.toDouble(),
-                  value: widget.position!.inMicroseconds.toDouble(),
+                  value: (widget.position!.inMicroseconds.toDouble() <=
+                          widget.duration!.inMicroseconds.toDouble())
+                      ? widget.position!.inMicroseconds.toDouble()
+                      : widget.duration!.inMicroseconds.toDouble(),
                   onChanged: (value) async {
                     // widget.onChange(value);
                   },
@@ -148,12 +154,8 @@ class _RingtonesCardState extends State<RingtonesCard> {
                         children: [
                           GestureDetector(
                             onTap: widget.onTap,
-                            child: AppImageAsset(
-                              image: widget.isPlaying
-                                  ? 'assets/pause.svg'
-                                  : 'assets/play.svg',
-                              height: 50,
-                            ),
+                            child: buildPlayAndPauseImage(),
+                            // child: LoadingPage(),
                           ),
                           const SizedBox(
                             width: 15,
@@ -230,5 +232,18 @@ class _RingtonesCardState extends State<RingtonesCard> {
         ),
       ),
     );
+  }
+
+  Widget buildPlayAndPauseImage() {
+    // print(
+    //     '>> buildPlayAndPauseImage - position , duration : ${widget.position!.inMilliseconds} , ${widget.duration!.inMilliseconds} , ');
+    if (widget.isBuffering) {
+      return LoadingPage();
+    } else {
+      return AppImageAsset(
+        image: widget.isPlaying ? 'assets/pause.svg' : 'assets/play.svg',
+        height: 50,
+      );
+    }
   }
 }
