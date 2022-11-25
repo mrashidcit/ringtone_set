@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -506,8 +507,11 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
           showCupertinoModalPopup(
             context: context,
             barrierDismissible: false,
-            builder: (context) => InternetCheckerDialog(
-                onRetryTap: () => nonActivePlayAndPauseAction(context, index)),
+            builder: (ctx) => InternetCheckerDialog(onRetryTap: () {
+              Navigator.pop(ctx); // Hide Internet Message Dialog
+              Timer(Duration(milliseconds: 500),
+                  () => nonActivePlayAndPauseAction(context, index));
+            }),
           );
         } else {
           setState(() {

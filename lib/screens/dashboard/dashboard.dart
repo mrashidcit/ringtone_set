@@ -14,7 +14,9 @@ import 'package:deeze_app/screens/web_view/show_web_page.dart';
 import 'package:deeze_app/uitilities/constants.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
+import 'package:deeze_app/widgets/internet_checkor_dialog.dart';
 import 'package:deeze_app/widgets/ringtone_category_card.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,6 +24,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:http/http.dart' as http;
 import 'package:rate_my_app/rate_my_app.dart';
@@ -575,8 +578,7 @@ class _DashbaordState extends State<Dashbaord> {
                                                     searchText:
                                                         _typeAheadController
                                                             .text,
-                                                    itemType: Constants
-                                                        .ItemType_Ringtones,
+                                                    itemType: widget.type,
                                                   )),
                                         );
                                         ishow = false;
@@ -846,6 +848,7 @@ class _DashbaordState extends State<Dashbaord> {
                   enablePullUp: true,
                   controller: _refreshController,
                   onRefresh: () async {
+                    print('>> dashboard - SmartRefresher - onRefresh');
                     final result = await fetchRingtone(isRefresh: true);
                     if (result) {
                       _refreshController.refreshCompleted();
@@ -854,6 +857,7 @@ class _DashbaordState extends State<Dashbaord> {
                     }
                   },
                   onLoading: () async {
+                    print('>> dashboard - SmartRefresher - onLoading');
                     final result = await fetchRingtone();
                     if (result) {
                       _refreshController.loadComplete();
@@ -862,10 +866,13 @@ class _DashbaordState extends State<Dashbaord> {
                     }
                   },
                   header: CustomHeader(builder: (context, mode) => Container()),
-                  footer: CustomFooter(
-                      builder: (context, mode) => isDataLoad && totalPage != 0
-                          ? const LoadingPage()
-                          : const SizedBox()),
+                  footer: CustomFooter(builder: (context, mode) {
+                    print(
+                        '>> CustomFooter - isDataLoad , totalPage : $isDataLoad , $totalPage');
+                    return isDataLoad && totalPage != 0
+                        ? const LoadingPage()
+                        : const SizedBox();
+                  }),
                   child: isLoading
                       ? const LoadingPage()
                       : ListView.builder(
@@ -1477,10 +1484,24 @@ class _DashbaordState extends State<Dashbaord> {
     if (isPlaying) {
       await audioPlayer.pause();
     } else {
-      setState(() {
-        _isBuffering = true;
-      });
-      await audioPlayer.play(hydraMember[index].file!);
+      bool hasInternet = await InternetConnectionChecker().hasConnection;
+      print('>> hasInternet : $hasInternet');
+      if (!await InternetConnectionChecker().hasConnection) {
+        showCupertinoModalPopup(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => InternetCheckerDialog(onRetryTap: () {
+            Navigator.pop(ctx); // Hide Internet Message Dialog
+            Timer(Duration(milliseconds: 500),
+                () => nonActiveRingtoneCardFunction(index));
+          }),
+        );
+      } else {
+        setState(() {
+          _isBuffering = true;
+        });
+        await audioPlayer.play(hydraMember[index].file!);
+      }
       // _isBuffering = false;
 
       // Uri downloadedFileUri = await audioPlayer.audioCache.load(
@@ -1519,11 +1540,26 @@ class _DashbaordState extends State<Dashbaord> {
     //   });
     // }
     else {
-      setState(() {
-        _isBuffering = true;
-        position = Duration.zero;
-      });
-      await audioPlayer.play(hydraMember[index].file!);
+      bool hasInternet = await InternetConnectionChecker().hasConnection;
+      print('>> hasInternet : $hasInternet');
+      if (!await InternetConnectionChecker().hasConnection) {
+        showCupertinoModalPopup(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => InternetCheckerDialog(onRetryTap: () {
+            Navigator.pop(ctx); // Hide Internet Message Dialog
+            Timer(Duration(milliseconds: 500),
+                () => activeRingtoneCardOnTapFunction(index));
+          }),
+        );
+      } else {
+        setState(() {
+          _isBuffering = true;
+          position = Duration.zero;
+        });
+        // await audioPlayer.play(hydraMember[index].file!);
+        await audioPlayer.play(hydraMember[index].file!);
+      }
     }
   }
 
@@ -1715,12 +1751,30 @@ class _DashbaordState extends State<Dashbaord> {
   Widget buildSearchResultContainer() {
     if (_showSearchQueryProgressBar) {
       return Container(
-          color: Colors.white,
+          // color: Colors.white,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(8),
+            ),
+          ),
           margin: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(vertical: 8),
           child: Center(child: RefreshProgressIndicator()));
     } else if (_searchResultList == null) {
       return Container(
-          color: Colors.white,
+          // color: Colors.white,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(8),
+            ),
+          ),
+          // margin: const EdgeInsets.symmetric(horizontal: 16),
           alignment: Alignment.centerLeft,
           margin: const EdgeInsets.symmetric(horizontal: 16),
           padding: const EdgeInsets.symmetric(vertical: 10).copyWith(left: 30),
@@ -1730,7 +1784,16 @@ class _DashbaordState extends State<Dashbaord> {
           ));
     } else if (_searchResultList.length > 0) {
       return Container(
-        color: Colors.white,
+        // color: Colors.white,
+
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(8),
+            bottomRight: Radius.circular(8),
+          ),
+        ),
         margin: const EdgeInsets.symmetric(horizontal: 16),
         child: ListView.builder(
           shrinkWrap: true,
@@ -1764,7 +1827,18 @@ class _DashbaordState extends State<Dashbaord> {
         ),
       );
     } else {
-      return Container();
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(8),
+            bottomRight: Radius.circular(8),
+          ),
+        ),
+        height: 10,
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+      );
     }
   }
 

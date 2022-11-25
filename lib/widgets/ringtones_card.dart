@@ -90,7 +90,7 @@ class _RingtonesCardState extends State<RingtonesCard> {
   refreshFavorite() async {
     favoriteList = await FavoriteDataBase.instance
         .readAllFavoriteOfCurrentMusic(widget.auidoId);
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   @override

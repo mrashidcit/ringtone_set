@@ -53,13 +53,20 @@ class SearchServices {
   }
 
   Future<List<SearchModel>> search(String query) async {
-    var url = getDeezeAppUrlContent;
+    // var url = getDeezeAppUrlContent;
+    var url = getDeezeAppSearchItemsUrl;
 
+    // Uri uri = Uri.parse(url).replace(queryParameters: {
+    //   "page": "1",
+    //   "itemsPerPage": "10",
+    //   "enabled": "true",
+    //   "name": query
+    // });
     Uri uri = Uri.parse(url).replace(queryParameters: {
       "page": "1",
       "itemsPerPage": "10",
-      "enabled": "true",
-      "name": query
+      "type": "RINGTONE",
+      "term": query
     });
 
     http.Response response = await http.get(

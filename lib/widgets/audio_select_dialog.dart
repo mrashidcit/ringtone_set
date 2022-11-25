@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:deeze_app/widgets/app_image_assets.dart';
@@ -269,8 +270,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
         barrierDismissible: false,
         builder: (context) => InternetCheckerDialog(
           onRetryTap: () {
-            actionSetRingTone();
             Navigator.pop(context); // Hide Internet Message Dialog
+            Timer(Duration(milliseconds: 500), () => actionSetRingTone());
           },
         ),
       );
@@ -315,8 +316,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
         barrierDismissible: false,
         builder: (context) => InternetCheckerDialog(
           onRetryTap: () {
-            actionSetNotification();
             Navigator.pop(context); // Hide Internet Message Dialog
+            Timer(Duration(milliseconds: 500), () => actionSetNotification());
           },
         ),
       );
@@ -356,8 +357,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
         barrierDismissible: false,
         builder: (context) => InternetCheckerDialog(
           onRetryTap: () {
-            actionSetAlarmSound();
             Navigator.pop(context); // Hide Internet Message Dialog
+            Timer(Duration(milliseconds: 500), () => actionSetAlarmSound());
           },
         ),
       );
@@ -398,8 +399,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
         barrierDismissible: false,
         builder: (context) => InternetCheckerDialog(
           onRetryTap: () {
-            actionSetAlarmSound();
             Navigator.pop(context); // Hide Internet Message Dialog
+            Timer(Duration(milliseconds: 500), () => actionSetAlarmSound());
           },
         ),
       );
@@ -440,8 +441,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
         barrierDismissible: false,
         builder: (context) => InternetCheckerDialog(
           onRetryTap: () {
-            actionSetAlarmSound();
             Navigator.pop(context); // Hide Internet Message Dialog
+            Timer(Duration(milliseconds: 500), () => actionSetAlarmSound());
           },
         ),
       );

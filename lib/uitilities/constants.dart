@@ -6,4 +6,5 @@ class Constants {
   static const ItemType_Wallpapers = 'WALLPAPER';
 
   static const PackageId = 'com.example.deeze_app';
+  static const ItemsPerPage = 10;
 }
