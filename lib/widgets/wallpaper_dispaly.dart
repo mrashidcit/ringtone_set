@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:deeze_app/widgets/more_audio_dialog.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
@@ -19,6 +20,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:social_share/social_share.dart';
 
 import '../db_services/favorite_database.dart';
 import '../models/deeze_model.dart';
@@ -239,10 +241,28 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const AppImageAsset(
-                          image: 'assets/dot.svg',
-                          color: Colors.white,
-                          height: 6),
+                      GestureDetector(
+                        onTap: () {
+                          showCupertinoModalPopup(
+                            context: context,
+                            barrierColor: Colors.black.withOpacity(0.8),
+                            builder: (context) {
+                              return MoreAudioDialog(
+                                file: '',
+                                fileName: widget.listHydra![activeIndex].name!,
+                                userName: widget
+                                    .listHydra![activeIndex].user!.firstName!,
+                                userImage:
+                                    widget.listHydra![activeIndex].user!.image!,
+                              );
+                            },
+                          );
+                        },
+                        child: const AppImageAsset(
+                            image: 'assets/dot.svg',
+                            color: Colors.white,
+                            height: 6),
+                      ),
                       const SizedBox(width: 30),
                       GestureDetector(
                         onTap: () {
@@ -257,10 +277,17 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                             image: 'assets/wallpaper_down.svg', height: 50),
                       ),
                       const SizedBox(width: 30),
-                      const AppImageAsset(
-                          image: 'assets/share.svg',
-                          color: Colors.white,
-                          height: 18),
+                      GestureDetector(
+                        onTap: () {
+                          var item = widget.listHydra![activeIndex];
+                          SocialShare.shareOptions("${item.file!}");
+                          ;
+                        },
+                        child: const AppImageAsset(
+                            image: 'assets/share.svg',
+                            color: Colors.white,
+                            height: 18),
+                      ),
                     ],
                   ),
                 ],

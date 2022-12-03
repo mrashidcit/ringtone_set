@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:deeze_app/helpers/ad_helper.dart';
 import 'package:deeze_app/uitilities/end_points.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/child_widgets/build_play.dart';
@@ -10,6 +11,7 @@ import 'package:deeze_app/widgets/internet_checkor_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import '../db_services/favorite_database.dart';
@@ -23,11 +25,13 @@ import 'package:http/http.dart' as http;
 class CustomAudioPlayer extends StatefulWidget {
   List<DeezeItemModel> listHydra;
   final int index;
+  final String type;
 
   CustomAudioPlayer({
     Key? key,
     required this.listHydra,
     required this.index,
+    required this.type,
   }) : super(key: key);
 
   @override
@@ -36,6 +40,7 @@ class CustomAudioPlayer extends StatefulWidget {
 
 class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   final CarouselController _controller = CarouselController();
+  InterstitialAd? _interstitialAd;
 
   animateToSilde(int index) {
     return _controller.animateToPage(
@@ -45,21 +50,22 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     );
   }
 
-  int page = 1;
+  int page = 2;
   int? totalPage;
 
   ScrollController scrollController = ScrollController();
   bool isDataLoad = false;
   bool isLoading = false;
 
-  Future<bool> fetchRingtone() async {
+  Future<bool> fetchData() async {
     var url = getDeezeAppHpUrlContent;
 
     Uri uri = Uri.parse(url).replace(queryParameters: {
       "page": "$page",
       "itemsPerPage": "10",
       // "enabled": "true",
-      "type": "RINGTONE"
+      // "type": "RINGTONE"
+      "type": widget.type,
     });
     try {
       http.Response response = await http.get(
@@ -74,7 +80,11 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
         print(response.body);
         var rawResponse = deezeItemModelFromJson(response.body);
 
-        widget.listHydra.addAll(rawResponse);
+        if (rawResponse.length > 0) page++;
+
+        setState(() {
+          widget.listHydra.addAll(rawResponse);
+        });
 
         return true;
       } else {
@@ -98,6 +108,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _loadInterstitialAd();
     widget.listHydra.removeRange(0, widget.index);
     WidgetsBinding.instance
         .addPostFrameCallback((timeStamp) => animateToSilde(widget.index));
@@ -106,6 +117,9 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
           '>> audioPlayer.onPlayerStateChanged - state , mounted = ${state.name} , ${mounted}');
       if (state == PlayerState.PAUSED) {
         isPlaying = false;
+      } else if (state == PlayerState.STOPPED) {
+        isPlaying = false;
+        isBuffering = false;
       } else if (state == PlayerState.COMPLETED) {
         isPlaying = false;
         isBuffering = false;
@@ -117,6 +131,8 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
       }
     });
     audioPlayer.onDurationChanged.listen((state) {
+      print(
+          '>> audioPlayer.onDurationChanged - state , mounted = ${audioPlayer.state.name} , ${mounted}');
       isBuffering = false;
       isPlaying = true;
       print(
@@ -128,6 +144,8 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     });
     audioPlayer.onAudioPositionChanged.listen((state) {
       setState(() {
+        isBuffering = false;
+        isPlaying = true;
         position = state;
       });
     });
@@ -141,6 +159,29 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     audioPlayer.dispose();
     isPlaying = false;
     // PlayerState.STOPPED;
+  }
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              _moveToHome();
+            },
+          );
+
+          setState(() {
+            _interstitialAd = ad;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          print('Failed to load an interstitial ad: ${err.message}');
+        },
+      ),
+    );
   }
 
   late int activeIndex = widget.index;
@@ -189,230 +230,295 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   ];
   Gradient? gradient;
 
+  _moveToHome() {
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     // print('>> build - CustomAudioPlayer - activeIndex = $activeIndex');
     double screenWidth = MediaQuery.of(context).size.width;
-    return Scaffold(
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(gradient: gradient),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
-          child: Stack(
-            children: [
-              const AppImageAsset(
-                  image: 'assets/drop_shadow.png',
-                  height: double.infinity,
-                  fit: BoxFit.cover),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CarouselSlider.builder(
-                    carouselController: _controller,
-                    itemCount: widget.listHydra.length,
-                    itemBuilder: (context, index, realIndex) {
-                      final file = widget.listHydra[index].file;
-                      final name = widget.listHydra[index].name;
-                      myfile = index == 0
-                          ? widget.listHydra[0].file!
-                          : widget.listHydra[index - 1].file!;
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            widget.listHydra[index].name!,
-                            style: GoogleFonts.archivo(
-                              fontStyle: FontStyle.normal,
-                              color: Colors.white,
-                              fontSize: 20,
-                              wordSpacing: -0.1,
-                              fontWeight: FontWeight.w600,
+    return WillPopScope(
+      onWillPop: () async {
+        if (_interstitialAd != null) {
+          _interstitialAd?.show();
+          return false;
+        } else {
+          return true;
+        }
+      },
+      child: Scaffold(
+        body: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(gradient: gradient),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
+            child: Stack(
+              children: [
+                const AppImageAsset(
+                    image: 'assets/drop_shadow.png',
+                    height: double.infinity,
+                    fit: BoxFit.cover),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CarouselSlider.builder(
+                      carouselController: _controller,
+                      itemCount: widget.listHydra.length + 1,
+                      itemBuilder: (context, index, realIndex) {
+                        if (index > widget.listHydra.length - 1) {
+                          return buildCarouselItemForLoading(
+                            context,
+                            screenWidth,
+                          );
+                        } else {
+                          final file = widget.listHydra[index].file;
+                          final name = widget.listHydra[index].name;
+                          myfile = index == 0
+                              ? widget.listHydra[0].file!
+                              : widget.listHydra[index - 1].file!;
+                          return buildCarouselItem(
+                              index, context, file, name, screenWidth);
+                        }
+                      },
+                      options: CarouselOptions(
+                        height: 450,
+                        pageSnapping: true,
+                        viewportFraction: 0.75,
+                        enlargeCenterPage: true,
+                        enableInfiniteScroll: false,
+                        onPageChanged: (index, reason) async {
+                          print(
+                              ">> CarouselOptions - onPageChanged - index : $index");
+                          setState(() {
+                            // page = index;
+                          });
+                          // fetchData();
+                          if (isPlaying) {
+                            await audioPlayer.pause();
+                            // await audioPlayer.play(widget.listHydra[index].file!);
+                          }
+                          if (isBuffering) {
+                            await audioPlayer.release();
+                          } else if (audioPlayer.state == PlayerState.PAUSED) {
+                            await audioPlayer.release();
+                          } else {
+                            // await audioPlayer.pause();
+                          }
+                          if (index > widget.listHydra.length - 1) {
+                            setState(() {
+                              gradient = (index % 4 == 0)
+                                  ? myGradientList[0]
+                                  : (index % 3 == 0)
+                                      ? myGradientList[3]
+                                      : (index % 2 == 0)
+                                          ? myGradientList[4]
+                                          : myGradientList[1];
+                              position = Duration.zero;
+                              // myfile = widget.listHydra[index].file!;
+                              fetchData();
+                              activeIndex = index;
+                              print(
+                                  '>> CarouselOptions - onPageChanged : activeIndex = $activeIndex');
+                            });
+                          } else {
+                            setState(() {
+                              gradient = (index % 4 == 0)
+                                  ? myGradientList[0]
+                                  : (index % 3 == 0)
+                                      ? myGradientList[3]
+                                      : (index % 2 == 0)
+                                          ? myGradientList[4]
+                                          : myGradientList[1];
+                              position = Duration.zero;
+                              myfile = widget.listHydra[index].file!;
+                              activeIndex = index;
+                              print(
+                                  '>> CarouselOptions - onPageChanged : activeIndex = $activeIndex');
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: GestureDetector(
+                            onTap: () {
+                              showCupertinoModalPopup(
+                                context: context,
+                                barrierColor: Colors.black.withOpacity(0.8),
+                                builder: (context) {
+                                  return MoreAudioDialog(
+                                    file: myfile,
+                                    fileName:
+                                        widget.listHydra[activeIndex].name!,
+                                    userName: widget.listHydra[activeIndex]
+                                        .user!.firstName!,
+                                    userImage: widget
+                                        .listHydra[activeIndex].user!.image!,
+                                  );
+                                },
+                              );
+                            },
+                            child: const AppImageAsset(
+                              image: 'assets/dot.svg',
+                              height: 5,
+                              width: 5,
+                              fit: BoxFit.fill,
                             ),
                           ),
-                          const SizedBox(height: 30),
-                          activeIndex == index
-                              ? buildActiveBuildPlay(index, context, file, name)
-                              : buildNonActiveBuildPlay(
-                                  index, context, file, name),
-                          const SizedBox(height: 10),
-                          if (activeIndex == index)
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: screenWidth * 0.05),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      widget.listHydra[activeIndex].user
-                                                  ?.image !=
-                                              null
-                                          ? CircleAvatar(
-                                              radius: 17,
-                                              backgroundImage: NetworkImage(
-                                                widget.listHydra[activeIndex]
-                                                    .user!.image!,
-                                              ),
-                                            )
-                                          : const CircleAvatar(
-                                              backgroundColor: Colors.grey,
-                                              radius: 15,
-                                            ),
-                                      const SizedBox(width: 12),
-                                      Text(
-                                        widget.listHydra[activeIndex].user!
-                                            .firstName!,
-                                        style: GoogleFonts.archivo(
-                                          fontStyle: FontStyle.normal,
-                                          color: Colors.white,
-                                          fontSize: 13,
-                                          wordSpacing: -0.05,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      const AppImageAsset(
-                                        image: 'assets/arrow.svg',
-                                        height: 8,
-                                        width: 8,
-                                        fit: BoxFit.fill,
-                                      ),
-                                      const SizedBox(width: 2),
-                                      Text(
-                                        "23k",
-                                        style: GoogleFonts.archivo(
-                                          fontSize: 11,
-                                          fontStyle: FontStyle.normal,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          const SizedBox(height: 45),
-                        ],
-                      );
-                    },
-                    options: CarouselOptions(
-                      height: 450,
-                      pageSnapping: true,
-                      viewportFraction: 0.75,
-                      enlargeCenterPage: true,
-                      enableInfiniteScroll: false,
-                      onPageChanged: (index, reason) async {
-                        print(
-                            ">> CarouselOptions - onPageChanged - index : $index");
-                        setState(() {
-                          page = index;
-                        });
-                        // fetchRingtone();
-                        if (isPlaying) {
-                          await audioPlayer.pause();
-                          // await audioPlayer.play(widget.listHydra[index].file!);
-                        }
-                        if (audioPlayer.state == PlayerState.PAUSED) {
-                          await audioPlayer.release();
-                        } else {
-                          // await audioPlayer.pause();
-                        }
-                        setState(() {
-                          gradient = (index % 4 == 0)
-                              ? myGradientList[0]
-                              : (index % 3 == 0)
-                                  ? myGradientList[3]
-                                  : (index % 2 == 0)
-                                      ? myGradientList[4]
-                                      : myGradientList[1];
-                          position = Duration.zero;
-                          myfile = widget.listHydra[index].file!;
-                          activeIndex = index;
-                          print(
-                              '>> CarouselOptions - onPageChanged : activeIndex = $activeIndex');
-                        });
-                      },
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: GestureDetector(
+                        ),
+                        const SizedBox(width: 25),
+                        GestureDetector(
                           onTap: () {
+                            print('>> onTap : myFile = $myfile');
                             showCupertinoModalPopup(
                               context: context,
                               barrierColor: Colors.black.withOpacity(0.8),
-                              builder: (context) {
-                                return MoreAudioDialog(
-                                  file: myfile,
-                                  fileName: widget.listHydra[activeIndex].name!,
-                                  userName: widget
-                                      .listHydra[activeIndex].user!.firstName!,
-                                  userImage: widget
-                                      .listHydra[activeIndex].user!.image!,
-                                );
-                              },
+                              builder: (context) =>
+                                  AudioSelectDialog(file: myfile),
                             );
                           },
-                          child: const AppImageAsset(
-                            image: 'assets/dot.svg',
-                            height: 5,
-                            width: 5,
-                            fit: BoxFit.fill,
+                          child: Container(
+                            height: 60,
+                            width: 60,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                            ),
+                            child: const AppImageAsset(
+                              image: 'assets/call.svg',
+                              height: 70,
+                              width: 70,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 25),
-                      GestureDetector(
-                        onTap: () {
-                          print('>> onTap : myFile = $myfile');
-                          showCupertinoModalPopup(
-                            context: context,
-                            barrierColor: Colors.black.withOpacity(0.8),
-                            builder: (context) =>
-                                AudioSelectDialog(file: myfile),
-                          );
-                        },
-                        child: Container(
-                          height: 60,
-                          width: 60,
-                          alignment: Alignment.center,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                          ),
-                          child: const AppImageAsset(
-                            image: 'assets/call.svg',
-                            height: 70,
-                            width: 70,
-                            fit: BoxFit.cover,
-                          ),
+                        const SizedBox(width: 25),
+                        const AppImageAsset(
+                          image: 'assets/share.svg',
+                          height: 20,
+                          width: 20,
+                          fit: BoxFit.cover,
                         ),
-                      ),
-                      const SizedBox(width: 25),
-                      const AppImageAsset(
-                        image: 'assets/share.svg',
-                        height: 20,
-                        width: 20,
-                        fit: BoxFit.cover,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Column buildCarouselItemForLoading(BuildContext context, double screenWidth) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Loading ...',
+          style: GoogleFonts.archivo(
+            fontStyle: FontStyle.normal,
+            color: Colors.white,
+            fontSize: 20,
+            wordSpacing: -0.1,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 30),
+        LoadingPage(),
+        const SizedBox(height: 10),
+        const SizedBox(height: 45),
+      ],
+    );
+  }
+
+  Column buildCarouselItem(int index, BuildContext context, String? file,
+      String? name, double screenWidth) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          widget.listHydra[index].name!,
+          style: GoogleFonts.archivo(
+            fontStyle: FontStyle.normal,
+            color: Colors.white,
+            fontSize: 20,
+            wordSpacing: -0.1,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 30),
+        // activeIndex == index
+        //     ? buildActiveBuildPlay(index, context, file, name)
+        //     : buildNonActiveBuildPlay(index, context, file, name),
+        buildActiveBuildPlay(index, context, file, name),
+        const SizedBox(height: 10),
+        if (activeIndex == index)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    widget.listHydra[activeIndex].user?.image != null
+                        ? CircleAvatar(
+                            radius: 17,
+                            backgroundImage: NetworkImage(
+                              widget.listHydra[activeIndex].user!.image!,
+                            ),
+                          )
+                        : const CircleAvatar(
+                            backgroundColor: Colors.grey,
+                            radius: 15,
+                          ),
+                    const SizedBox(width: 12),
+                    Text(
+                      widget.listHydra[activeIndex].user!.firstName!,
+                      style: GoogleFonts.archivo(
+                        fontStyle: FontStyle.normal,
+                        color: Colors.white,
+                        fontSize: 13,
+                        wordSpacing: -0.05,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const AppImageAsset(
+                      image: 'assets/arrow.svg',
+                      height: 8,
+                      width: 8,
+                      fit: BoxFit.fill,
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      "23k",
+                      style: GoogleFonts.archivo(
+                        fontSize: 11,
+                        fontStyle: FontStyle.normal,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        const SizedBox(height: 45),
+      ],
     );
   }
 
@@ -432,7 +538,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
         });
       },
       isFavourite: widget.listHydra[index].isFavourite,
-      onTap: () => nonActivePlayAndPauseAction(context, index),
+      onTap: () => activePlayAndPauseAction(context, index),
       audioPlayer: activeIndex == index ? audioPlayer : pausePlayer,
       isPlaying: isPlaying,
       isBuffering: isBuffering,
@@ -457,7 +563,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
         await audioPlayer.seek(myposition);
         await audioPlayer.resume();
       },
-      onTap: () => nonActivePlayAndPauseAction(context, index),
+      onTap: () => activePlayAndPauseAction(context, index),
       onTapFavourite: () {
         setState(() {
           widget.listHydra[index].isFavourite =
@@ -480,13 +586,12 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     );
   }
 
-  Future<void> nonActivePlayAndPauseAction(
-      BuildContext context, int index) async {
+  Future<void> activePlayAndPauseAction(BuildContext context, int index) async {
     {
       // if (isPlaying) {
       // } else {}
       print(
-          '>> nonActivePlayAndPauseAction - audioPlayer.state : ${audioPlayer.state.name} ');
+          '>> activePlayAndPauseAction - audioPlayer.state : ${audioPlayer.state.name} ');
 
       if (isPlaying || isBuffering) {
         await audioPlayer.pause();
@@ -510,7 +615,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
             builder: (ctx) => InternetCheckerDialog(onRetryTap: () {
               Navigator.pop(ctx); // Hide Internet Message Dialog
               Timer(Duration(milliseconds: 500),
-                  () => nonActivePlayAndPauseAction(context, index));
+                  () => activePlayAndPauseAction(context, index));
             }),
           );
         } else {
@@ -524,45 +629,4 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
       }
     }
   }
-
-  // Future<void> activePlayAndPauseAction(BuildContext context, int index) async {
-  //   {
-  //     // if (isPlaying) {
-  //     // } else {}
-
-  //     print(
-  //         '>> activePlayAndPauseAction : audioPlayer.state = ${audioPlayer.state}');
-
-  //     setState(() {
-  //       position = Duration.zero;
-  //     });
-  //     if (isPlaying || isBuffering) {
-  //       await audioPlayer.pause();
-  //       setState(() {
-  //         isPlaying = false;
-  //         isBuffering = false;
-  //       });
-  //     } else if (audioPlayer.state == PlayerState.PAUSED) {
-  //       audioPlayer.resume();
-  //     } else {
-  //       bool hasInternet = await InternetConnectionChecker().hasConnection;
-  //       print('>> hasInternet : $hasInternet');
-  //       if (!await InternetConnectionChecker().hasConnection) {
-  //         showCupertinoModalPopup(
-  //           context: context,
-  //           barrierDismissible: false,
-  //           builder: (context) => InternetCheckerDialog(onRetryTap: () {
-  //             print('>> onRetryTap');
-  //             activePlayAndPauseAction(context, index);
-  //           }),
-  //         );
-  //       } else {
-  //         setState(() {
-  //           isBuffering = true;
-  //         });
-  //         await audioPlayer.play(widget.listHydra[index].file!);
-  //       }
-  //     }
-  //   }
-  // }
 }

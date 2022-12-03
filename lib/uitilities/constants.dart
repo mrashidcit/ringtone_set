@@ -5,6 +5,6 @@ class Constants {
   static const ItemType_Notifications = 'NOTIFICATION';
   static const ItemType_Wallpapers = 'WALLPAPER';
 
-  static const PackageId = 'com.example.deeze_app';
+  static const PackageId = 'com.aggyapps.top2015.ringtones';
   static const ItemsPerPage = 10;
 }

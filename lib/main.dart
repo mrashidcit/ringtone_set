@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:deeze_app/bloc/deeze_bloc/wallpaper_bloc/wallpaper_bloc.dart';
+import 'package:deeze_app/helpers/share_value_helper.dart';
+import 'package:deeze_app/helpers/utils.dart';
 
 import 'package:deeze_app/screens/dashboard/dashboard.dart';
 import 'package:deeze_app/screens/screens.dart';
@@ -9,12 +11,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_value/shared_value.dart';
 
 import 'bloc/deeze_bloc/Category_bloc/category_bloc.dart';
 import 'bloc/deeze_bloc/ringtone_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+      apiKey: 'AIzaSyDZ0kwmgSKX4tYwFpbelQWRgM0cHiamtqg',
+      appId: '1:500648108734:android:b1c9a79dc460032e0e34ef',
+      messagingSenderId: '500648108734',
+      projectId: 'top-aggy',
+      // authDomain: '',
+      // databaseURL: '',
+      // storageBucket: '',
+      // measurementId: '',
+    ),
+  );
+  FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    if (user == null) {
+      print('User is currently signed out!');
+    } else {
+      print('User is signed in!');
+    }
+  });
+  runApp(
+    SharedValue.wrapApp(MyApp()),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -33,6 +61,10 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initAppState();
+
+    Utils.getSharedValueHelperData();
+
+    _initGoogleMobileAds();
   }
 
   Future<void> initAppState() async {
@@ -85,5 +117,10 @@ class _MyAppState extends State<MyApp> {
       child:
           MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen()),
     );
+  }
+
+  Future<InitializationStatus> _initGoogleMobileAds() {
+    // TODO: Initialize Google Mobile Ads SDK
+    return MobileAds.instance.initialize();
   }
 }

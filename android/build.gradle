@@ -1,8 +1,16 @@
 buildscript {
     ext.kotlin_version = '1.6.10'
     repositories {
-        google()
-        mavenCentral()
+//        google()
+//        mavenCentral()
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+        jcenter()
+        maven {
+            url 'https://mvnrepository.com/artifact/com.android.tools.lint/lint-gradle-api'
+        }
     }
 
     dependencies {
@@ -13,8 +21,18 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
-        mavenCentral()
+//        google()
+//        mavenCentral()
+        repositories {
+            maven {
+                url 'https://maven.google.com/'
+                name 'Google'
+            }
+            jcenter()
+            maven {
+                url 'https://mvnrepository.com/artifact/com.android.tools.lint/lint-gradle-api'
+            }
+        }
     }
 }
 

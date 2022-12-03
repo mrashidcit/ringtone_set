@@ -5,10 +5,12 @@ import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:deeze_app/enums/enum_item_type.dart';
+import 'package:deeze_app/helpers/ad_helper.dart';
 import 'package:deeze_app/models/search_model.dart';
 import 'package:deeze_app/screens/categories/categories.dart';
 import 'package:deeze_app/screens/favourite/favourite_screen.dart';
 import 'package:deeze_app/screens/search/search_screen.dart';
+import 'package:deeze_app/screens/setting.dart';
 import 'package:deeze_app/screens/tags/tags.dart';
 import 'package:deeze_app/screens/web_view/show_web_page.dart';
 import 'package:deeze_app/uitilities/constants.dart';
@@ -24,6 +26,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:http/http.dart' as http;
@@ -63,11 +66,29 @@ class _DashbaordState extends State<Dashbaord> {
   List<SearchModel> _searchResultList = [];
   Timer? _searchQueryTimer = null;
   bool _showSearchQueryProgressBar = false;
+  BannerAd? _bannerAd;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    // TODO: Load a banner ad
+    BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      request: AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _bannerAd = ad as BannerAd;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          print('Failed to load a banner ad: ${err.message}');
+          ad.dispose();
+        },
+      ),
+    ).load();
     scrollController.addListener(() {
       if (scrollController.position.pixels ==
           scrollController.position.maxScrollExtent) {
@@ -105,6 +126,8 @@ class _DashbaordState extends State<Dashbaord> {
       });
     });
     audioPlayer.onAudioPositionChanged.listen((state) {
+      print(
+          ">> dashboard - onAudioPositionChanged - position : ${state.inMicroseconds.toDouble()}");
       _isBuffering = false;
       isPlaying = true;
       setState(() {
@@ -123,6 +146,7 @@ class _DashbaordState extends State<Dashbaord> {
   @override
   void dispose() {
     // TODO: implement dispose
+    _bannerAd?.dispose();
     super.dispose();
     audioPlayer.dispose();
     isPlaying = false;
@@ -406,6 +430,7 @@ class _DashbaordState extends State<Dashbaord> {
                                                     CustomAudioPlayer(
                                                   listHydra: hydraMember,
                                                   index: index,
+                                                  type: widget.type,
                                                 ),
                                               ),
                                             );
@@ -454,6 +479,7 @@ class _DashbaordState extends State<Dashbaord> {
                                                     CustomAudioPlayer(
                                                   listHydra: hydraMember,
                                                   index: index - 1,
+                                                  type: widget.type,
                                                 ),
                                               ),
                                             );
@@ -502,6 +528,10 @@ class _DashbaordState extends State<Dashbaord> {
                               width: MediaQuery.of(context).size.width,
                               child: TextFormField(
                                 controller: _typeAheadController,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
                                 // onChanged: (data) => setState(() {}),
                                 onChanged: (newValue) {
                                   if (_searchQueryTimer != null) {
@@ -809,7 +839,10 @@ class _DashbaordState extends State<Dashbaord> {
                     ishow
                         ? const SizedBox.shrink()
                         : GestureDetector(
-                            onTap: () => setState(() => ishow = true),
+                            onTap: () {
+                              print('>> search - onTap');
+                              setState(() => ishow = true);
+                            },
                             // onTap: () {
                             //   Navigator.push(
                             //     context,
@@ -820,7 +853,8 @@ class _DashbaordState extends State<Dashbaord> {
                             //   );
                             // },
                             child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 15),
                               child: AppImageAsset(image: 'assets/search.svg'),
                             ),
                           ),
@@ -1022,9 +1056,19 @@ class _DashbaordState extends State<Dashbaord> {
                                         child:
                                             buildTrendingSearchContainerForMainScreen(),
                                       ),
-                                      const SizedBox(
-                                        height: 30,
-                                      ),
+                                      SizedBox(height: 5),
+                                      if (_bannerAd != null)
+                                        Align(
+                                          alignment: Alignment.topCenter,
+                                          child: Container(
+                                            width: _bannerAd!.size.width
+                                                .toDouble(),
+                                            height: _bannerAd!.size.height
+                                                .toDouble(),
+                                            child: AdWidget(ad: _bannerAd!),
+                                          ),
+                                        ),
+                                      const SizedBox(height: 5),
                                     ]),
                               );
                             }
@@ -1227,7 +1271,7 @@ class _DashbaordState extends State<Dashbaord> {
                             //   minLaunches: 10,
                             //   remindDays: 7,
                             //   remindLaunches: 10,
-                            //   googlePlayIdentifier: 'com.example.deeze_app',
+                            //   googlePlayIdentifier: 'com.aggyapps.top2015.ringtones',
                             //   appStoreIdentifier: '1491556149',
                             // );
 
@@ -1272,28 +1316,38 @@ class _DashbaordState extends State<Dashbaord> {
                         const SizedBox(
                           height: 25,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 37),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.settings,
-                                color: Color(0xffA49FAD),
-                                size: 20,
-                              ),
-                              const SizedBox(
-                                width: 30,
-                              ),
-                              Text(
-                                "Settings",
-                                style: GoogleFonts.archivo(
-                                  fontStyle: FontStyle.normal,
-                                  color: const Color(0xffA49FAD),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w400,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pop();
+
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (ctx) => SettingScreen()));
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 37),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.settings,
+                                  color: Color(0xffA49FAD),
+                                  size: 20,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(
+                                  width: 30,
+                                ),
+                                Text(
+                                  "Settings",
+                                  style: GoogleFonts.archivo(
+                                    fontStyle: FontStyle.normal,
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(
@@ -1405,6 +1459,7 @@ class _DashbaordState extends State<Dashbaord> {
             builder: (context) => CustomAudioPlayer(
               listHydra: hydraMember,
               index: index,
+              type: widget.type,
             ),
           ),
         );
@@ -1444,6 +1499,7 @@ class _DashbaordState extends State<Dashbaord> {
             builder: (context) => CustomAudioPlayer(
               listHydra: hydraMember,
               index: index,
+              type: widget.type,
             ),
           ),
         );
@@ -1785,7 +1841,7 @@ class _DashbaordState extends State<Dashbaord> {
     } else if (_searchResultList.length > 0) {
       return Container(
         // color: Colors.white,
-
+        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 6),
         decoration: BoxDecoration(
           color: Colors.white,
           shape: BoxShape.rectangle,

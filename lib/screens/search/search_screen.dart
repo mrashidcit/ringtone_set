@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -6,9 +7,12 @@ import 'package:deeze_app/models/search_model.dart';
 import 'package:deeze_app/uitilities/constants.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
+import 'package:deeze_app/widgets/internet_checkor_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:http/http.dart' as http;
 import '../../models/deeze_model.dart';
@@ -38,6 +42,7 @@ class _SearchScreenState extends State<SearchScreen> {
   final AudioPlayer pausePlayer = AudioPlayer();
   int? selectedIndex;
   bool isPlaying = false;
+  bool isBuffering = false;
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
   Duration pauseDuration = Duration.zero;
@@ -107,13 +112,37 @@ class _SearchScreenState extends State<SearchScreen> {
       }
     });
     liseten();
+    audioPlayer.onPlayerStateChanged.listen((state) {
+      print(
+          '>> audioPlayer.onPlayerStateChanged - state , mounted = ${state.name} , ${mounted}');
+      if (state == PlayerState.PAUSED) {
+        isPlaying = false;
+      } else if (state == PlayerState.STOPPED) {
+        isPlaying = false;
+        isBuffering = false;
+      } else if (state == PlayerState.COMPLETED) {
+        isPlaying = false;
+        isBuffering = false;
+      }
+      if (mounted) {
+        setState(() {
+          // isPlaying = state == PlayerState.PLAYING;
+        });
+      }
+    });
     audioPlayer.onDurationChanged.listen((state) {
-      setState(() {
-        duration = state;
-      });
+      isBuffering = false;
+      isPlaying = true;
+      if (mounted) {
+        setState(() {
+          duration = state;
+        });
+      }
     });
     audioPlayer.onAudioPositionChanged.listen((state) {
       setState(() {
+        isBuffering = false;
+        isPlaying = true;
         position = state;
       });
     });
@@ -500,120 +529,114 @@ class _SearchScreenState extends State<SearchScreen> {
                               controller: scrollController,
                               scrollDirection: Axis.vertical,
                               itemBuilder: (context, index) {
-                                return selectedIndex == index
-                                    ? RingtonesCard(
-                                        onNavigate: () async {
-                                          await audioPlayer.pause();
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CustomAudioPlayer(
-                                                listHydra: ringtonelist,
-                                                index: index,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        onChange: (value) async {
-                                          final myposition =
-                                              Duration(seconds: value.toInt());
-                                          await audioPlayer.seek(myposition);
-                                          await audioPlayer.resume();
-                                        },
-                                        onTap: (() async {
-                                          // if (isPlaying) {
-                                          // } else {}
+                                // return selectedIndex == index
+                                //     ?
+                                return RingtonesCard(
+                                  onNavigate: () async {
+                                    await audioPlayer.stop();
+                                    setState(() {
+                                      position = Duration.zero;
+                                    });
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CustomAudioPlayer(
+                                          listHydra: ringtonelist,
+                                          index: index,
+                                          type: widget.itemType,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  onChange: (value) async {
+                                    final myposition =
+                                        Duration(seconds: value.toInt());
+                                    await audioPlayer.seek(myposition);
+                                    await audioPlayer.resume();
+                                  },
+                                  onTap: (() async {
+                                    performPlayAndPauseAction(index);
+                                  }),
+                                  audioPlayer: selectedIndex == index
+                                      ? audioPlayer
+                                      : pausePlayer,
+                                  isPlaying: selectedIndex == index
+                                      ? isPlaying
+                                      : false,
+                                  isBuffering: selectedIndex == index
+                                      ? isBuffering
+                                      : false,
+                                  duration: selectedIndex == index
+                                      ? duration
+                                      : pauseDuration,
+                                  position: selectedIndex == index
+                                      ? position
+                                      : pausePosition,
+                                  index: index,
+                                  listHydra: ringtonelist,
+                                  ringtoneName: ringtonelist[index].name!,
+                                  auidoId: ringtonelist[index].id!.toString(),
+                                  file: ringtonelist[index].file!,
+                                );
+                                // : RingtonesCard(
+                                //     onNavigate: () async {
+                                //       await audioPlayer.pause();
+                                //       // ignore: use_build_context_synchronously
+                                //       Navigator.push(
+                                //         context,
+                                //         MaterialPageRoute(
+                                //           builder: (context) =>
+                                //               CustomAudioPlayer(
+                                //             listHydra: ringtonelist,
+                                //             index: index,
+                                //             type: widget.itemType,
+                                //           ),
+                                //         ),
+                                //       );
+                                //     },
+                                //     onChange: (value) async {
+                                //       final myposition =
+                                //           Duration(seconds: value.toInt());
+                                //       await audioPlayer.seek(myposition);
+                                //       await audioPlayer.resume();
+                                //     },
+                                //     onTap: (() async {
+                                //       // if (isPlaying) {
+                                //       // } else {}
 
-                                          setState(() {
-                                            selectedIndex = index;
-                                            position = Duration.zero;
-                                          });
-
-                                          if (isPlaying) {
-                                            await audioPlayer.pause();
-                                          } else {
-                                            await audioPlayer.play(
-                                                ringtonelist[index].file!);
-                                          }
-                                        }),
-                                        audioPlayer: selectedIndex == index
-                                            ? audioPlayer
-                                            : pausePlayer,
-                                        isPlaying: selectedIndex == index
-                                            ? isPlaying
-                                            : false,
-                                        duration: selectedIndex == index
-                                            ? duration
-                                            : pauseDuration,
-                                        position: selectedIndex == index
-                                            ? position
-                                            : pausePosition,
-                                        index: index,
-                                        listHydra: ringtonelist,
-                                        ringtoneName: ringtonelist[index].name!,
-                                        auidoId:
-                                            ringtonelist[index].id!.toString(),
-                                        file: ringtonelist[index].file!,
-                                      )
-                                    : RingtonesCard(
-                                        onNavigate: () async {
-                                          await audioPlayer.pause();
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CustomAudioPlayer(
-                                                listHydra: ringtonelist,
-                                                index: index,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        onChange: (value) async {
-                                          final myposition =
-                                              Duration(seconds: value.toInt());
-                                          await audioPlayer.seek(myposition);
-                                          await audioPlayer.resume();
-                                        },
-                                        onTap: (() async {
-                                          // if (isPlaying) {
-                                          // } else {}
-
-                                          setState(() {
-                                            selectedIndex = index;
-                                            position = Duration.zero;
-                                            isPlaying = false;
-                                          });
-                                          await audioPlayer.pause();
-                                          if (isPlaying) {
-                                            await audioPlayer.pause();
-                                          } else {
-                                            await audioPlayer.play(
-                                                ringtonelist[index].file!);
-                                          }
-                                        }),
-                                        audioPlayer: selectedIndex == index
-                                            ? audioPlayer
-                                            : pausePlayer,
-                                        isPlaying: selectedIndex == index
-                                            ? isPlaying
-                                            : false,
-                                        duration: selectedIndex == index
-                                            ? duration
-                                            : pauseDuration,
-                                        position: selectedIndex == index
-                                            ? position
-                                            : pausePosition,
-                                        index: index,
-                                        listHydra: ringtonelist,
-                                        ringtoneName: ringtonelist[index].name!,
-                                        auidoId:
-                                            ringtonelist[index].id!.toString(),
-                                        file: ringtonelist[index].file!,
-                                      );
+                                //       setState(() {
+                                //         selectedIndex = index;
+                                //         position = Duration.zero;
+                                //         isPlaying = false;
+                                //       });
+                                //       await audioPlayer.pause();
+                                //       if (isPlaying) {
+                                //         await audioPlayer.pause();
+                                //       } else {
+                                //         await audioPlayer.play(
+                                //             ringtonelist[index].file!);
+                                //       }
+                                //     }),
+                                //     audioPlayer: selectedIndex == index
+                                //         ? audioPlayer
+                                //         : pausePlayer,
+                                //     isPlaying: selectedIndex == index
+                                //         ? isPlaying
+                                //         : false,
+                                //     duration: selectedIndex == index
+                                //         ? duration
+                                //         : pauseDuration,
+                                //     position: selectedIndex == index
+                                //         ? position
+                                //         : pausePosition,
+                                //     index: index,
+                                //     listHydra: ringtonelist,
+                                //     ringtoneName: ringtonelist[index].name!,
+                                //     auidoId:
+                                //         ringtonelist[index].id!.toString(),
+                                //     file: ringtonelist[index].file!,
+                                //   );
                               },
                             ),
                     ),
@@ -672,6 +695,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                                   CustomAudioPlayer(
                                                 listHydra: _notificationList,
                                                 index: index,
+                                                type: widget.itemType,
                                               ),
                                             ),
                                           );
@@ -730,6 +754,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                                   CustomAudioPlayer(
                                                 listHydra: _notificationList,
                                                 index: index,
+                                                type: widget.itemType,
                                               ),
                                             ),
                                           );
@@ -842,6 +867,60 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> performPlayAndPauseAction(int index) async {
+    {
+      print(
+          '>> performPlayAndPauseAction - selectedIndex , index : $selectedIndex , $index');
+      bool isCurrentlySelectedIndex = (selectedIndex == index);
+
+      if (selectedIndex != index && (isPlaying || isBuffering)) {
+        await audioPlayer.stop();
+        setState(() {
+          isPlaying = false;
+          isBuffering = false;
+        });
+      }
+
+      setState(() {
+        selectedIndex = index;
+        position = Duration.zero;
+      });
+
+      if (isPlaying || isBuffering) {
+        await audioPlayer.pause();
+        setState(() {
+          isPlaying = false;
+          isBuffering = false;
+        });
+      } else if (audioPlayer.state == PlayerState.PAUSED) {
+        audioPlayer.resume();
+        setState(() {
+          isBuffering = false;
+          isPlaying = true;
+        });
+      } else {
+        bool hasInternet = await InternetConnectionChecker().hasConnection;
+        print('>> hasInternet : $hasInternet');
+        if (!await InternetConnectionChecker().hasConnection) {
+          showCupertinoModalPopup(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => InternetCheckerDialog(onRetryTap: () {
+              Navigator.pop(ctx); // Hide Internet Message Dialog
+              Timer(Duration(milliseconds: 500),
+                  () => performPlayAndPauseAction(index));
+            }),
+          );
+        } else {
+          setState(() {
+            isBuffering = true;
+          });
+          await audioPlayer.play(ringtonelist[index].file!);
+        }
+      }
+    }
   }
 
   Padding buildTabsBar() {

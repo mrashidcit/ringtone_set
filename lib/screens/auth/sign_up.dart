@@ -7,17 +7,20 @@ import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+class SignUp extends StatefulWidget {
+  const SignUp({Key? key}) : super(key: key);
 
   @override
-  State<Login> createState() => LoginState();
+  State<SignUp> createState() => SignUpState();
 }
 
-class LoginState extends State<Login> {
+class SignUpState extends State<SignUp> {
   bool obscureText = true;
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController reEnterPasswordController = TextEditingController();
   bool _showProgressBar = false;
 
   @override
@@ -54,7 +57,7 @@ class LoginState extends State<Login> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  'pimp your Android device with top ringtones and new wallpapers.',
+                  'Create New Account',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.archivo(
                     color: Colors.white,
@@ -65,6 +68,62 @@ class LoginState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 40),
+              TextFormField(
+                controller: firstNameController,
+                style: GoogleFonts.archivo(
+                  color: Colors.black,
+                  fontStyle: FontStyle.normal,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  border: UnderlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  fillColor: Colors.white,
+                  filled: true,
+                  hintText: 'First Name',
+                  hintStyle: GoogleFonts.archivo(
+                    color: const Color(0XFF929292),
+                    fontStyle: FontStyle.normal,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: lastNameController,
+                style: GoogleFonts.archivo(
+                  color: Colors.black,
+                  fontStyle: FontStyle.normal,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  border: UnderlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  fillColor: Colors.white,
+                  filled: true,
+                  hintText: 'Last Name',
+                  hintStyle: GoogleFonts.archivo(
+                    color: const Color(0XFF929292),
+                    fontStyle: FontStyle.normal,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: emailController,
                 style: GoogleFonts.archivo(
@@ -133,6 +192,48 @@ class LoginState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 20),
+              TextFormField(
+                controller: reEnterPasswordController,
+                style: GoogleFonts.archivo(
+                  color: Colors.black,
+                  fontStyle: FontStyle.normal,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                obscureText: obscureText,
+                decoration: InputDecoration(
+                  border: UnderlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  fillColor: Colors.white,
+                  filled: true,
+                  hintText: 'Re-Enter Password',
+                  hintStyle: GoogleFonts.archivo(
+                    color: const Color(0XFF929292),
+                    fontStyle: FontStyle.normal,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  suffixIconConstraints: const BoxConstraints(minWidth: 2),
+                  suffixIcon: InkWell(
+                    onTap: () => passwordText(),
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(20, 5, 5, 0),
+                      child: AppImageAsset(
+                        image: obscureText
+                            ? 'assets/visible_on.svg'
+                            : 'assets/visible_off.svg',
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Container(
+              //     width: 24, height: 24, child: RefreshProgressIndicator()),
               _showProgressBar
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -156,7 +257,7 @@ class LoginState extends State<Login> {
                     ),
                   ),
                   child: Text(
-                    'Log in',
+                    'Submit',
                     style: GoogleFonts.archivo(
                       color: const Color(0XFFFFFFFF),
                       fontStyle: FontStyle.normal,
@@ -164,20 +265,20 @@ class LoginState extends State<Login> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  onPressed: performSignInAction,
+                  onPressed: performSignUpAction,
                 ),
               ),
               const SizedBox(height: 36),
-              Text(
-                'Forgot password?',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.archivo(
-                  color: Colors.white,
-                  fontStyle: FontStyle.normal,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              // Text(
+              //   'Forgot password?',
+              //   textAlign: TextAlign.center,
+              //   style: GoogleFonts.archivo(
+              //     color: Colors.white,
+              //     fontStyle: FontStyle.normal,
+              //     fontSize: 16,
+              //     fontWeight: FontWeight.w500,
+              //   ),
+              // ),
               const SizedBox(height: 40),
               Text(
                 'By log in you agree with our',
@@ -223,15 +324,19 @@ class LoginState extends State<Login> {
 
   void passwordText() => setState(() => obscureText = !obscureText);
 
-  Future<void> performSignInAction() async {
+  Future<void> performSignUpAction() async {
+    var firstName = firstNameController.text.trim();
+    var lastName = lastNameController.text.trim();
     var email = emailController.text.trim();
     var password = passwordController.text.trim();
+    var reEnterPassword = passwordController.text.trim();
 
     Utils.hideKeyboard();
 
-    if (email.isEmpty || password.isEmpty) {
+    if (password != reEnterPassword) {
       var snackBar = SnackBar(
-        content: Text('Fill All Required Fields!'),
+        content: Text(
+            'Both Password are not Matched.\nBoth Password Should be same!'),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return;
@@ -241,10 +346,12 @@ class LoginState extends State<Login> {
       _showProgressBar = true;
     });
 
-    var loginResponse =
-        await AuthRepository().getSignInUserResponse(email, password);
+    var signUpResponse = await AuthRepository()
+        .getSignUpUserResponse(firstName, lastName, email, password);
 
-    if (loginResponse.result) {
+    if (signUpResponse.result) {
+      var loginResponse =
+          await AuthRepository().getSignInUserResponse(email, password);
       saveUserInCache(loginResponse.user);
       api_token.$ = loginResponse.api_token;
       is_logged_in.$ = true;
@@ -259,7 +366,7 @@ class LoginState extends State<Login> {
       );
     } else {
       var snackBar = SnackBar(
-        content: Text(loginResponse.message),
+        content: Text(signUpResponse.message),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }

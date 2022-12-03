@@ -52,6 +52,7 @@ class BuildPlay extends StatefulWidget {
 
 class _BuildPlayState extends State<BuildPlay> {
   List<Favorite> favoriteList = [];
+  // late AnimationController controller;
 
   refreshFavorite() async {
     favoriteList = await FavoriteDataBase.instance
@@ -106,6 +107,19 @@ class _BuildPlayState extends State<BuildPlay> {
     // TODO: implement initState
     super.initState();
     refreshFavorite();
+    // controller = AnimationController(
+    //   vsync: this,
+    //   duration: const Duration(seconds: 10),
+    // )..addListener(() {
+    //     setState(() {});
+    //   });
+    // controller.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    // controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -153,6 +167,10 @@ class _BuildPlayState extends State<BuildPlay> {
                   // color: MyTheme.orange,
                   borderRadius: BorderRadius.circular(6)),
             ),
+            // LinearProgressIndicator(
+            //   value: controller.value,
+            //   semanticsLabel: 'Linear progress indicator',
+            // ),
             GestureDetector(
               onTap: widget.onTap,
               child: Align(

@@ -1,9 +1,17 @@
+import 'package:deeze_app/enums/enum_item_type.dart';
+import 'package:deeze_app/helpers/share_value_helper.dart';
+import 'package:deeze_app/helpers/utils.dart';
+import 'package:deeze_app/repositories/auth_repository.dart';
 import 'package:deeze_app/screens/auth/login.dart';
+import 'package:deeze_app/screens/auth/sign_up.dart';
 import 'package:deeze_app/screens/dashboard/dashboard.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_social_login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class OnBoarding extends StatefulWidget {
   const OnBoarding({Key? key}) : super(key: key);
@@ -13,6 +21,8 @@ class OnBoarding extends StatefulWidget {
 }
 
 class OnBoardingState extends State<OnBoarding> {
+  bool _showProgressBar = false;
+
   @override
   Widget build(BuildContext context) {
     print('Current screen --> $runtimeType');
@@ -59,17 +69,123 @@ class OnBoardingState extends State<OnBoarding> {
                   ),
                 ),
                 const SizedBox(height: 70),
+                _showProgressBar
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          RefreshProgressIndicator(),
+                        ],
+                      )
+                    : Container(),
+                const SizedBox(height: 20),
                 AppSocialMediaButton(
-                    image: 'assets/google.svg',
-                    color: Color(0XFF0764E3),
-                    text: 'Google',
-                    onTap: () {}),
+                  image: 'assets/google.svg',
+                  color: Color(0XFF0764E3),
+                  text: 'Google',
+                  onTap: () async {
+                    UserCredential userCredentials = await signInWithGoogle();
+
+                    setState(() {
+                      _showProgressBar = true;
+                    });
+
+                    var email = userCredentials.user!.email!;
+                    var password =
+                        '${userCredentials.user!.displayName!}***@#123';
+
+                    var signUpResponse = await AuthRepository()
+                        .getSignUpUserWithThirdPartyResponse(
+                      userCredentials.user!.displayName!,
+                      '',
+                      email,
+                      // userCredentials.credential!.token!.toString(),
+                      password,
+                    );
+
+                    if (signUpResponse.result) {
+                      performSignInAction(email, password);
+
+                      // is_logged_in.$ = true;
+                      // user_id.$ = signUpResponse.id!;
+                      // var snackBar = SnackBar(
+                      //   content: Text('Successfully Logged In!'),
+                      // );
+                      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      // Navigator.pushAndRemoveUntil(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (ctx) =>
+                      //             Dashbaord(type: ItemType.RINGTONE.name)),
+                      //     (route) => false);
+                    } else {
+                      performSignInAction(email, password);
+                      // is_logged_in.$ = false;
+                      // user_id.$ = 0;
+                      // var snackBar = SnackBar(
+                      //   content: Text(signUpResponse.message),
+                      // );
+                      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
+
+                    setState(() {
+                      _showProgressBar = false;
+                    });
+                  },
+                ),
                 const SizedBox(height: 20),
                 AppSocialMediaButton(
                     image: 'assets/facebook.svg',
                     color: Color(0XFF4267B2),
                     text: 'Facebook',
-                    onTap: () {}),
+                    onTap: () async {
+                      UserCredential userCredentials =
+                          await signInWithFacebook();
+
+                      setState(() {
+                        _showProgressBar = true;
+                      });
+
+                      var email = userCredentials.user!.email!;
+                      var password =
+                          '${userCredentials.user!.displayName!}***@#FB123';
+
+                      var signUpResponse = await AuthRepository()
+                          .getSignUpUserWithThirdPartyResponse(
+                        userCredentials.user!.displayName!,
+                        '',
+                        email,
+                        // userCredentials.credential!.token!.toString(),
+                        password,
+                      );
+
+                      if (signUpResponse.result) {
+                        performSignInAction(email, password);
+                        // is_logged_in.$ = true;
+                        // user_id.$ = signUpResponse.id!;
+                        // var snackBar = SnackBar(
+                        //   content: Text('Successfully Logged In!'),
+                        // );
+                        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        // Navigator.pushAndRemoveUntil(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (ctx) =>
+                        //             Dashbaord(type: ItemType.RINGTONE.name)),
+                        //     (route) => false);
+                      } else {
+                        performSignInAction(email, password);
+                        // is_logged_in.$ = false;
+                        // user_id.$ = 0;
+                        // var snackBar = SnackBar(
+                        //   content: Text(signUpResponse.message),
+                        // );
+                        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+
+                      setState(() {
+                        _showProgressBar = false;
+                      });
+                    }),
                 const SizedBox(height: 20),
                 AppSocialMediaButton(
                   color: Colors.white,
@@ -82,21 +198,33 @@ class OnBoardingState extends State<OnBoarding> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("New here?    Sign Up",
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.archivo(
-                          color: Colors.white,
-                          fontStyle: FontStyle.normal,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        )),
-                    const SizedBox(
-                      width: 5,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (ctx) => SignUp()));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("New here?    Sign Up",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.archivo(
+                              color: Colors.white,
+                              fontStyle: FontStyle.normal,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                            )),
+                      ),
                     ),
-                    const Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: Colors.white,
-                      size: 12,
+                    // const SizedBox(
+                    //   width: 5,
+                    // ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: Colors.white,
+                        size: 12,
+                      ),
                     )
                   ],
                 ),
@@ -107,5 +235,67 @@ class OnBoardingState extends State<OnBoarding> {
         ],
       ),
     );
+  }
+
+  Future<UserCredential> signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  Future<UserCredential> signInWithFacebook() async {
+    // Trigger the sign-in flow
+    final LoginResult loginResult = await FacebookAuth.instance.login();
+
+    // Create a credential from the access token
+    final OAuthCredential facebookAuthCredential =
+        FacebookAuthProvider.credential(loginResult.accessToken!.token);
+
+    // Once signed in, return the UserCredential
+    return FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+  }
+
+  Future<void> performSignInAction(email, password) async {
+    setState(() {
+      _showProgressBar = true;
+    });
+
+    var loginResponse =
+        await AuthRepository().getSignInUserResponse(email, password);
+
+    if (loginResponse.result) {
+      saveUserInCache(loginResponse.user);
+      api_token.$ = loginResponse.api_token;
+      is_logged_in.$ = true;
+
+      await Utils.getSharedValueHelperData();
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (ctx) => Dashbaord(type: ItemType.RINGTONE.name)),
+        (route) => false,
+      );
+    } else {
+      var snackBar = SnackBar(
+        content: Text(loginResponse.message),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+    setState(() {
+      _showProgressBar = false;
+    });
   }
 }

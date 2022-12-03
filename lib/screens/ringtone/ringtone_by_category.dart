@@ -415,6 +415,7 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                                                         CustomAudioPlayer(
                                                       listHydra: hydraMember,
                                                       index: index,
+                                                      type: widget.type,
                                                     ),
                                                   ),
                                                 );
@@ -476,6 +477,7 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                                                         CustomAudioPlayer(
                                                       listHydra: hydraMember,
                                                       index: index,
+                                                      type: widget.type,
                                                     ),
                                                   ),
                                                 );
@@ -847,6 +849,7 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                                                         CustomAudioPlayer(
                                                       listHydra: hydraMember,
                                                       index: index,
+                                                      type: widget.type,
                                                     ),
                                                   ),
                                                 );
@@ -911,6 +914,7 @@ class _RingtoneByCategoryState extends State<RingtoneByCategory> {
                                                         CustomAudioPlayer(
                                                       listHydra: hydraMember,
                                                       index: index,
+                                                      type: widget.type,
                                                     ),
                                                   ),
                                                 );

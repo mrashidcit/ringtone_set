@@ -25,6 +25,7 @@ class _ShowWebPageState extends State<ShowWebPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xFF4d047d),
         leading: InkWell(
             onTap: () {
               Navigator.of(context).pop();
