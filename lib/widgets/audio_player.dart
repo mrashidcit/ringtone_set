@@ -104,6 +104,9 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   Duration pauseDuration = Duration.zero;
   Duration pausePosition = Duration.zero;
 
+  static final _kAdIndex = 4;
+  BannerAd? _ad;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -149,16 +152,42 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
         position = state;
       });
     });
+
+    BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      size: AdSize.mediumRectangle,
+      request: AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _ad = ad as BannerAd;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          // Releases an ad resource when it fails to load
+          ad.dispose();
+          print('Ad load failed (code=${error.code} message=${error.message})');
+        },
+      ),
+    ).load();
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
+    _ad?.dispose();
     super.dispose();
 
     audioPlayer.dispose();
     isPlaying = false;
     // PlayerState.STOPPED;
+  }
+
+  int _getDestinationItemIndex(int rawIndex) {
+    if (rawIndex >= _kAdIndex && _ad != null) {
+      return rawIndex - 1;
+    }
+    return rawIndex;
   }
 
   void _loadInterstitialAd() {
@@ -266,7 +295,10 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                       carouselController: _controller,
                       itemCount: widget.listHydra.length + 1,
                       itemBuilder: (context, index, realIndex) {
-                        if (index > widget.listHydra.length - 1) {
+                        if (_ad != null && index == _kAdIndex) {
+                          return buildCarouselItemForAd(
+                              index, context, '', '', screenWidth);
+                        } else if (index > widget.listHydra.length - 1) {
                           return buildCarouselItemForLoading(
                             context,
                             screenWidth,
@@ -348,6 +380,8 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                           width: 20,
                           child: GestureDetector(
                             onTap: () {
+                              print(
+                                  '>> audio_player - tags : ${widget.listHydra[activeIndex].tags}');
                               showCupertinoModalPopup(
                                 context: context,
                                 barrierColor: Colors.black.withOpacity(0.8),
@@ -360,6 +394,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                                         .user!.firstName!,
                                     userImage: widget
                                         .listHydra[activeIndex].user!.image!,
+                                    tags: widget.listHydra[activeIndex].tags,
                                   );
                                 },
                               );
@@ -518,6 +553,39 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
             ),
           ),
         const SizedBox(height: 45),
+      ],
+    );
+  }
+
+  Column buildCarouselItemForAd(int index, BuildContext context, String? file,
+      String? name, double screenWidth) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Text(
+        //   widget.listHydra[index].name!,
+        //   style: GoogleFonts.archivo(
+        //     fontStyle: FontStyle.normal,
+        //     color: Colors.white,
+        //     fontSize: 20,
+        //     wordSpacing: -0.1,
+        //     fontWeight: FontWeight.w600,
+        //   ),
+        // ),
+        const SizedBox(height: 10),
+        // activeIndex == index
+        //     ? buildActiveBuildPlay(index, context, file, name)
+        //     : buildNonActiveBuildPlay(index, context, file, name),
+        // buildActiveBuildPlay(index, context, file, name),
+        // AdWidget(ad: _ad!),
+        Container(
+          width: _ad!.size.width.toDouble(),
+          height: 272.0,
+          alignment: Alignment.center,
+          child: AdWidget(ad: _ad!),
+        ),
+        const SizedBox(height: 10),
       ],
     );
   }

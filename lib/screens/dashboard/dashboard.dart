@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:deeze_app/ads_util/app_lifecycle_reactor.dart';
+import 'package:deeze_app/ads_util/app_open_ad_manager.dart';
 import 'package:deeze_app/enums/enum_item_type.dart';
 import 'package:deeze_app/helpers/ad_helper.dart';
 import 'package:deeze_app/models/search_model.dart';
@@ -51,7 +53,7 @@ class Dashbaord extends StatefulWidget {
   State<Dashbaord> createState() => _DashbaordState();
 }
 
-class _DashbaordState extends State<Dashbaord> {
+class _DashbaordState extends State<Dashbaord> with WidgetsBindingObserver {
   final SearchServices _searchServices = SearchServices();
 
   final AudioPlayer audioPlayer = AudioPlayer();
@@ -67,16 +69,21 @@ class _DashbaordState extends State<Dashbaord> {
   Timer? _searchQueryTimer = null;
   bool _showSearchQueryProgressBar = false;
   BannerAd? _bannerAd;
+  late AppOpenAdManager _appOpenAdManager;
+  late AppLifecycleReactor _appLifecycleReactor;
 
   @override
   void initState() {
     // TODO: implement initState
+
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // TODO: Load a banner ad
     BannerAd(
       adUnitId: AdHelper.bannerAdUnitId,
       request: AdRequest(),
       size: AdSize.banner,
+      // size: AdSize.mediumRectangle,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           setState(() {
@@ -134,6 +141,23 @@ class _DashbaordState extends State<Dashbaord> {
         position = state;
       });
     });
+
+    // _appOpenAdManager = AppOpenAdManager()..loadAd();
+    _appOpenAdManager = AppOpenAdManager();
+    _appOpenAdManager.loadAd();
+    _appLifecycleReactor =
+        AppLifecycleReactor(appOpenAdManager: _appOpenAdManager);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print('>> dashboard - didChangeAppLifecycleState - state : ${state.name}');
+    if (state == AppLifecycleState.resumed) {
+      // print('>> dashboard - didChangeAppLifecycleState - profrm : ${state.name}');
+      _appOpenAdManager.showAdIfAvailable();
+    }
+
+    setState(() {});
   }
 
   addTrendingList() async {
@@ -147,6 +171,7 @@ class _DashbaordState extends State<Dashbaord> {
   void dispose() {
     // TODO: implement dispose
     _bannerAd?.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
     audioPlayer.dispose();
     isPlaying = false;
@@ -215,7 +240,8 @@ class _DashbaordState extends State<Dashbaord> {
       } else {
         return false;
       }
-    } catch (e) {
+    } catch (ex, stack) {
+      print('>> $ex');
       return false;
     }
   }

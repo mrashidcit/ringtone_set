@@ -127,16 +127,17 @@
 //   }
 // }
 
-
 // To parse this JSON data, do
 //
 //     final tagModel = tagModelFromJson(jsonString);
 
 import 'dart:convert';
 
-List<TagModel> tagModelFromJson(String str) => List<TagModel>.from(json.decode(str).map((x) => TagModel.fromJson(x)));
+List<TagModel> tagModelFromJson(String str) =>
+    List<TagModel>.from(json.decode(str).map((x) => TagModel.fromJson(x)));
 
-String tagModelToJson(List<TagModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String tagModelToJson(List<TagModel> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class TagModel {
   TagModel({
@@ -150,14 +151,16 @@ class TagModel {
   List<String>? items;
 
   factory TagModel.fromJson(Map<String, dynamic> json) => TagModel(
-    id: json["id"],
-    name: json["name"],
-    items: List<String>.from(json["items"].map((x) => x)),
-  );
+        id: int.parse(json["id"]),
+        name: json["name"],
+        items: (json['items'] != null)
+            ? List<String>.from(json["items"].map((x) => x))
+            : [],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "items": List<dynamic>.from(items!.map((x) => x)),
-  };
+        "id": id,
+        "name": name,
+        "items": List<dynamic>.from(items!.map((x) => x)),
+      };
 }

@@ -1,38 +1,39 @@
 buildscript {
     ext.kotlin_version = '1.6.10'
     repositories {
-//        google()
-//        mavenCentral()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
-        jcenter()
-        maven {
-            url 'https://mvnrepository.com/artifact/com.android.tools.lint/lint-gradle-api'
-        }
+        google()
+        mavenCentral()
+//        maven {
+//            url 'https://maven.google.com/'
+//            name 'Google'
+//        }
+//        jcenter()
+//        maven {
+//            url 'https://mvnrepository.com/artifact/com.android.tools.lint/lint-gradle-api'
+//        }
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:7.1.2'
+//        classpath 'com.android.tools.build:gradle:4.1.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 allprojects {
     repositories {
-//        google()
-//        mavenCentral()
-        repositories {
-            maven {
-                url 'https://maven.google.com/'
-                name 'Google'
-            }
-            jcenter()
-            maven {
-                url 'https://mvnrepository.com/artifact/com.android.tools.lint/lint-gradle-api'
-            }
-        }
+        google()
+        mavenCentral()
+//        repositories {
+//            maven {
+//                url 'https://maven.google.com/'
+//                name 'Google'
+//            }
+//            jcenter()
+//            maven {
+//                url 'https://mvnrepository.com/artifact/com.android.tools.lint/lint-gradle-api'
+//            }
+//        }
     }
 }
 

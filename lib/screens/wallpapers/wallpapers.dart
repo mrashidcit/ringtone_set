@@ -118,7 +118,8 @@ class _WallPapersState extends State<WallPapers> {
       } else {
         return false;
       }
-    } catch (e) {
+    } catch (ex, stack) {
+      print('>> $ex , $stack');
       return false;
     }
   }

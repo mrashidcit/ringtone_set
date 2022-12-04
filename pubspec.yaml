@@ -47,6 +47,7 @@ dependencies:
   # audioplayers: ^1.1.1
   flutter_svg: ^1.1.1+1
   ringtone_set: ^0.0.2
+  # ringtone_set:
   flutter_wallpaper_manager: ^0.0.3
   dio: ^4.0.6
   path_provider: ^2.0.11
@@ -77,6 +78,8 @@ dependencies:
   # google_mobile_ads: ^2.3.0
   # google_mobile_ads: ^2.1.0
   google_mobile_ads: 2.1.0
+  # android_intent_plus: ^3.1.5
+  flutter_contacts: ^1.1.5+1
 
 dev_dependencies:
   flutter_test:

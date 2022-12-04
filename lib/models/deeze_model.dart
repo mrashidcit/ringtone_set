@@ -282,6 +282,8 @@ import 'dart:convert';
 
 import 'dart:convert';
 
+import 'package:deeze_app/models/tags_model.dart';
+
 List<DeezeItemModel> deezeItemModelFromSearchQueryJson(String str) =>
     List<DeezeItemModel>.from(json
         .decode(str)['items']
@@ -301,6 +303,7 @@ class DeezeItemModel {
     this.type,
     this.file,
     this.user,
+    this.tags = const [],
     this.isFavourite = false,
   });
 
@@ -309,6 +312,7 @@ class DeezeItemModel {
   String? type;
   String? file;
   User? user;
+  List<TagModel> tags;
   bool isFavourite;
 
   factory DeezeItemModel.fromSearchQueryJson(Map<String, dynamic> json) =>
@@ -318,6 +322,8 @@ class DeezeItemModel {
         type: json["type"],
         file: json["file"],
         user: User(),
+        tags: List<TagModel>.of(
+            json['tags'].map((item) => TagModel.fromJson(item))),
         isFavourite: false,
       );
 
@@ -327,6 +333,8 @@ class DeezeItemModel {
         type: json["type"],
         file: json["file"],
         user: User.fromJson(json["user"]),
+        tags: List<TagModel>.from(
+            json['tags'].map((item) => TagModel.fromJson(item))),
         isFavourite: json["isFavourite"] ?? false,
       );
 

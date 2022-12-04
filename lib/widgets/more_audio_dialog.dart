@@ -1,3 +1,4 @@
+import 'package:deeze_app/models/tags_model.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,14 +8,16 @@ class MoreAudioDialog extends StatelessWidget {
   final String fileName;
   final String userName;
   final String userImage;
+  final List<TagModel> tags;
 
-  const MoreAudioDialog(
-      {Key? key,
-      required this.file,
-      required this.userName,
-      required this.userImage,
-      required this.fileName})
-      : super(key: key);
+  const MoreAudioDialog({
+    Key? key,
+    required this.file,
+    required this.userName,
+    required this.userImage,
+    required this.fileName,
+    required this.tags,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +65,7 @@ class MoreAudioDialog extends StatelessWidget {
                     width: MediaQuery.of(context).size.width,
                     height: 23,
                     child: ListView.builder(
-                        itemCount: 3,
+                        itemCount: tags.length,
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (context, index) {
                           return Container(
@@ -75,7 +78,7 @@ class MoreAudioDialog extends StatelessWidget {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 13),
                               child: Text(
-                                "Love",
+                                tags[index].name!,
                                 style: GoogleFonts.archivo(
                                   fontStyle: FontStyle.normal,
                                   color: Colors.white,

@@ -254,6 +254,7 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                                     .listHydra![activeIndex].user!.firstName!,
                                 userImage:
                                     widget.listHydra![activeIndex].user!.image!,
+                                tags: widget.listHydra![activeIndex].tags,
                               );
                             },
                           );

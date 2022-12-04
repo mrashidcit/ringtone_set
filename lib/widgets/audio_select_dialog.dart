@@ -8,12 +8,15 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:ringtone_set/ringtone_set.dart';
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:android_intent_plus/flag.dart';
 
 class AudioSelectDialog extends StatefulWidget {
   final String file;
@@ -406,32 +409,49 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       );
       return;
     }
-    bool success = false;
-    ProgressDialog pd = ProgressDialog(
-      context,
-      dismissable: false,
-      message: Text(
-        "Please Wait!",
-        style: GoogleFonts.archivo(
-          fontStyle: FontStyle.normal,
-          color: Colors.black,
-        ),
-      ),
-    );
-    pd.show();
-    try {
-      success = await RingtoneSet.setAlarmFromNetwork(widget.file);
-      pd.dismiss();
-    } on PlatformException {
-      success = false;
+
+    // if (Platform.isAndroid) {
+    //   AndroidIntent intent = AndroidIntent(
+    //     action: 'ACTION_VIEW',
+    //     // action: 'ACTION_PICK',
+    //     // action: 'ACTION_GET_CONTENT',
+    //     // type: 'vnd.android.cursor.dir/contact',
+    //     // type: 'vnd.android.cursor.item/phone',
+    //   );
+    //   await intent.launchChooser('Contact');
+    // }
+
+    // Request contact permission
+    if (await FlutterContacts.requestPermission()) {
+      await FlutterContacts.openExternalPick();
     }
 
-    if (success) {
-      showMessage(context, message: "Alarm sound  set successfully!");
-    } else {
-      showMessage(context, message: "Error");
-    }
-    Navigator.pop(context);
+    // bool success = false;
+    // ProgressDialog pd = ProgressDialog(
+    //   context,
+    //   dismissable: false,
+    //   message: Text(
+    //     "Please Wait!",
+    //     style: GoogleFonts.archivo(
+    //       fontStyle: FontStyle.normal,
+    //       color: Colors.black,
+    //     ),
+    //   ),
+    // );
+    // pd.show();
+    // try {
+    //   success = await RingtoneSet.setRingtoneFromNetwork(widget.file);
+    //   pd.dismiss();
+    // } on PlatformException {
+    //   success = false;
+    // }
+
+    // if (success) {
+    //   showMessage(context, message: "Alarm sound  set successfully!");
+    // } else {
+    //   showMessage(context, message: "Error");
+    // }
+    // Navigator.pop(context);
   }
 
   Future<void> actionSaveToMedia() async {
@@ -442,7 +462,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
         builder: (context) => InternetCheckerDialog(
           onRetryTap: () {
             Navigator.pop(context); // Hide Internet Message Dialog
-            Timer(Duration(milliseconds: 500), () => actionSetAlarmSound());
+            Timer(Duration(milliseconds: 500), () => actionSaveToMedia());
           },
         ),
       );
@@ -537,7 +557,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
             break;
           }
         }
-        newPath = newPath + "/DeezePlayer";
+        newPath = newPath + '/Download' + "/DeezePlayer";
         directory = Directory(newPath);
       } else {
         return false;
