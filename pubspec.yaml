@@ -46,8 +46,9 @@ dependencies:
   audioplayers: 0.20.1
   # audioplayers: ^1.1.1
   flutter_svg: ^1.1.1+1
-  ringtone_set: ^0.0.2
-  # ringtone_set:
+  # ringtone_set: ^0.0.2
+  ringtone_set:
+    path: ./ringtone_set
   flutter_wallpaper_manager: ^0.0.3
   dio: ^4.0.6
   path_provider: ^2.0.11
