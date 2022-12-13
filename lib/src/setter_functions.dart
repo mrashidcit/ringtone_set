@@ -32,11 +32,13 @@ Future<bool> setFromAsset({
 Future<bool> setFromNetwork({
   required String url,
   required String action,
+  String contactId = '',
 }) async {
   final path = await _getPath(
     src: url,
     storageDirectoryType: _getStorageDirectoryType(action),
   );
+  print('>> setFromNetwork - path : $path');
   final file = File(path);
   final response = await http.get(Uri.parse(url));
   if (response.statusCode == 200) {
@@ -45,7 +47,7 @@ Future<bool> setFromNetwork({
 
     final bool result = await _channel.invokeMethod(
       action,
-      {"path": file.path, "mimeType": mimeType},
+      {"path": file.path, "mimeType": mimeType, 'contactId': contactId},
     );
 
     return result;
@@ -70,7 +72,8 @@ Future<String> _getPath({
   required String src,
   required StorageDirectory storageDirectoryType,
 }) async {
-  final int sdk = await _channel.invokeMethod('getPlatformSdk');//await RingtoneSet.platformSdk;
+  final int sdk = await _channel
+      .invokeMethod('getPlatformSdk'); //await RingtoneSet.platformSdk;
 
   if (sdk >= 29) {
     // Android 10 or newer
@@ -87,9 +90,9 @@ Future<String> _getPath({
 
 /// Returns the temporary directory type according to action.
 ///
-/// [action] can be `"setRingtone"`, `"setNotification"`, `"setAlarm"`.
+/// [action] can be `"setRingtone"`, `"setRingtoneToContact"`, `"setNotification"`, `"setAlarm"`.
 StorageDirectory _getStorageDirectoryType(String action) {
-  if (action == "setRingtone") {
+  if (action == "setRingtone" || action == "setRingtoneToContact") {
     return StorageDirectory.ringtones;
   }
   if (action == "setNotification") {

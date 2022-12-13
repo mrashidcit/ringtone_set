@@ -45,6 +45,17 @@ class RingtoneSet {
     );
   }
 
+  static Future<bool> setRingtoneToContactFromNetwork(
+    String url,
+    String contactId,
+  ) async {
+    return setFromNetwork(
+      url: url,
+      action: 'setRingtoneToContact',
+      contactId: contactId,
+    );
+  }
+
   /// Sets ringtone from file.
   static Future<bool> setRingtoneFromFile(File file) async {
     return setFromFile(

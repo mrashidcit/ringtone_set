@@ -6,8 +6,11 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
@@ -32,6 +35,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
  * RingtoneSetPlugin
  */
 public class RingtoneSetPlugin implements FlutterPlugin, MethodCallHandler {
+    private static final String TAG = RingtoneSetPlugin.class.getSimpleName();
     private static RingtoneSetPlugin instance;
     private MethodChannel channel;
     private Context mContext;
@@ -204,16 +208,30 @@ public class RingtoneSetPlugin implements FlutterPlugin, MethodCallHandler {
         return "audio/mpeg";
     }
 
+    /**
+     *
+     * @param path
+     * @param downloadedMimeType
+     * @param isRingt
+     * @param isNotif
+     * @param isAlarm
+     * @param contactId  // If Not Empty then It's means set to Ringtone to Particular Contact Only
+     */
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void setThings(String path, String downloadedMimeType, boolean isRingt, boolean isNotif, boolean isAlarm) {
+    private void setThings(String path, String downloadedMimeType, boolean isRingt, boolean isNotif, boolean isAlarm, String contactId) {
         requestSystemWritePermission();
         String s = path;
+        String relativePath = "";
+
         File mFile = new File(s);  // set File from path
+        Log.d(TAG, ">> setThings - check0 : isRingt , contactId , mFile.getAbsolutePath() = " + isRingt + " , " + contactId + " , " + mFile.getAbsolutePath());
         if (mFile.exists()) {
             // Android 10 or newer
-            if (android.os.Build.VERSION.SDK_INT > 28) {// file.exists
+            ContentValues newValuesForSetToContact = new ContentValues();
+            if (android.os.Build.VERSION.SDK_INT >= 29) { // file.exists
+                relativePath = Environment.DIRECTORY_ALARMS;
+                Uri mediaCollection = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
                 ContentValues values = new ContentValues();
-                values.put(MediaStore.MediaColumns.DATA, mFile.getAbsolutePath());
                 values.put(MediaStore.MediaColumns.TITLE, "Custom ringtone");
                 values.put(MediaStore.MediaColumns.MIME_TYPE, getMIMEType(mFile.getAbsolutePath(), downloadedMimeType));
                 values.put(MediaStore.MediaColumns.SIZE, mFile.length());
@@ -222,8 +240,22 @@ public class RingtoneSetPlugin implements FlutterPlugin, MethodCallHandler {
                 values.put(MediaStore.Audio.Media.IS_NOTIFICATION, isNotif);
                 values.put(MediaStore.Audio.Media.IS_ALARM, isAlarm);
                 values.put(MediaStore.Audio.Media.IS_MUSIC, false);
+                Uri newUri = null;
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    values.put(MediaStore.Images.ImageColumns.RELATIVE_PATH, relativePath);
+                    values.put(MediaStore.Audio.Media.IS_PENDING, 0);
+                    newUri = mContext.getApplicationContext().getContentResolver().insert(mediaCollection, values);
+//                } else {
+//                    values.put(MediaStore.MediaColumns.DATA, mFile.getAbsolutePath());
+//                    newUri = mContext.getContentResolver().insert(mediaCollection, values);
+//                }
 
-                Uri newUri = mContext.getContentResolver().insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
+//                Uri newUri = mContext.getContentResolver().insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
+//                Uri newUri = mContext.getContentResolver().insert(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, values);
+//                Uri newUri = mContext.getContentResolver().insert(MediaStore.Audio.Media.getContentUriForPath(mFile.getAbsolutePath()), values);
+
+                newValuesForSetToContact.put(ContactsContract.Contacts.CUSTOM_RINGTONE, newUri.toString());
+                values.put(ContactsContract.Contacts.CUSTOM_RINGTONE, newUri.toString());
 
                 try (OutputStream os = mContext.getContentResolver().openOutputStream(newUri)) {
                     int size = (int) mFile.length();
@@ -250,6 +282,13 @@ public class RingtoneSetPlugin implements FlutterPlugin, MethodCallHandler {
                     RingtoneManager.setActualDefaultRingtoneUri(
                             mContext, RingtoneManager.TYPE_RINGTONE,
                             newUri);
+                }
+                if (!contactId.isEmpty()) {
+                    ContentValues customValues = new ContentValues();
+                    customValues.put(ContactsContract.Contacts.CUSTOM_RINGTONE, newUri.toString());
+                    int count = mContext.getContentResolver().update(ContactsContract.Contacts.CONTENT_URI, customValues, ContactsContract.Contacts._ID + " = " + contactId, null);
+                    Log.i("MainActivity", ">> assignedToContact - Update: " + count);
+
                 }
                 if (isAlarm) {
                     RingtoneManager.setActualDefaultRingtoneUri(
@@ -310,21 +349,29 @@ public class RingtoneSetPlugin implements FlutterPlugin, MethodCallHandler {
         }else if (call.method.equals("setRingtone")) {
             String path = call.argument("path");
             String downloadedMimeType = call.argument("mimeType");
-            setThings(path, downloadedMimeType, true, false, false);
+            setThings(path, downloadedMimeType, true, false, false, "");
+
+            result.success(true);
+            return;
+        } else if (call.method.equals("setRingtoneToContact")) {
+            String path = call.argument("path");
+            String downloadedMimeType = call.argument("mimeType");
+            String contactId = call.argument("contactId");
+            setThings(path, downloadedMimeType, false, false, false, contactId);
 
             result.success(true);
             return;
         } else if (call.method.equals("setNotification")) {
             String path = call.argument("path");
             String downloadedMimeType = call.argument("mimeType");
-            setThings(path, downloadedMimeType, false, true, false);
+            setThings(path, downloadedMimeType, false, true, false, "");
 
             result.success(true);
             return;
         } else if (call.method.equals("setAlarm")) {
             String path = call.argument("path");
             String downloadedMimeType = call.argument("mimeType");
-            setThings(path, downloadedMimeType, false, false, true);
+            setThings(path, downloadedMimeType, false, false, true, "");
 
             result.success(true);
             return;
