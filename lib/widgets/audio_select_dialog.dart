@@ -423,35 +423,44 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
 
     // Request contact permission
     if (await FlutterContacts.requestPermission()) {
-      await FlutterContacts.openExternalPick();
+      Contact? contact = await FlutterContacts.openExternalPick();
+
+      if (contact == null || contact!.id.isEmpty) {
+        return;
+      }
+
+      bool success = false;
+      ProgressDialog pd = ProgressDialog(
+        context,
+        dismissable: false,
+        message: Text(
+          "Please Wait!",
+          style: GoogleFonts.archivo(
+            fontStyle: FontStyle.normal,
+            color: Colors.black,
+          ),
+        ),
+      );
+      pd.show();
+      try {
+        print('>> actionSetToContact - contact!.id : ${contact!.id}');
+        success = await RingtoneSet.setRingtoneToContactFromNetwork(
+            widget.file, contact!.id);
+        pd.dismiss();
+      } on PlatformException {
+        success = false;
+      }
+
+      if (success) {
+        showMessage(context, message: "Alarm sound set successfully!");
+      } else {
+        showMessage(context, message: "Error");
+      }
+      Navigator.pop(context);
+    } else {
+      showMessage(context,
+          message: "Contact Permission is Required to Set the Ringtone.");
     }
-
-    // bool success = false;
-    // ProgressDialog pd = ProgressDialog(
-    //   context,
-    //   dismissable: false,
-    //   message: Text(
-    //     "Please Wait!",
-    //     style: GoogleFonts.archivo(
-    //       fontStyle: FontStyle.normal,
-    //       color: Colors.black,
-    //     ),
-    //   ),
-    // );
-    // pd.show();
-    // try {
-    //   success = await RingtoneSet.setRingtoneFromNetwork(widget.file);
-    //   pd.dismiss();
-    // } on PlatformException {
-    //   success = false;
-    // }
-
-    // if (success) {
-    //   showMessage(context, message: "Alarm sound  set successfully!");
-    // } else {
-    //   showMessage(context, message: "Error");
-    // }
-    // Navigator.pop(context);
   }
 
   Future<void> actionSaveToMedia() async {

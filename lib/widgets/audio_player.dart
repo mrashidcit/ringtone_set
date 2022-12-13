@@ -14,6 +14,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:platform_device_id/platform_device_id.dart';
+import 'package:social_share/social_share.dart';
 import '../db_services/favorite_database.dart';
 import '../models/deeze_model.dart';
 import '../models/favorite.dart';
@@ -435,11 +436,18 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                           ),
                         ),
                         const SizedBox(width: 25),
-                        const AppImageAsset(
-                          image: 'assets/share.svg',
-                          height: 20,
-                          width: 20,
-                          fit: BoxFit.cover,
+                        GestureDetector(
+                          onTap: () {
+                            var item = widget.listHydra![activeIndex];
+                            SocialShare.shareOptions("${item.file!}");
+                            ;
+                          },
+                          child: const AppImageAsset(
+                            image: 'assets/share.svg',
+                            height: 20,
+                            width: 20,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ],
                     ),
