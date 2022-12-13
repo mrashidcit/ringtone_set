@@ -69,8 +69,8 @@ class _DashbaordState extends State<Dashbaord> with WidgetsBindingObserver {
   Timer? _searchQueryTimer = null;
   bool _showSearchQueryProgressBar = false;
   BannerAd? _bannerAd;
-  late AppOpenAdManager _appOpenAdManager;
-  late AppLifecycleReactor _appLifecycleReactor;
+  // late AppOpenAdManager _appOpenAdManager;
+  // late AppLifecycleReactor _appLifecycleReactor;
 
   @override
   void initState() {
@@ -143,19 +143,19 @@ class _DashbaordState extends State<Dashbaord> with WidgetsBindingObserver {
     });
 
     // _appOpenAdManager = AppOpenAdManager()..loadAd();
-    _appOpenAdManager = AppOpenAdManager();
-    _appOpenAdManager.loadAd();
-    _appLifecycleReactor =
-        AppLifecycleReactor(appOpenAdManager: _appOpenAdManager);
+    // _appOpenAdManager = AppOpenAdManager();
+    // _appOpenAdManager.loadAd();
+    // _appLifecycleReactor =
+    //     AppLifecycleReactor(appOpenAdManager: _appOpenAdManager);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     print('>> dashboard - didChangeAppLifecycleState - state : ${state.name}');
-    if (state == AppLifecycleState.resumed) {
-      // print('>> dashboard - didChangeAppLifecycleState - profrm : ${state.name}');
-      _appOpenAdManager.showAdIfAvailable();
-    }
+    // if (state == AppLifecycleState.resumed) {
+    //   // print('>> dashboard - didChangeAppLifecycleState - profrm : ${state.name}');
+    //   _appOpenAdManager.showAdIfAvailable();
+    // }
 
     setState(() {});
   }
@@ -1483,8 +1483,9 @@ class _DashbaordState extends State<Dashbaord> with WidgetsBindingObserver {
           context,
           MaterialPageRoute(
             builder: (context) => CustomAudioPlayer(
-              listHydra: hydraMember,
-              index: index,
+              listHydra: hydraMember.sublist(index),
+              // index: index,
+              index: 0,
               type: widget.type,
             ),
           ),

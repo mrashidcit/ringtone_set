@@ -84,6 +84,8 @@ class AuthRepository {
     });
 
     Uri url = Uri.parse("${AppConfig.BASE_URL}/auth");
+    print('>> getSignInUserResponse : url = $url');
+    print('>> post_body : $post_body');
     final response = await http.post(url,
         headers: {
           "Content-Type": "application/json",
@@ -94,9 +96,11 @@ class AuthRepository {
 
     if (response.statusCode == 200) {
       signInResponse = signInResponseFromJson(response.body);
+      print('>> getSignInUserResponse : response = ${response.body}');
     } else {
       signInResponse.message = jsonDecode(response.body)['error'];
     }
+
     return signInResponse;
   }
 }

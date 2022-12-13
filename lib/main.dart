@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:deeze_app/ads_util/app_lifecycle_reactor.dart';
+import 'package:deeze_app/ads_util/app_open_ad_manager.dart';
 import 'package:deeze_app/bloc/deeze_bloc/wallpaper_bloc/wallpaper_bloc.dart';
 import 'package:deeze_app/helpers/share_value_helper.dart';
 import 'package:deeze_app/helpers/utils.dart';
@@ -11,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
+import 'package:get/get_state_manager/src/simple/list_notifier.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_value/shared_value.dart';
 
@@ -34,12 +37,14 @@ void main() async {
     ),
   );
   FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    print('>> authStateChanges');
     if (user == null) {
-      print('User is currently signed out!');
+      print('>> authStateChanges - User is currently signed out!');
     } else {
-      print('User is signed in!');
+      print('>> authStateChanges - User is signed in!');
     }
   });
+  MobileAds.instance.initialize();
   runApp(
     SharedValue.wrapApp(MyApp()),
   );
@@ -52,19 +57,45 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   StreamSubscription? connectivitySubcription;
   ConnectivityResult? connectivityResult;
   String _platformVersion = 'Unknown';
   String __heightWidth = "Unknown";
+  late AppOpenAdManager _appOpenAdManager;
+  late AppLifecycleReactor _appLifecycleReactor;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     initAppState();
 
     Utils.getSharedValueHelperData();
 
-    _initGoogleMobileAds();
+    // _initGoogleMobileAds();
+    _appOpenAdManager = AppOpenAdManager();
+    _appOpenAdManager.loadAd();
+    _appLifecycleReactor =
+        AppLifecycleReactor(appOpenAdManager: _appOpenAdManager);
+  }
+
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   print('>> main - didChangeAppLifecycleState - state : ${state.name}');
+  //   if (state == AppLifecycleState.resumed) {
+  //     // print('>> dashboard - didChangeAppLifecycleState - profrm : ${state.name}');
+  //     _appOpenAdManager.showAdIfAvailable();
+  //   }
+
+  //   setState(() {});
+  // }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   Future<void> initAppState() async {

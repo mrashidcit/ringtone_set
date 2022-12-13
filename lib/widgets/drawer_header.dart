@@ -5,6 +5,7 @@ import 'package:deeze_app/helpers/share_value_helper.dart';
 import 'package:deeze_app/screens/profile_screen/profile_screen.dart';
 import 'package:deeze_app/screens/upload_screen/upload_screen.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../screens/screens.dart';
 import 'elevated_button_widget.dart';
@@ -123,11 +124,13 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
     }
   }
 
-  void performLogout() {
+  void performLogout() async {
     // Clear Cache Values
     is_logged_in.$ = false;
     user_id.$ = 0;
     api_token.$ = '';
+
+    await FirebaseAuth.instance.signOut();
 
     Navigator.pushAndRemoveUntil(
       context,

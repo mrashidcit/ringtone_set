@@ -92,6 +92,7 @@ class OnBoardingState extends State<OnBoarding> {
                     var email = userCredentials.user!.email!;
                     var password =
                         '${userCredentials.user!.displayName!}***@#123';
+                    var profileUrl = userCredentials.user!.photoURL;
 
                     var signUpResponse = await AuthRepository()
                         .getSignUpUserWithThirdPartyResponse(

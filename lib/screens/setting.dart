@@ -1,5 +1,9 @@
+import 'package:deeze_app/enums/enum_item_type.dart';
+import 'package:deeze_app/helpers/share_value_helper.dart';
+import 'package:deeze_app/screens/dashboard/dashboard.dart';
 import 'package:deeze_app/screens/web_view/show_web_page.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -179,15 +183,35 @@ class SettingScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Text(
-                      'Log out',
-                      style: GoogleFonts.archivo(
-                        fontStyle: FontStyle.normal,
-                        color: Colors.white70,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                  GestureDetector(
+                    onTap: () async {
+                      // Clear Cache Values
+                      is_logged_in.$ = false;
+                      user_id.$ = 0;
+                      api_token.$ = '';
+
+                      await FirebaseAuth.instance.signOut();
+
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              Dashbaord(type: ItemType.RINGTONE.name),
+                        ),
+                        (route) => false,
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 4, right: 10, top: 6, bottom: 6),
+                      child: Text(
+                        'Log out',
+                        style: GoogleFonts.archivo(
+                          fontStyle: FontStyle.normal,
+                          color: Colors.white70,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),

@@ -78,6 +78,7 @@ class AppOpenAdManager {
         loadAd();
       },
     );
+    _appOpenAd!.show();
   }
 
   /// Whether an ad is available to be shown.

@@ -233,13 +233,16 @@ class _RingtonesCardState extends State<RingtonesCard> {
                         const SizedBox(
                           width: 15,
                         ),
-                        Text(
-                          widget.ringtoneName,
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.white,
-                            fontSize: 14,
-                            wordSpacing: -0.07,
+                        GestureDetector(
+                          onTap: widget.onNavigate,
+                          child: Text(
+                            widget.ringtoneName,
+                            style: GoogleFonts.archivo(
+                              fontStyle: FontStyle.normal,
+                              color: Colors.white,
+                              fontSize: 14,
+                              wordSpacing: -0.07,
+                            ),
                           ),
                         ),
                       ],
