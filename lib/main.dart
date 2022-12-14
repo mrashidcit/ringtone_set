@@ -78,6 +78,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     _appOpenAdManager.loadAd();
     _appLifecycleReactor =
         AppLifecycleReactor(appOpenAdManager: _appOpenAdManager);
+    _appLifecycleReactor.listenToAppStateChanges();
   }
 
   // @override

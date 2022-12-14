@@ -51,7 +51,10 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
                         }
                       },
                       child: const AppImageAsset(
-                          image: 'assets/dummy_profile_pic.svg', height: 70),
+                        // image: 'assets/dummy_profile_pic.svg',
+                        image: 'assets/user_profile_avatar.png',
+                        height: 70,
+                      ),
                     )
                   : Container(),
               const Spacer(),
