@@ -40,20 +40,22 @@ class AuthRepository {
     return signUpResposne;
   }
 
-  Future<SignupResponse> getSignUpUserWithThirdPartyResponse(
+  Future<SignupResponse> getSignUpWithFacebookResponse(
     @required String firstName,
     @required String lastName,
     @required String email,
-    @required String password,
+    @required String facebookId,
+    @required String imageUrl,
   ) async {
     var post_body = jsonEncode({
       "firstName": "$firstName",
       "lastName": "$lastName",
       "email": "$email",
-      "password": "$password",
+      "facebookId": "$facebookId",
+      "imageUrl": "$imageUrl",
     });
 
-    Uri url = Uri.parse("${AppConfig.BASE_URL}/users");
+    Uri url = Uri.parse("${AppConfig.BASE_URL}/users/signup/facebook");
     final response = await http.post(url,
         headers: {
           "Content-Type": "application/json",
@@ -64,6 +66,44 @@ class AuthRepository {
 
     var signUpResposne = SignupResponse();
 
+    print('>> getSignUpWithFacebookResponse - response : ${response.body}');
+    if (response.statusCode == 201) {
+      signUpResposne = signupResponseFromJson(response.body);
+    } else if (response.statusCode == 409) {
+      signUpResposne.result = false;
+      signUpResposne.message = json.decode(response.body);
+    }
+
+    return signUpResposne;
+  }
+
+  Future<SignupResponse> getSignUpWithGoogleResponse(
+    @required String firstName,
+    @required String lastName,
+    @required String email,
+    @required String googleId,
+    @required String imageUrl,
+  ) async {
+    var post_body = jsonEncode({
+      "firstName": "$firstName",
+      "lastName": "$lastName",
+      "email": "$email",
+      "googleId": "$googleId",
+      "imageUrl": "$imageUrl",
+    });
+
+    Uri url = Uri.parse("${AppConfig.BASE_URL}/users/signup/google");
+    print('>> getSignUpWithGoogleResponse - url : $url');
+    print('>> getSignUpWithGoogleResponse - post_body : $post_body');
+    final response = await http.post(url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: post_body);
+
+    var signUpResposne = SignupResponse();
+
+    print('>> getSignUpWithGoogleResponse - response : ${response.body}');
     if (response.statusCode == 201) {
       signUpResposne = signupResponseFromJson(response.body);
     } else if (response.statusCode == 409) {

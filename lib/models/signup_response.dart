@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:deeze_app/models/deeze_model.dart';
+
 SignupResponse signupResponseFromJson(String str) =>
     SignupResponse.fromJson(json.decode(str));
 
@@ -13,35 +15,33 @@ class SignupResponse {
   SignupResponse({
     this.result = false,
     this.message = '',
-    this.id,
-    this.items,
-    this.first_name,
-    this.last_name,
-    this.image,
+    this.apiToken = '',
+    this.user,
   });
 
   bool result; // For Success = true, for error = false
   String message; // For Success = true, for error = false
-  int? id;
-  List<String>? items;
-  String? first_name;
-  String? last_name;
-  String? image;
+  String apiToken;
+  User? user;
 
   factory SignupResponse.fromJson(Map<String, dynamic> json) => SignupResponse(
         result: true,
-        id: json["id"],
-        items: [],
-        first_name: json["firstName"],
-        last_name: json["lastName"],
-        image: json["image"],
+        apiToken: json["api_token"],
+        user: User(
+          id: json['user']["id"],
+          firstName: json['user']["firstName"],
+          lastName: json['user']["lastName"],
+          image: json['user']["image"],
+        ),
       );
 
   Map<String, dynamic> toJson() => {
         "result": result,
-        "id": id,
-        "items": items,
-        "firstName": first_name,
-        "lastName": last_name,
+        "user": {
+          "id": user!.id,
+          "firstName": user!.firstName,
+          "lastName": user!.lastName,
+          "image": user!.image,
+        }
       };
 }

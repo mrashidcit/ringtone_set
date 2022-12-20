@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -18,6 +19,7 @@ class ProfileScreen extends StatefulWidget {
 class ProfileScreenState extends State<ProfileScreen> {
   bool isDeleted = false;
   int selectedIndex = -1;
+  XFile? _selectedProfileImage;
 
   @override
   Widget build(BuildContext context) {
@@ -117,29 +119,45 @@ class ProfileScreenState extends State<ProfileScreen> {
                         color: Color(0XFFDAD8DF),
                         shape: BoxShape.circle,
                       ),
-                      child: const AppImageAsset(
-                        image: 'assets/dummy_profile.svg',
+                      child: AppImageAsset(
+                        image: (_selectedProfileImage == null)
+                            ? 'assets/dummy_profile.svg'
+                            : _selectedProfileImage!.path,
                         height: 55,
                       ),
                     ),
                     Positioned(
                       right: 4,
                       top: 2,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.5),
-                          shape: BoxShape.circle,
-                        ),
-                        padding: const EdgeInsets.all(2),
+                      child: InkWell(
+                        onTap: () async {
+                          final ImagePicker _picker = ImagePicker();
+                          // Pick an image
+                          final XFile? image = await _picker.pickImage(
+                            source: ImageSource.gallery,
+                          );
+
+                          _selectedProfileImage =
+                              image ?? _selectedProfileImage;
+
+                          setState(() {});
+                        },
                         child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.5),
                             shape: BoxShape.circle,
                           ),
-                          child: const AppImageAsset(
-                            image: 'assets/add.svg',
-                            height: 8,
+                          padding: const EdgeInsets.all(2),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const AppImageAsset(
+                              image: 'assets/add.svg',
+                              height: 8,
+                            ),
                           ),
                         ),
                       ),

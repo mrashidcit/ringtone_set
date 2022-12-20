@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="facebook_app_id">163707561450293</string>
+    <string name="fb_login_protocol_scheme">fb163707561450293</string>
     <string name="facebook_client_token">85f7cc90bc2bf4d7cacd9872951258f3</string>
 
     <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>

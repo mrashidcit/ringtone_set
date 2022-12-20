@@ -89,43 +89,51 @@ class OnBoardingState extends State<OnBoarding> {
                       _showProgressBar = true;
                     });
 
+                    var firstName = userCredentials.user!.displayName!;
+                    var lastName = userCredentials.user!.displayName!;
                     var email = userCredentials.user!.email!;
-                    var password =
-                        '${userCredentials.user!.displayName!}***@#123';
-                    var profileUrl = userCredentials.user!.photoURL;
+                    var googleId = userCredentials.credential!.providerId!;
+                    var imageUrl = userCredentials.user!.photoURL!;
 
-                    var signUpResponse = await AuthRepository()
-                        .getSignUpUserWithThirdPartyResponse(
-                      userCredentials.user!.displayName!,
-                      '',
+                    var signUpResponse =
+                        await AuthRepository().getSignUpWithGoogleResponse(
+                      firstName,
+                      lastName,
                       email,
-                      // userCredentials.credential!.token!.toString(),
-                      password,
+                      googleId,
+                      imageUrl,
                     );
 
+                    print(
+                        '>> signUpResponse.result : ${signUpResponse.result}');
                     if (signUpResponse.result) {
-                      performSignInAction(email, password);
+                      // performSignInAction(email, password);
 
-                      // is_logged_in.$ = true;
-                      // user_id.$ = signUpResponse.id!;
-                      // var snackBar = SnackBar(
-                      //   content: Text('Successfully Logged In!'),
-                      // );
-                      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      // Navigator.pushAndRemoveUntil(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (ctx) =>
-                      //             Dashbaord(type: ItemType.RINGTONE.name)),
-                      //     (route) => false);
+                      saveUserInCache(signUpResponse.user!);
+                      api_token.$ = signUpResponse.apiToken;
+                      is_logged_in.$ = true;
+
+                      await Utils.getSharedValueHelperData();
+
+                      var snackBar = SnackBar(
+                        content: Text('Successfully Logged In!'),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (ctx) =>
+                                Dashbaord(type: ItemType.RINGTONE.name),
+                          ),
+                          (route) => false);
                     } else {
-                      performSignInAction(email, password);
+                      // performSignInAction(email, password);
                       // is_logged_in.$ = false;
                       // user_id.$ = 0;
-                      // var snackBar = SnackBar(
-                      //   content: Text(signUpResponse.message),
-                      // );
-                      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      var snackBar = SnackBar(
+                        content: Text(signUpResponse.message),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     }
 
                     setState(() {
@@ -146,41 +154,48 @@ class OnBoardingState extends State<OnBoarding> {
                         _showProgressBar = true;
                       });
 
+                      var firstName = userCredentials.user!.displayName!;
+                      var lastName = '';
                       var email = userCredentials.user!.email!;
-                      var password =
-                          '${userCredentials.user!.displayName!}***@#FB123';
+                      var facebookId =
+                          userCredentials.additionalUserInfo!.providerId!;
+                      var imageUrl = userCredentials.user!.photoURL!;
 
-                      var signUpResponse = await AuthRepository()
-                          .getSignUpUserWithThirdPartyResponse(
-                        userCredentials.user!.displayName!,
-                        '',
+                      var signUpResponse =
+                          await AuthRepository().getSignUpWithFacebookResponse(
+                        firstName,
+                        lastName,
                         email,
-                        // userCredentials.credential!.token!.toString(),
-                        password,
+                        facebookId,
+                        imageUrl,
                       );
 
                       if (signUpResponse.result) {
-                        performSignInAction(email, password);
-                        // is_logged_in.$ = true;
-                        // user_id.$ = signUpResponse.id!;
-                        // var snackBar = SnackBar(
-                        //   content: Text('Successfully Logged In!'),
-                        // );
-                        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        // Navigator.pushAndRemoveUntil(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //         builder: (ctx) =>
-                        //             Dashbaord(type: ItemType.RINGTONE.name)),
-                        //     (route) => false);
+                        saveUserInCache(signUpResponse.user!);
+                        api_token.$ = signUpResponse.apiToken;
+                        is_logged_in.$ = true;
+
+                        await Utils.getSharedValueHelperData();
+
+                        var snackBar = SnackBar(
+                          content: Text('Successfully Logged In!'),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (ctx) =>
+                                  Dashbaord(type: ItemType.RINGTONE.name),
+                            ),
+                            (route) => false);
                       } else {
-                        performSignInAction(email, password);
+                        // performSignInAction(email, password);
                         // is_logged_in.$ = false;
                         // user_id.$ = 0;
-                        // var snackBar = SnackBar(
-                        //   content: Text(signUpResponse.message),
-                        // );
-                        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        var snackBar = SnackBar(
+                          content: Text(signUpResponse.message),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
 
                       setState(() {
