@@ -50,11 +50,31 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
                           );
                         }
                       },
-                      child: const AppImageAsset(
-                        // image: 'assets/dummy_profile_pic.svg',
-                        image: 'assets/user_profile_avatar.png',
-                        height: 70,
-                      ),
+                      // child: AppImageAsset(
+                      //   // image: 'assets/dummy_profile_pic.svg',
+                      //   // image: 'assets/user_profile_avatar.png',
+                      //   image: user_profile_image.$,
+                      //   height: 70,
+                      // ),
+                      child: (user_profile_image.$.isNotEmpty)
+                          ? CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(user_profile_image.$),
+                              // : AssetImage('assets/user_profile_avatar.png'),
+                              // Image.network(
+                              //   user_profile_image.$,
+                              //   fit: BoxFit.fill,
+                              //   width: 70,
+                              //   height: 70,
+                              // ),
+                              radius: 30,
+                            )
+                          : AppImageAsset(
+                              // image: 'assets/dummy_profile_pic.svg',
+                              // image: 'assets/user_profile_avatar.png',
+                              image: user_profile_image.$,
+                              height: 70,
+                            ),
                     )
                   : Container(),
               const Spacer(),

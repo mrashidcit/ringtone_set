@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:deeze_app/helpers/share_value_helper.dart';
+import 'package:deeze_app/repositories/user_repository.dart';
 import 'package:deeze_app/screens/dashboard/dashboard.dart';
 import 'package:deeze_app/screens/favourite/favourite_screen.dart';
 import 'package:deeze_app/screens/wallpapers/wallpapers.dart';
@@ -119,12 +123,13 @@ class ProfileScreenState extends State<ProfileScreen> {
                         color: Color(0XFFDAD8DF),
                         shape: BoxShape.circle,
                       ),
-                      child: AppImageAsset(
-                        image: (_selectedProfileImage == null)
-                            ? 'assets/dummy_profile.svg'
-                            : _selectedProfileImage!.path,
-                        height: 55,
-                      ),
+                      // child: AppImageAsset(
+                      //   image: (_selectedProfileImage == null)
+                      //       ? 'assets/dummy_profile.svg'
+                      //       : _selectedProfileImage!.path,
+                      //   height: 55,
+                      // ),
+                      child: buildProfileImageAvatar(),
                     ),
                     Positioned(
                       right: 4,
@@ -139,6 +144,11 @@ class ProfileScreenState extends State<ProfileScreen> {
 
                           _selectedProfileImage =
                               image ?? _selectedProfileImage;
+
+                          if (_selectedProfileImage != null) {
+                            await UserRepository()
+                                .uploadFileResponse(_selectedProfileImage!);
+                          }
 
                           setState(() {});
                         },
@@ -477,6 +487,27 @@ class ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  Widget buildProfileImageAvatar() {
+    if (_selectedProfileImage != null) {
+      return CircleAvatar(
+        backgroundImage: FileImage(File(_selectedProfileImage!.path)),
+        radius: 35,
+      );
+    } else if (user_profile_image.$.isNotEmpty) {
+      return CircleAvatar(
+        backgroundImage: NetworkImage(user_profile_image.$),
+        radius: 35,
+      );
+    } else {
+      return AppImageAsset(
+        image: (_selectedProfileImage == null)
+            ? 'assets/dummy_profile.svg'
+            : _selectedProfileImage!.path,
+        height: 55,
+      );
+    }
   }
 
   Expanded profilePostView(double screenWidth, BuildContext context) {
