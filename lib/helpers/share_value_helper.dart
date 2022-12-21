@@ -38,7 +38,7 @@ void saveUserInCache(User user) {
   user_profile_image.$ = user.image!;
 }
 
-User getUserFromCache(User user) {
+User getUserFromCache() {
   return User(
     id: user_id.$,
     firstName: first_name.$,

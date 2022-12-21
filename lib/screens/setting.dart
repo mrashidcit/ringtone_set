@@ -1,5 +1,6 @@
 import 'package:deeze_app/enums/enum_item_type.dart';
 import 'package:deeze_app/helpers/share_value_helper.dart';
+import 'package:deeze_app/repositories/auth_repository.dart';
 import 'package:deeze_app/screens/dashboard/dashboard.dart';
 import 'package:deeze_app/screens/web_view/show_web_page.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
@@ -10,9 +11,15 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:math' as math;
 
-class SettingScreen extends StatelessWidget {
+class SettingScreen extends StatefulWidget {
   const SettingScreen({Key? key}) : super(key: key);
 
+  @override
+  State<SettingScreen> createState() => _SettingScreenState();
+}
+
+class _SettingScreenState extends State<SettingScreen> {
+  bool _showProgressForDeleteRequest = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -216,16 +223,52 @@ class SettingScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Text(
-                      'Delete Account',
-                      style: GoogleFonts.archivo(
-                        fontStyle: FontStyle.normal,
-                        color: Colors.red,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  InkWell(
+                    onTap: () async {
+                      setState(() {
+                        _showProgressForDeleteRequest = true;
+                      });
+
+                      await AuthRepository().getDeleteUserAccountResponse();
+
+                      // Clear Cache Values
+                      is_logged_in.$ = false;
+                      user_id.$ = 0;
+                      api_token.$ = '';
+
+                      await FirebaseAuth.instance.signOut();
+
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              Dashbaord(type: ItemType.RINGTONE.name),
+                        ),
+                        (route) => false,
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      // child: Text(
+                      //   'Delete Account',
+                      //   style: GoogleFonts.archivo(
+                      //     fontStyle: FontStyle.normal,
+                      //     color: Colors.red,
+                      //     fontSize: 14,
+                      //     fontWeight: FontWeight.w500,
+                      //   ),
+                      // ),
+                      child: _showProgressForDeleteRequest
+                          ? RefreshProgressIndicator()
+                          : Text(
+                              'Delete Account',
+                              style: GoogleFonts.archivo(
+                                fontStyle: FontStyle.normal,
+                                color: Colors.red,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                     ),
                   ),
                 ],

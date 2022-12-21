@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:deeze_app/app_config.dart';
+import 'package:deeze_app/helpers/share_value_helper.dart';
 import 'package:deeze_app/models/deeze_model.dart';
+import 'package:deeze_app/models/delete_user_response.dart';
 import 'package:deeze_app/models/signin_response.dart';
 import 'package:deeze_app/models/signup_response.dart';
 import 'package:flutter/foundation.dart';
@@ -142,5 +144,23 @@ class AuthRepository {
     }
 
     return signInResponse;
+  }
+
+  Future<DeleteUserResponse> getDeleteUserAccountResponse() async {
+    Uri url = Uri.parse("${AppConfig.BASE_URL}/users/${user_id.$}");
+    print('>> getSignInUserResponse : url = $url');
+    final response =
+        await http.delete(url, headers: {'x-api-token': api_token.$});
+
+    var deleteUserResponse =
+        DeleteUserResponse(result: true, message: 'Successfully Deleted!');
+
+    if (response.statusCode == 204) {
+      deleteUserResponse.result = true;
+      deleteUserResponse.message = "Successfully Deleted!";
+      print('>> getSignInUserResponse : response = ${response.body}');
+    }
+
+    return deleteUserResponse;
   }
 }

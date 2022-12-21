@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:flutter/material.dart';
@@ -48,18 +50,30 @@ class AppImageAsset extends StatelessWidget {
             ),
           )
         : image!.split('.').last != 'svg'
-            ? Image.asset(
-                image!,
-                fit: fit,
-                height: height,
-                width: width,
-                color: color,
-              )
+            ? buildImageFromAssetOrFile()
             : SvgPicture.asset(
                 image!,
                 height: height,
                 width: width,
                 color: color,
               );
+  }
+
+  Image buildImageFromAssetOrFile() {
+    return image!.contains('assets')
+        ? Image.asset(
+            image!,
+            fit: fit,
+            height: height,
+            width: width,
+            color: color,
+          )
+        : Image.file(
+            File(image!),
+            fit: fit,
+            height: height,
+            width: width,
+            color: color,
+          );
   }
 }
