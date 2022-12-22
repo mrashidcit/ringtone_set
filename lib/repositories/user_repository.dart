@@ -7,6 +7,7 @@ import 'package:deeze_app/models/delete_user_response.dart';
 import 'package:deeze_app/models/file_upload_response.dart';
 import 'package:deeze_app/models/signin_response.dart';
 import 'package:deeze_app/models/signup_response.dart';
+import 'package:deeze_app/models/user_profile_update_response.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -41,9 +42,9 @@ class UserRepository {
     print(
         '>> uploadFileResponse - response.statusCode : ${response.statusCode}');
 
-    print('>> uploadFileResponse - response.toString : ${response.toString()}');
-    print(
-        '>> uploadFileResponse - response.body : ${await response.stream.bytesToString()}');
+    // print('>> uploadFileResponse - response.toString : ${response.toString()}');
+    // print(
+    //     '>> uploadFileResponse - response.body : ${await response.stream.bytesToString()}');
 
     if (response.statusCode == 200) {
       fileUploadResponse =
@@ -58,41 +59,37 @@ class UserRepository {
     return fileUploadResponse;
   }
 
-  Future<SignupResponse> getSignUpWithFacebookResponse(
-    @required String firstName,
-    @required String lastName,
-    @required String email,
-    @required String facebookId,
-    @required String imageUrl,
+  Future<UserProfileUpdateResponse> updateUserProfileImageResponse(
+    @required
+        String fileName, // Put that filename which is saved on webserver db
   ) async {
     var post_body = jsonEncode({
-      "firstName": "$firstName",
-      "lastName": "$lastName",
-      "email": "$email",
-      "facebookId": "$facebookId",
-      "imageUrl": "$imageUrl",
+      "image": "$fileName",
     });
 
-    Uri url = Uri.parse("${AppConfig.BASE_URL}/users/signup/facebook");
+    Uri url = Uri.parse("${AppConfig.BASE_URL}/users/${user_id.$}");
     final response = await http.post(url,
         headers: {
+          'Accept': 'application/json',
           "Content-Type": "application/json",
+          'x-api-token': api_token.$
         },
         body: post_body);
 
     print('>> post_body : $post_body');
 
-    var signUpResposne = SignupResponse();
+    var userProfileUpdateResponse = UserProfileUpdateResponse();
 
     print('>> getSignUpWithFacebookResponse - response : ${response.body}');
-    if (response.statusCode == 201) {
-      signUpResposne = signupResponseFromJson(response.body);
-    } else if (response.statusCode == 409) {
-      signUpResposne.result = false;
-      signUpResposne.message = json.decode(response.body);
+    if (response.statusCode == 200) {
+      userProfileUpdateResponse =
+          userProfileUpdateResponseFromJson(response.body);
+    } else {
+      userProfileUpdateResponse.result = false;
+      userProfileUpdateResponse.message = 'Error while updating.';
     }
 
-    return signUpResposne;
+    return userProfileUpdateResponse;
   }
 
   Future<SignupResponse> getSignUpWithGoogleResponse(

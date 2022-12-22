@@ -146,8 +146,26 @@ class ProfileScreenState extends State<ProfileScreen> {
                               image ?? _selectedProfileImage;
 
                           if (_selectedProfileImage != null) {
-                            await UserRepository()
+                            var fileUploadResponse = await UserRepository()
                                 .uploadFileResponse(_selectedProfileImage!);
+
+                            if (fileUploadResponse.result) {
+                              var userProfileUpdateResponse =
+                                  await UserRepository()
+                                      .updateUserProfileImageResponse(
+                                          fileUploadResponse
+                                              .fileModel!.fileName);
+
+                              if (userProfileUpdateResponse.result) {
+                                saveUserInCache(
+                                    userProfileUpdateResponse.user!);
+                                var snackBar = SnackBar(
+                                  content: Text('Successfully Updated!'),
+                                );
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                              }
+                            }
                           }
 
                           setState(() {});
