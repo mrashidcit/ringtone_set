@@ -24,6 +24,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   bool isDeleted = false;
   int selectedIndex = -1;
   XFile? _selectedProfileImage;
+  bool _showProfileUploadingProgressBar = false;
 
   @override
   Widget build(BuildContext context) {
@@ -131,11 +132,21 @@ class ProfileScreenState extends State<ProfileScreen> {
                       // ),
                       child: buildProfileImageAvatar(),
                     ),
+                    _showProfileUploadingProgressBar
+                        ? Positioned.fill(
+                            child: Align(
+                                alignment: Alignment.center,
+                                child: CircularProgressIndicator(
+                                  backgroundColor: Colors.transparent,
+                                )),
+                          )
+                        : SizedBox(),
                     Positioned(
                       right: 4,
                       top: 2,
                       child: InkWell(
                         onTap: () async {
+                          show_openAppAd.$ = false;
                           final ImagePicker _picker = ImagePicker();
                           // Pick an image
                           final XFile? image = await _picker.pickImage(
@@ -145,7 +156,12 @@ class ProfileScreenState extends State<ProfileScreen> {
                           _selectedProfileImage =
                               image ?? _selectedProfileImage;
 
+                          show_openAppAd.$ = true;
+
                           if (_selectedProfileImage != null) {
+                            setState(() {
+                              _showProfileUploadingProgressBar = true;
+                            });
                             var fileUploadResponse = await UserRepository()
                                 .uploadFileResponse(_selectedProfileImage!);
 
@@ -168,7 +184,9 @@ class ProfileScreenState extends State<ProfileScreen> {
                             }
                           }
 
-                          setState(() {});
+                          setState(() {
+                            _showProfileUploadingProgressBar = false;
+                          });
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -189,7 +207,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
                 const Spacer(),

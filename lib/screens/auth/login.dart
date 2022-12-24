@@ -249,7 +249,7 @@ class LoginState extends State<Login> {
       api_token.$ = loginResponse.api_token;
       is_logged_in.$ = true;
 
-      await Utils.getSharedValueHelperData();
+      // await Utils.getSharedValueHelperData();
 
       Navigator.pushAndRemoveUntil(
         context,

@@ -25,6 +25,7 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    print('>> user_profile_image = ${user_profile_image.$} ');
     return Container(
       height: 200,
       width: double.infinity,
@@ -71,8 +72,8 @@ class _MyDrawerHeaderState extends State<MyDrawerHeader> {
                             )
                           : AppImageAsset(
                               // image: 'assets/dummy_profile_pic.svg',
-                              // image: 'assets/user_profile_avatar.png',
-                              image: user_profile_image.$,
+                              image: 'assets/user_profile_avatar.png',
+                              // image: user_profile_image.$,
                               height: 70,
                             ),
                     )

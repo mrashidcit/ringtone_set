@@ -68,7 +68,8 @@ class UserRepository {
     });
 
     Uri url = Uri.parse("${AppConfig.BASE_URL}/users/${user_id.$}");
-    final response = await http.post(url,
+    print('>> updateUserProfileImageResponse - url : $url');
+    final response = await http.put(url,
         headers: {
           'Accept': 'application/json',
           "Content-Type": "application/json",
@@ -76,11 +77,11 @@ class UserRepository {
         },
         body: post_body);
 
-    print('>> post_body : $post_body');
+    print('>> post_body : $post_body , ${api_token.$}');
 
     var userProfileUpdateResponse = UserProfileUpdateResponse();
 
-    print('>> getSignUpWithFacebookResponse - response : ${response.body}');
+    print('>> updateUserProfileImageResponse - response : ${response.body}');
     if (response.statusCode == 200) {
       userProfileUpdateResponse =
           userProfileUpdateResponseFromJson(response.body);

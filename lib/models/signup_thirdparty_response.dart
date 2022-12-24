@@ -6,13 +6,14 @@ import 'dart:convert';
 
 import 'package:deeze_app/models/deeze_model.dart';
 
-SignupResponse signupResponseFromJson(String str) =>
-    SignupResponse.fromJson(json.decode(str));
+SignupWithThirdPartyResponse signupWithThirdPartyResponseFromJson(String str) =>
+    SignupWithThirdPartyResponse.fromJson(json.decode(str));
 
-String signupResponseToJson(SignupResponse data) => json.encode(data.toJson());
+String signupThirdPartyResponseToJson(SignupWithThirdPartyResponse data) =>
+    json.encode(data.toJson());
 
-class SignupResponse {
-  SignupResponse({
+class SignupWithThirdPartyResponse {
+  SignupWithThirdPartyResponse({
     this.result = false,
     this.message = '',
     this.apiToken = '',
@@ -24,14 +25,15 @@ class SignupResponse {
   String apiToken;
   User? user;
 
-  factory SignupResponse.fromJson(Map<String, dynamic> json) => SignupResponse(
+  factory SignupWithThirdPartyResponse.fromJson(Map<String, dynamic> json) =>
+      SignupWithThirdPartyResponse(
         result: true,
         apiToken: json["api_token"] ?? '',
         user: User(
-          id: json["id"],
-          firstName: json["firstName"],
-          lastName: json["lastName"],
-          image: json["image"],
+          id: json['user']["id"],
+          firstName: json['user']["firstName"],
+          lastName: json['user']["lastName"],
+          image: json['user']["image"],
         ),
       );
 

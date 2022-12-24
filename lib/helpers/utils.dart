@@ -8,6 +8,8 @@ class Utils {
     await first_name.load();
     await last_name.load();
     await user_profile_image.load();
+    await api_token.load();
+    await show_openAppAd.load();
   }
 
   static void hideKeyboard() {

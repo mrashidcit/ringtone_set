@@ -6,6 +6,7 @@ import 'package:deeze_app/models/deeze_model.dart';
 import 'package:deeze_app/models/delete_user_response.dart';
 import 'package:deeze_app/models/signin_response.dart';
 import 'package:deeze_app/models/signup_response.dart';
+import 'package:deeze_app/models/signup_thirdparty_response.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
@@ -32,6 +33,8 @@ class AuthRepository {
 
     var signUpResposne = SignupResponse();
 
+    print('>> getSignUpUserResponse - response : ${response.body}');
+
     if (response.statusCode == 201) {
       signUpResposne = signupResponseFromJson(response.body);
     } else if (response.statusCode == 409) {
@@ -42,7 +45,7 @@ class AuthRepository {
     return signUpResposne;
   }
 
-  Future<SignupResponse> getSignUpWithFacebookResponse(
+  Future<SignupWithThirdPartyResponse> getSignUpWithFacebookResponse(
     @required String firstName,
     @required String lastName,
     @required String email,
@@ -66,11 +69,11 @@ class AuthRepository {
 
     print('>> post_body : $post_body');
 
-    var signUpResposne = SignupResponse();
+    var signUpResposne = SignupWithThirdPartyResponse();
 
     print('>> getSignUpWithFacebookResponse - response : ${response.body}');
     if (response.statusCode == 201) {
-      signUpResposne = signupResponseFromJson(response.body);
+      signUpResposne = signupWithThirdPartyResponseFromJson(response.body);
     } else if (response.statusCode == 409) {
       signUpResposne.result = false;
       signUpResposne.message = json.decode(response.body);
@@ -79,7 +82,7 @@ class AuthRepository {
     return signUpResposne;
   }
 
-  Future<SignupResponse> getSignUpWithGoogleResponse(
+  Future<SignupWithThirdPartyResponse> getSignUpWithGoogleResponse(
     @required String firstName,
     @required String lastName,
     @required String email,
@@ -103,11 +106,11 @@ class AuthRepository {
         },
         body: post_body);
 
-    var signUpResposne = SignupResponse();
+    var signUpResposne = SignupWithThirdPartyResponse();
 
     print('>> getSignUpWithGoogleResponse - response : ${response.body}');
     if (response.statusCode == 201) {
-      signUpResposne = signupResponseFromJson(response.body);
+      signUpResposne = signupWithThirdPartyResponseFromJson(response.body);
     } else if (response.statusCode == 409) {
       signUpResposne.result = false;
       signUpResposne.message = json.decode(response.body);

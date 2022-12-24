@@ -356,8 +356,6 @@ class SignUpState extends State<SignUp> {
       api_token.$ = loginResponse.api_token;
       is_logged_in.$ = true;
 
-      await Utils.getSharedValueHelperData();
-
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(

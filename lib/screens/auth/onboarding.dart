@@ -113,8 +113,6 @@ class OnBoardingState extends State<OnBoarding> {
                       api_token.$ = signUpResponse.apiToken;
                       is_logged_in.$ = true;
 
-                      await Utils.getSharedValueHelperData();
-
                       var snackBar = SnackBar(
                         content: Text('Successfully Logged In!'),
                       );
@@ -174,8 +172,6 @@ class OnBoardingState extends State<OnBoarding> {
                         saveUserInCache(signUpResponse.user!);
                         api_token.$ = signUpResponse.apiToken;
                         is_logged_in.$ = true;
-
-                        await Utils.getSharedValueHelperData();
 
                         var snackBar = SnackBar(
                           content: Text('Successfully Logged In!'),

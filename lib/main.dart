@@ -71,14 +71,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     initAppState();
 
-    Utils.getSharedValueHelperData();
+    getSharedValueHelperData();
 
     // _initGoogleMobileAds();
     _appOpenAdManager = AppOpenAdManager();
     _appOpenAdManager.loadAd();
     _appLifecycleReactor =
         AppLifecycleReactor(appOpenAdManager: _appOpenAdManager);
-    // _appLifecycleReactor.listenToAppStateChanges();
+    _appLifecycleReactor.listenToAppStateChanges();
   }
 
   // @override
@@ -154,5 +154,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Future<InitializationStatus> _initGoogleMobileAds() {
     // TODO: Initialize Google Mobile Ads SDK
     return MobileAds.instance.initialize();
+  }
+
+  Future<void> getSharedValueHelperData() async {
+    await Utils.getSharedValueHelperData();
+
+    print('>> MyApp - getSharedValueHelperData : ${is_logged_in.$}');
   }
 }
