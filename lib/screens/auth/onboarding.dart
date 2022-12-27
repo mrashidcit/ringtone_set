@@ -275,6 +275,7 @@ class OnBoardingState extends State<OnBoarding> {
     //     await FacebookAuth.instance.login(permissions: const ['email']);
 
     print(">> signInWithFacebook - status : ${loginResult.status.name}");
+    print(">> signInWithFacebook - message : ${loginResult.message}");
     // Create a credential from the access token
     final OAuthCredential facebookAuthCredential =
         FacebookAuthProvider.credential(loginResult.accessToken!.token);

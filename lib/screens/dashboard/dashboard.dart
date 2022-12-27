@@ -1758,6 +1758,24 @@ class _DashbaordState extends State<Dashbaord> with WidgetsBindingObserver {
       setState(() {
         _showSearchQueryProgressBar = true;
       });
+
+      if (!await InternetConnectionChecker().hasConnection) {
+        showCupertinoModalPopup(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => InternetCheckerDialog(
+            onRetryTap: () {
+              Navigator.pop(context); // Hide Internet Message Dialog
+              Timer(Duration(milliseconds: 500), () => performSearchRintone());
+            },
+          ),
+        );
+        setState(() {
+          _showSearchQueryProgressBar = false;
+        });
+        return [];
+      }
+
       _searchResultList = await _searchServices.searchRingtone(
           query: searchStr, type: widget.type);
     } else {

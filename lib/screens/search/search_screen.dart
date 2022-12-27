@@ -221,7 +221,8 @@ class _SearchScreenState extends State<SearchScreen> {
       } else {
         return false;
       }
-    } catch (e) {
+    } catch (ex, stacktrace) {
+      Completer().completeError(ex, stacktrace);
       return false;
     }
   }

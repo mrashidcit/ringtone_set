@@ -61,9 +61,10 @@ class SearchModel {
         categories: (json["categories"] != null)
             ? List<String>.from(json["categories"].map((x) => x))
             : [],
-        tags: (json["tags"] != null)
-            ? List<String>.from(json["tags"].map((x) => x))
-            : [],
+        // tags: (json["tags"] != null)
+        //     ? List<String>.from(json["tags"].map((x) => x))
+        //     : [],
+        tags: [],
         enabled: json["enabled"] ?? null,
       );
 
@@ -96,7 +97,7 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) => User(
         id: json["id"],
-        email: json["email"],
+        email: json["email"] ?? '',
         firstName: json["firstName"],
         lastName: json["lastName"],
         image: json["image"],

@@ -322,7 +322,7 @@ class DeezeItemModel {
         type: json["type"],
         file: json["file"],
         user: User(),
-        tags: List<TagModel>.of(
+        tags: List<TagModel>.from(
             json['tags'].map((item) => TagModel.fromJson(item))),
         isFavourite: false,
       );

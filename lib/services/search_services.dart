@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:deeze_app/enums/enum_item_type.dart';
 import 'package:deeze_app/models/search_model.dart';
 import 'package:deeze_app/models/trending_search_model.dart';
@@ -40,8 +42,10 @@ class SearchServices {
       List<SearchModel> rawResponse = [];
       try {
         rawResponse = searchModelFromJson(response.body);
-      } catch (ex) {
+      } catch (ex, stacktrace) {
         print('>> searchRingtone - Exception = ${ex.toString()}');
+        Completer().completeError(
+            ex, stacktrace); // .completeException(ex, stacktrace);
       }
 
       print('>> searchRingtone - rawResponse.length = ${rawResponse.length}');
