@@ -329,11 +329,41 @@ class SignUpState extends State<SignUp> {
     var lastName = lastNameController.text.trim();
     var email = emailController.text.trim();
     var password = passwordController.text.trim();
-    var reEnterPassword = passwordController.text.trim();
+    var reEnterPassword = reEnterPasswordController.text.trim();
 
     Utils.hideKeyboard();
 
-    if (password != reEnterPassword) {
+    if (firstName.isEmpty) {
+      var snackBar = SnackBar(
+        content: Text('Please Enter First Name!'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
+    } else if (lastName.isEmpty) {
+      var snackBar = SnackBar(
+        content: Text('Please Enter Last Name!'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
+    } else if (email.isEmpty) {
+      var snackBar = SnackBar(
+        content: Text('Please Enter Email Address!'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
+    } else if (password.isEmpty) {
+      var snackBar = SnackBar(
+        content: Text('Please Enter Password!'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
+    } else if (reEnterPassword.isEmpty) {
+      var snackBar = SnackBar(
+        content: Text('Please Enter ReEnter Password!'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
+    } else if (password != reEnterPassword) {
       var snackBar = SnackBar(
         content: Text(
             'Both Password are not Matched.\nBoth Password Should be same!'),

@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:deeze_app/db_services/favorite_database.dart';
 import 'package:deeze_app/models/favorite.dart';
+import 'package:deeze_app/screens/custom_widgets/custom_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -347,282 +348,283 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                     ));
               }),
         ),
-        drawer: Drawer(
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF252030),
-              // gradient: const LinearGradient(colors: [
-              //   Color(0xFF252030),
-              // ]),
-              // borderRadius: BorderRadius.circular(10),
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  MyDrawerHeader(),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      refreshPost();
-                      setState(() {});
-                      Navigator.pop(context);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 40),
-                      child: Row(
-                        children: [
-                          const AppImageAsset(
-                              image: 'assets/favourite_fill.svg'),
-                          const SizedBox(
-                            width: 29,
-                          ),
-                          Text(
-                            "Favourite",
-                            style: GoogleFonts.archivo(
-                              fontStyle: FontStyle.normal,
-                              color: Colors.white,
-                              fontSize: 18,
-                              // fontWeight: FontWeight.w700,
-                              wordSpacing: -0.09,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      Navigator.of(context).pop();
-                      // ignore: use_build_context_synchronously
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const WallPapers(
-                            type: "WALLPAPER",
-                          ),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 40),
-                      child: Row(
-                        children: [
-                          const AppImageAsset(image: "assets/wallpaper.svg"),
-                          const SizedBox(
-                            width: 26,
-                          ),
-                          Text(
-                            "Wallpapers",
-                            style: GoogleFonts.archivo(
-                              fontStyle: FontStyle.normal,
-                              color: Colors.white,
-                              fontSize: 18,
-                              // fontWeight: FontWeight.w700,
-                              wordSpacing: -0.09,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 40),
-                    child: Row(
-                      children: [
-                        SvgPicture.asset("assets/bell.svg"),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "Notifications",
-                            style: GoogleFonts.archivo(
-                              fontStyle: FontStyle.normal,
-                              color: Colors.white,
-                              fontSize: 18,
-                              // fontWeight: FontWeight.w700,
-                              wordSpacing: -0.09,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  InkWell(
-                    onTap: () async {
-                      Navigator.of(context).pop();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Dashbaord(
-                            type: "RINGTONE",
-                          ),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 40),
-                      child: Row(
-                        children: [
-                          const AppImageAsset(image: 'assets/ringtone.svg'),
-                          const SizedBox(
-                            width: 26,
-                          ),
-                          Text(
-                            "Ringtones",
-                            style: GoogleFonts.archivo(
-                              fontStyle: FontStyle.normal,
-                              color: Colors.white,
-                              fontSize: 18,
-                              // fontWeight: FontWeight.w700,
-                              wordSpacing: -0.09,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 37),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.info,
-                          color: Colors.grey,
-                          size: 20,
-                        ),
-                        const SizedBox(
-                          width: 30,
-                        ),
-                        Text(
-                          "Help",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 37),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.settings,
-                          color: Color(0xffA49FAD),
-                          size: 20,
-                        ),
-                        const SizedBox(
-                          width: 30,
-                        ),
-                        Text(
-                          "Settings",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: const Color(0xffA49FAD),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 37),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.privacy_tip,
-                          color: Color(0xffA49FAD),
-                          size: 20,
-                        ),
-                        const SizedBox(
-                          width: 25,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "Privacy Policy",
-                            style: GoogleFonts.archivo(
-                              fontStyle: FontStyle.normal,
-                              color: const Color(0xffA49FAD),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 40),
-                    child: Row(
-                      children: [
-                        const AppImageAsset(
-                          image: "assets/facebook.svg",
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(width: 30),
-                        Text(
-                          "Join us on Facebook",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+        drawer: CustomDrawer(),
+        // drawer: Drawer(
+        //   child: Container(
+        //     decoration: const BoxDecoration(
+        //       color: Color(0xFF252030),
+        //       // gradient: const LinearGradient(colors: [
+        //       //   Color(0xFF252030),
+        //       // ]),
+        //       // borderRadius: BorderRadius.circular(10),
+        //     ),
+        //     child: SingleChildScrollView(
+        //       child: Column(
+        //         children: [
+        //           MyDrawerHeader(),
+        //           const SizedBox(
+        //             height: 40,
+        //           ),
+        //           GestureDetector(
+        //             onTap: () {
+        //               refreshPost();
+        //               setState(() {});
+        //               Navigator.pop(context);
+        //             },
+        //             child: Padding(
+        //               padding: const EdgeInsets.only(left: 40),
+        //               child: Row(
+        //                 children: [
+        //                   const AppImageAsset(
+        //                       image: 'assets/favourite_fill.svg'),
+        //                   const SizedBox(
+        //                     width: 29,
+        //                   ),
+        //                   Text(
+        //                     "Favourite",
+        //                     style: GoogleFonts.archivo(
+        //                       fontStyle: FontStyle.normal,
+        //                       color: Colors.white,
+        //                       fontSize: 18,
+        //                       // fontWeight: FontWeight.w700,
+        //                       wordSpacing: -0.09,
+        //                     ),
+        //                   ),
+        //                 ],
+        //               ),
+        //             ),
+        //           ),
+        //           const SizedBox(
+        //             height: 30,
+        //           ),
+        //           GestureDetector(
+        //             onTap: () async {
+        //               Navigator.of(context).pop();
+        //               // ignore: use_build_context_synchronously
+        //               Navigator.push(
+        //                 context,
+        //                 MaterialPageRoute(
+        //                   builder: (context) => const WallPapers(
+        //                     type: "WALLPAPER",
+        //                   ),
+        //                 ),
+        //               );
+        //             },
+        //             child: Padding(
+        //               padding: const EdgeInsets.only(left: 40),
+        //               child: Row(
+        //                 children: [
+        //                   const AppImageAsset(image: "assets/wallpaper.svg"),
+        //                   const SizedBox(
+        //                     width: 26,
+        //                   ),
+        //                   Text(
+        //                     "Wallpapers",
+        //                     style: GoogleFonts.archivo(
+        //                       fontStyle: FontStyle.normal,
+        //                       color: Colors.white,
+        //                       fontSize: 18,
+        //                       // fontWeight: FontWeight.w700,
+        //                       wordSpacing: -0.09,
+        //                     ),
+        //                   ),
+        //                 ],
+        //               ),
+        //             ),
+        //           ),
+        //           const SizedBox(
+        //             height: 30,
+        //           ),
+        //           Padding(
+        //             padding: const EdgeInsets.only(left: 40),
+        //             child: Row(
+        //               children: [
+        //                 SvgPicture.asset("assets/bell.svg"),
+        //                 const SizedBox(
+        //                   width: 20,
+        //                 ),
+        //                 Padding(
+        //                   padding: const EdgeInsets.all(8.0),
+        //                   child: Text(
+        //                     "Notifications",
+        //                     style: GoogleFonts.archivo(
+        //                       fontStyle: FontStyle.normal,
+        //                       color: Colors.white,
+        //                       fontSize: 18,
+        //                       // fontWeight: FontWeight.w700,
+        //                       wordSpacing: -0.09,
+        //                     ),
+        //                   ),
+        //                 ),
+        //               ],
+        //             ),
+        //           ),
+        //           const SizedBox(
+        //             height: 30,
+        //           ),
+        //           InkWell(
+        //             onTap: () async {
+        //               Navigator.of(context).pop();
+        //               Navigator.push(
+        //                 context,
+        //                 MaterialPageRoute(
+        //                   builder: (context) => const Dashbaord(
+        //                     type: "RINGTONE",
+        //                   ),
+        //                 ),
+        //               );
+        //             },
+        //             child: Padding(
+        //               padding: const EdgeInsets.only(left: 40),
+        //               child: Row(
+        //                 children: [
+        //                   const AppImageAsset(image: 'assets/ringtone.svg'),
+        //                   const SizedBox(
+        //                     width: 26,
+        //                   ),
+        //                   Text(
+        //                     "Ringtones",
+        //                     style: GoogleFonts.archivo(
+        //                       fontStyle: FontStyle.normal,
+        //                       color: Colors.white,
+        //                       fontSize: 18,
+        //                       // fontWeight: FontWeight.w700,
+        //                       wordSpacing: -0.09,
+        //                     ),
+        //                   ),
+        //                 ],
+        //               ),
+        //             ),
+        //           ),
+        //           const SizedBox(
+        //             height: 30,
+        //           ),
+        //           Divider(
+        //             height: 1,
+        //             thickness: 1,
+        //             color: Colors.grey.shade600,
+        //           ),
+        //           const SizedBox(
+        //             height: 25,
+        //           ),
+        //           Padding(
+        //             padding: const EdgeInsets.only(left: 37),
+        //             child: Row(
+        //               children: [
+        //                 const Icon(
+        //                   Icons.info,
+        //                   color: Colors.grey,
+        //                   size: 20,
+        //                 ),
+        //                 const SizedBox(
+        //                   width: 30,
+        //                 ),
+        //                 Text(
+        //                   "Help",
+        //                   style: GoogleFonts.archivo(
+        //                     fontStyle: FontStyle.normal,
+        //                     color: Colors.white,
+        //                     fontSize: 13,
+        //                     fontWeight: FontWeight.w400,
+        //                   ),
+        //                 ),
+        //               ],
+        //             ),
+        //           ),
+        //           const SizedBox(
+        //             height: 25,
+        //           ),
+        //           Padding(
+        //             padding: const EdgeInsets.only(left: 37),
+        //             child: Row(
+        //               children: [
+        //                 const Icon(
+        //                   Icons.settings,
+        //                   color: Color(0xffA49FAD),
+        //                   size: 20,
+        //                 ),
+        //                 const SizedBox(
+        //                   width: 30,
+        //                 ),
+        //                 Text(
+        //                   "Settings",
+        //                   style: GoogleFonts.archivo(
+        //                     fontStyle: FontStyle.normal,
+        //                     color: const Color(0xffA49FAD),
+        //                     fontSize: 13,
+        //                     fontWeight: FontWeight.w400,
+        //                   ),
+        //                 ),
+        //               ],
+        //             ),
+        //           ),
+        //           const SizedBox(
+        //             height: 25,
+        //           ),
+        //           Padding(
+        //             padding: const EdgeInsets.only(left: 37),
+        //             child: Row(
+        //               children: [
+        //                 const Icon(
+        //                   Icons.privacy_tip,
+        //                   color: Color(0xffA49FAD),
+        //                   size: 20,
+        //                 ),
+        //                 const SizedBox(
+        //                   width: 25,
+        //                 ),
+        //                 Padding(
+        //                   padding: const EdgeInsets.all(8.0),
+        //                   child: Text(
+        //                     "Privacy Policy",
+        //                     style: GoogleFonts.archivo(
+        //                       fontStyle: FontStyle.normal,
+        //                       color: const Color(0xffA49FAD),
+        //                       fontSize: 13,
+        //                       fontWeight: FontWeight.w400,
+        //                     ),
+        //                   ),
+        //                 ),
+        //               ],
+        //             ),
+        //           ),
+        //           const SizedBox(
+        //             height: 25,
+        //           ),
+        //           Divider(
+        //             height: 1,
+        //             thickness: 1,
+        //             color: Colors.grey.shade600,
+        //           ),
+        //           const SizedBox(
+        //             height: 25,
+        //           ),
+        //           Padding(
+        //             padding: const EdgeInsets.only(left: 40),
+        //             child: Row(
+        //               children: [
+        //                 const AppImageAsset(
+        //                   image: "assets/facebook.svg",
+        //                   color: Colors.grey,
+        //                 ),
+        //                 const SizedBox(width: 30),
+        //                 Text(
+        //                   "Join us on Facebook",
+        //                   style: GoogleFonts.archivo(
+        //                     fontStyle: FontStyle.normal,
+        //                     color: Colors.white,
+        //                     fontSize: 13,
+        //                     fontWeight: FontWeight.w400,
+        //                   ),
+        //                 ),
+        //               ],
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ),
     );
   }

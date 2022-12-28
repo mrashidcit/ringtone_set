@@ -27,7 +27,6 @@ import 'package:http/http.dart' as http;
 import '../categories/categories.dart';
 import '../tags/tags.dart';
 
-
 class UploadScreen extends StatefulWidget {
   const UploadScreen({Key? key}) : super(key: key);
 
@@ -47,7 +46,10 @@ class UploadScreenState extends State<UploadScreen> {
 
   final TextEditingController _typeAheadController = TextEditingController();
   final SearchServices _searchServices = SearchServices();
-  final RefreshController _refreshController = RefreshController(initialRefresh: true);
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: true);
+  TextEditingController _titleTextEditingController = TextEditingController();
+  TextEditingController _tagTextEditingController = TextEditingController();
 
   Future<bool> fetchWallpapers({bool isRefresh = false}) async {
     if (isRefresh) {
@@ -97,7 +99,6 @@ class UploadScreenState extends State<UploadScreen> {
       return false;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -262,6 +263,7 @@ class UploadScreenState extends State<UploadScreen> {
                         Border.all(color: const Color(0XFF979797), width: 1),
                   ),
                   child: TextFormField(
+                    controller: _titleTextEditingController,
                     style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
@@ -281,11 +283,13 @@ class UploadScreenState extends State<UploadScreen> {
                   alignment: Alignment.center,
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0XFF979797), width: 1),
+                    borderRadius: BorderRadius.circular(16),
+                    border:
+                        Border.all(color: const Color(0XFF979797), width: 1),
                   ),
                   child: TextFormField(
                     style: const TextStyle(color: Colors.white),
+                    controller: _tagTextEditingController,
                     decoration: const InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                       hintText: 'Tags',
@@ -333,10 +337,14 @@ class UploadScreenState extends State<UploadScreen> {
                       ),
                     ),
                     onPressed: () {
-                      if (profileImage!.lengthSync() < ((1024*1024) * 2)) {
-                        showCupertinoModalPopup(context: context, builder: (context) => const UploadSuccess());
+                      if (profileImage!.lengthSync() < ((1024 * 1024) * 2)) {
+                        showCupertinoModalPopup(
+                            context: context,
+                            builder: (context) => const UploadSuccess());
                       } else {
-                        showCupertinoModalPopup(context: context, builder: (context) => const UploadFail());
+                        showCupertinoModalPopup(
+                            context: context,
+                            builder: (context) => const UploadFail());
                       }
                     },
                   ),
@@ -470,9 +478,9 @@ class UploadScreenState extends State<UploadScreen> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => const FavouriteScreen(
-                            id: 9,
-                            type: 'Favourites',
-                          )),
+                                id: 9,
+                                type: 'Favourites',
+                              )),
                     );
                   },
                   child: Padding(

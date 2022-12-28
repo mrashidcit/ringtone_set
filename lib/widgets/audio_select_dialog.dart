@@ -281,6 +281,13 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       return;
     }
 
+    bool storagePermissionStatus = await _requestStoragePermission();
+
+    if (!storagePermissionStatus) {
+      showMessage(context, message: "Storage Permission is Required");
+      return;
+    }
+
     bool success = false;
     ProgressDialog pd = ProgressDialog(
       context,
@@ -346,7 +353,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       success = false;
     }
     if (success) {
-      showMessage(context, message: "Notifications sound  set successfully!");
+      showMessage(context, message: "Notifications sound set successfully!");
     } else {
       showMessage(context, message: "Error");
     }
@@ -511,17 +518,17 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
   Future<bool> _requestPermission() async {
     PermissionStatus storageStatus = await Permission.storage.status;
 
-    PermissionStatus externalStorageStatus =
+    PermissionStatus managedExternalStorageStatus =
         await Permission.manageExternalStorage.status;
 
     if ((storageStatus.isDenied ||
         storageStatus.isPermanentlyDenied ||
-        externalStorageStatus.isDenied ||
-        externalStorageStatus.isPermanentlyDenied)) {
+        managedExternalStorageStatus.isDenied ||
+        managedExternalStorageStatus.isPermanentlyDenied)) {
       if (storageStatus.isDenied) {
         await Permission.storage.request();
       }
-      if (externalStorageStatus.isDenied) {
+      if (managedExternalStorageStatus.isDenied) {
         await Permission.manageExternalStorage.request();
       }
 
@@ -535,14 +542,57 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
         openAppSettings();
       }
       if (storageStatus.isGranted ||
-          storageStatus.isLimited && externalStorageStatus.isGranted ||
-          externalStorageStatus.isLimited) {
+          storageStatus.isLimited && managedExternalStorageStatus.isGranted ||
+          managedExternalStorageStatus.isLimited) {
         return true;
       }
       return false;
     } else if (storageStatus.isGranted ||
-        storageStatus.isLimited && externalStorageStatus.isGranted ||
-        externalStorageStatus.isLimited) {
+        storageStatus.isLimited && managedExternalStorageStatus.isGranted ||
+        managedExternalStorageStatus.isLimited) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> _requestStoragePermission() async {
+    PermissionStatus storageStatus = await Permission.storage.status;
+
+    // PermissionStatus managedExternalStorageStatus =
+    //     await Permission.manageExternalStorage.status;
+
+    if ((storageStatus.isDenied || storageStatus.isPermanentlyDenied
+        // || managedExternalStorageStatus.isDenied ||
+        // managedExternalStorageStatus.isPermanentlyDenied
+        )) {
+      if (storageStatus.isDenied) {
+        await Permission.storage.request();
+      }
+      // if (managedExternalStorageStatus.isDenied) {
+      //   await Permission.manageExternalStorage.request();
+      // }
+
+      PermissionStatus permissionStorageStatus =
+          await Permission.storage.status;
+      // PermissionStatus permissionExternalStatus =
+      //     await Permission.manageExternalStorage.status;
+
+      if (permissionStorageStatus
+              .isDenied // || permissionExternalStatus.isDenied
+
+          ) {
+        openAppSettings();
+      }
+      if (storageStatus.isGranted || storageStatus.isLimited
+          //&& managedExternalStorageStatus.isGranted ||  managedExternalStorageStatus.isLimited
+          ) {
+        return true;
+      }
+      return false;
+    } else if (storageStatus.isGranted || storageStatus.isLimited
+        //&& managedExternalStorageStatus.isGranted || managedExternalStorageStatus.isLimited
+        ) {
       return true;
     } else {
       return false;
