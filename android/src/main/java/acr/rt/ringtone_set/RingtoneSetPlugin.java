@@ -224,11 +224,12 @@ public class RingtoneSetPlugin implements FlutterPlugin, MethodCallHandler {
         String relativePath = "";
 
         File mFile = new File(s);  // set File from path
-        Log.d(TAG, ">> setThings - check0 : isRingt , contactId , mFile.getAbsolutePath() = " + isRingt + " , " + contactId + " , " + mFile.getAbsolutePath());
+        Log.d(TAG, ">> setThings - check1 : isRingt , contactId , mFile.getAbsolutePath() = " + isRingt + " , " + contactId + " , " + mFile.getAbsolutePath());
         if (mFile.exists()) {
             // Android 10 or newer
             ContentValues newValuesForSetToContact = new ContentValues();
-            if (android.os.Build.VERSION.SDK_INT >= 29) { // file.exists
+            if (android.os.Build.VERSION.SDK_INT >= 29) {
+                Log.i("MainActivity", ">> assignedToContact - Android 10 or later");// file.exists
                 relativePath = Environment.DIRECTORY_ALARMS;
                 Uri mediaCollection = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
                 ContentValues values = new ContentValues();
@@ -297,14 +298,16 @@ public class RingtoneSetPlugin implements FlutterPlugin, MethodCallHandler {
                 }
             } else {
                 // Android 9 or older
+                Log.i("MainActivity", ">> assignedToContact - Android 9 or older");
                 final String absolutePath = mFile.getAbsolutePath();
-
+//                Uri mediaCollection = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.MediaColumns.DATA, absolutePath);
                 values.put(MediaStore.MediaColumns.TITLE, "Custom ringtone");
                 values.put(MediaStore.MediaColumns.SIZE, mFile.length());
                 values.put(MediaStore.Audio.Media.ARTIST, "Ringtone app");
                 values.put(MediaStore.Audio.Media.IS_RINGTONE, isRingt);
+                if (!contactId.isEmpty()) values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
                 values.put(MediaStore.Audio.Media.IS_NOTIFICATION, isNotif);
                 values.put(MediaStore.Audio.Media.IS_ALARM, isAlarm);
                 values.put(MediaStore.Audio.Media.IS_MUSIC, false);
@@ -313,7 +316,8 @@ public class RingtoneSetPlugin implements FlutterPlugin, MethodCallHandler {
                 Uri uri = MediaStore.Audio.Media.getContentUriForPath(absolutePath);
 
                 // delete the old one first
-                mContext.getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + absolutePath + "\"", null);
+                int deleteCount = mContext.getContentResolver().delete(uri, MediaStore.MediaColumns.DATA + "=\"" + absolutePath + "\"", null);
+                Log.i("MainActivity", ">> assignedToContact - deleteCount: " + deleteCount);
 
                 // insert a new record
                 Uri newUri = mContext.getContentResolver().insert(uri, values);
@@ -327,6 +331,13 @@ public class RingtoneSetPlugin implements FlutterPlugin, MethodCallHandler {
                     RingtoneManager.setActualDefaultRingtoneUri(
                             mContext, RingtoneManager.TYPE_RINGTONE,
                             newUri);
+                }
+                if (!contactId.isEmpty()) {
+                    ContentValues customValues = new ContentValues();
+                    customValues.put(ContactsContract.Contacts.CUSTOM_RINGTONE, newUri.toString());
+                    int count = mContext.getContentResolver().update(ContactsContract.Contacts.CONTENT_URI, customValues, ContactsContract.Contacts._ID + " = " + contactId, null);
+                    Log.i("MainActivity", ">> assignedToContact - Update: " + count);
+
                 }
                 if (isAlarm) {
                     RingtoneManager.setActualDefaultRingtoneUri(

@@ -28,7 +28,7 @@ Future<bool> setFromAsset({
 
 /// Sets [action] from network URL.
 ///
-/// [action] can be `"setRingtone"`, `"setNotification"`, `"setAlarm"`.
+/// [action] can be `"setRingtone"`, `"setNotification"`, `"setAlarm"`. `'setRingtoneToContact'`
 Future<bool> setFromNetwork({
   required String url,
   required String action,
