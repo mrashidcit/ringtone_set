@@ -14,6 +14,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:platform_device_id/platform_device_id.dart';
 import 'package:ringtone_set/ringtone_set.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
@@ -333,6 +334,14 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       );
       return;
     }
+
+    bool storagePermissionStatus = await _requestStoragePermission();
+
+    if (!storagePermissionStatus) {
+      showMessage(context, message: "Storage Permission is Required");
+      return;
+    }
+
     bool success = false;
     ProgressDialog pd = ProgressDialog(
       context,
@@ -374,6 +383,13 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       );
       return;
     }
+    bool storagePermissionStatus = await _requestStoragePermission();
+
+    if (!storagePermissionStatus) {
+      showMessage(context, message: "Storage Permission is Required");
+      return;
+    }
+
     bool success = false;
     ProgressDialog pd = ProgressDialog(
       context,
@@ -417,16 +433,12 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       return;
     }
 
-    // if (Platform.isAndroid) {
-    //   AndroidIntent intent = AndroidIntent(
-    //     action: 'ACTION_VIEW',
-    //     // action: 'ACTION_PICK',
-    //     // action: 'ACTION_GET_CONTENT',
-    //     // type: 'vnd.android.cursor.dir/contact',
-    //     // type: 'vnd.android.cursor.item/phone',
-    //   );
-    //   await intent.launchChooser('Contact');
-    // }
+    bool storagePermissionStatus = await _requestStoragePermission();
+
+    if (!storagePermissionStatus) {
+      showMessage(context, message: "Storage Permission is Required");
+      return;
+    }
 
     // Request contact permission
     if (await FlutterContacts.requestPermission()) {
@@ -459,7 +471,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       }
 
       if (success) {
-        showMessage(context, message: "Alarm sound set successfully!");
+        showMessage(context, message: "Rintone Successfully Set to Contact!");
       } else {
         showMessage(context, message: "Error");
       }
@@ -484,6 +496,14 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       );
       return;
     }
+
+    bool storagePermissionStatus = await _requestStoragePermission();
+
+    if (!storagePermissionStatus) {
+      showMessage(context, message: "Storage Permission is Required");
+      return;
+    }
+
     bool success = false;
 
     ProgressDialog pd = ProgressDialog(
@@ -557,52 +577,58 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
   }
 
   Future<bool> _requestStoragePermission() async {
-    PermissionStatus storageStatus = await Permission.storage.status;
+    bool output = false;
 
-    // PermissionStatus managedExternalStorageStatus =
-    //     await Permission.manageExternalStorage.status;
+    if (Platform.isAndroid) {
+      var androidInfo = await PlatformDeviceId.deviceInfoPlugin.androidInfo;
+      var release = androidInfo.version.release;
+      var sdkInt = androidInfo.version.sdkInt;
 
-    if ((storageStatus.isDenied || storageStatus.isPermanentlyDenied
-        // || managedExternalStorageStatus.isDenied ||
-        // managedExternalStorageStatus.isPermanentlyDenied
-        )) {
-      if (storageStatus.isDenied) {
-        await Permission.storage.request();
+      if (sdkInt >= 23 && sdkInt <= 28) {
+        PermissionStatus storageStatus = await Permission.storage.status;
+        if ((storageStatus.isDenied || storageStatus.isPermanentlyDenied)) {
+          if (storageStatus.isDenied) {
+            storageStatus = await Permission.storage.request();
+          }
+
+          output = storageStatus.isGranted;
+        } else if (storageStatus.isGranted || storageStatus.isLimited) {
+          output = true;
+        } else {
+          output = false;
+        }
       }
-      // if (managedExternalStorageStatus.isDenied) {
-      //   await Permission.manageExternalStorage.request();
-      // }
-
-      PermissionStatus permissionStorageStatus =
-          await Permission.storage.status;
-      // PermissionStatus permissionExternalStatus =
-      //     await Permission.manageExternalStorage.status;
-
-      if (permissionStorageStatus
-              .isDenied // || permissionExternalStatus.isDenied
-
-          ) {
-        openAppSettings();
-      }
-      if (storageStatus.isGranted || storageStatus.isLimited
-          //&& managedExternalStorageStatus.isGranted ||  managedExternalStorageStatus.isLimited
-          ) {
-        return true;
-      }
-      return false;
-    } else if (storageStatus.isGranted || storageStatus.isLimited
-        //&& managedExternalStorageStatus.isGranted || managedExternalStorageStatus.isLimited
-        ) {
-      return true;
+      var manufacturer = androidInfo.manufacturer;
+      var model = androidInfo.model;
+      print('Android $release (SDK $sdkInt), $manufacturer $model');
+      // Android 9 (SDK 28), Xiaomi Redmi Note 7
     } else {
-      return false;
+      // for API level 29 & Above
+      PermissionStatus managedExternalStorageStatus =
+          await Permission.manageExternalStorage.status;
+      if (managedExternalStorageStatus.isDenied ||
+          managedExternalStorageStatus.isPermanentlyDenied) {
+        if (managedExternalStorageStatus.isDenied) {
+          managedExternalStorageStatus =
+              await Permission.manageExternalStorage.request();
+        }
+
+        output = managedExternalStorageStatus.isGranted;
+      } else if (managedExternalStorageStatus.isGranted ||
+          managedExternalStorageStatus.isLimited) {
+        output = true;
+      } else {
+        output = false;
+      }
     }
+
+    return output;
   }
 
   Future<bool> downloadFile(String url, String fileName) async {
     Directory directory;
     try {
-      if (await _requestPermission()) {
+      if (await _requestStoragePermission()) {
         directory = (await getExternalStorageDirectory())!;
         String newPath = "";
 
