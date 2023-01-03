@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:deeze_app/helpers/share_value_helper.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/internet_checkor_dialog.dart';
@@ -442,7 +443,10 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
 
     // Request contact permission
     if (await FlutterContacts.requestPermission()) {
+      show_openAppAd.$ = false;
       Contact? contact = await FlutterContacts.openExternalPick();
+
+      show_openAppAd.$ = true;
 
       if (contact == null || contact!.id.isEmpty) {
         return;
@@ -597,29 +601,36 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
         } else {
           output = false;
         }
+      } else {
+        // for API level 29 & Above
+        print('>> for API level 29 & Above ');
+        PermissionStatus managedExternalStorageStatus =
+            await Permission.manageExternalStorage.status;
+        print(
+            '>> managedExternalStorageStatus.isGranted : ${managedExternalStorageStatus.isGranted}');
+        print(
+            '>> managedExternalStorageStatus.isDenied : ${managedExternalStorageStatus.isDenied}');
+        print(
+            '>> managedExternalStorageStatus.isPermanentlyDenied : ${managedExternalStorageStatus.isPermanentlyDenied}');
+        print(
+            '>> managedExternalStorageStatus.isRestricted : ${managedExternalStorageStatus.isRestricted}');
+        if (!managedExternalStorageStatus.isGranted) {
+          managedExternalStorageStatus =
+              await Permission.manageExternalStorage.request();
+          managedExternalStorageStatus = await Permission.storage.request();
+
+          output = managedExternalStorageStatus.isGranted;
+        } else if (managedExternalStorageStatus.isGranted ||
+            managedExternalStorageStatus.isLimited) {
+          output = true;
+        } else {
+          output = false;
+        }
       }
       var manufacturer = androidInfo.manufacturer;
       var model = androidInfo.model;
       print('Android $release (SDK $sdkInt), $manufacturer $model');
       // Android 9 (SDK 28), Xiaomi Redmi Note 7
-    } else {
-      // for API level 29 & Above
-      PermissionStatus managedExternalStorageStatus =
-          await Permission.manageExternalStorage.status;
-      if (managedExternalStorageStatus.isDenied ||
-          managedExternalStorageStatus.isPermanentlyDenied) {
-        if (managedExternalStorageStatus.isDenied) {
-          managedExternalStorageStatus =
-              await Permission.manageExternalStorage.request();
-        }
-
-        output = managedExternalStorageStatus.isGranted;
-      } else if (managedExternalStorageStatus.isGranted ||
-          managedExternalStorageStatus.isLimited) {
-        output = true;
-      } else {
-        output = false;
-      }
     }
 
     return output;
