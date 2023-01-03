@@ -3,6 +3,7 @@ package acr.rt.ringtone_set;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteConstraintException;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -320,7 +321,19 @@ public class RingtoneSetPlugin implements FlutterPlugin, MethodCallHandler {
                 Log.i("MainActivity", ">> assignedToContact - deleteCount: " + deleteCount);
 
                 // insert a new record
-                Uri newUri = mContext.getContentResolver().insert(uri, values);
+                Uri newUri;
+                try {
+                    Log.d("MainActivity", ">> mContext.getContentResolver().insert");
+                    newUri = mContext.getContentResolver().insert(uri, values);
+                } catch (SQLiteConstraintException ex) {
+                    Log.e("MainActivity", "Catch Exception");
+                    Log.e("MainActivity", ex.getMessage(), ex);
+
+                    newUri = uri;
+
+                }
+
+
 
                 if (isNotif) {
                     RingtoneManager.setActualDefaultRingtoneUri(
