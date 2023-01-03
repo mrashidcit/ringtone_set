@@ -442,6 +442,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
     }
 
     // Request contact permission
+    show_openAppAd.$ = false;
     if (await FlutterContacts.requestPermission()) {
       show_openAppAd.$ = false;
       Contact? contact = await FlutterContacts.openExternalPick();
@@ -466,9 +467,12 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       );
       pd.show();
       try {
-        print('>> actionSetToContact - contact!.id : ${contact!.id}');
+        print(
+            '>> actionSetToContact - contact!.id , widget.file : ${contact!.id} , ${widget.file}');
         success = await RingtoneSet.setRingtoneToContactFromNetwork(
-            widget.file, contact!.id);
+          widget.file,
+          contact!.id,
+        );
         pd.dismiss();
       } on PlatformException {
         success = false;
@@ -484,6 +488,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       showMessage(context,
           message: "Contact Permission is Required to Set the Ringtone.");
     }
+
+    show_openAppAd.$ = true;
   }
 
   Future<void> actionSaveToMedia() async {
@@ -675,8 +681,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
         await Dio().download(url, saveFile.path);
         return true;
       }
-    } catch (e) {
-      print(e);
+    } catch (ex, stackTrace) {
+      Completer().completeError(ex, stackTrace);
     }
     return false;
   }

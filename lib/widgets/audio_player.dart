@@ -286,9 +286,10 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
             child: Stack(
               children: [
                 const AppImageAsset(
-                    image: 'assets/drop_shadow.png',
-                    height: double.infinity,
-                    fit: BoxFit.cover),
+                  image: 'assets/drop_shadow.png',
+                  height: double.infinity,
+                  fit: BoxFit.cover,
+                ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -307,11 +308,19 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                         } else {
                           final file = widget.listHydra[index].file;
                           final name = widget.listHydra[index].name;
-                          myfile = index == 0
-                              ? widget.listHydra[0].file!
-                              : widget.listHydra[index - 1].file!;
+                          print(
+                              '>> CarouselSlider - itemBuilder - name , file : $name , $file');
+                          // myfile = index == 0
+                          //     ? widget.listHydra[0].file!
+                          //     : widget.listHydra[index - 1].file!;
+                          myfile = file!;
                           return buildCarouselItem(
-                              index, context, file, name, screenWidth);
+                            index,
+                            context,
+                            file,
+                            name,
+                            screenWidth,
+                          );
                         }
                       },
                       options: CarouselOptions(
@@ -411,12 +420,15 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                         const SizedBox(width: 25),
                         GestureDetector(
                           onTap: () {
-                            print('>> onTap : myFile = $myfile');
+                            var file = widget.listHydra[activeIndex].file;
+                            var name = widget.listHydra[activeIndex].name;
+                            // print('>> onTap : myFile = $myfile ');
+                            print('>> onTap : name , file = $name , $file ');
                             showCupertinoModalPopup(
                               context: context,
                               barrierColor: Colors.black.withOpacity(0.8),
                               builder: (context) =>
-                                  AudioSelectDialog(file: myfile),
+                                  AudioSelectDialog(file: file!),
                             );
                           },
                           child: Container(
