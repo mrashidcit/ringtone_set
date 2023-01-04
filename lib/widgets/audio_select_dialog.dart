@@ -366,10 +366,17 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       var sdkInt = androidInfo.version.sdkInt;
 
       if (sdkInt >= 30) {
-        if ((await Permission.manageExternalStorage.status).isGranted) {
+        PermissionStatus managedExternalStorageStatus =
+            await Permission.manageExternalStorage.status;
+        print(
+            '>> actionSetRingTone - sdkInt , Permission.manageExternalStorage.status.isGranted : $sdkInt , ${managedExternalStorageStatus.isGranted}');
+
+        if (managedExternalStorageStatus.isGranted) {
           storagePermissionStatus = true;
         } else {
-          storagePermissionStatus = await _requestStoragePermission();
+          print('>> actionSetRingTone : _requestStoragePermission');
+
+          _requestStoragePermission();
           return;
         }
       }
@@ -421,7 +428,29 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       );
       return;
     }
-    bool storagePermissionStatus = await _requestStoragePermission();
+    bool storagePermissionStatus = false;
+
+    if (Platform.isAndroid) {
+      var androidInfo = await PlatformDeviceId.deviceInfoPlugin.androidInfo;
+      var release = androidInfo.version.release;
+      var sdkInt = androidInfo.version.sdkInt;
+
+      if (sdkInt >= 30) {
+        PermissionStatus managedExternalStorageStatus =
+            await Permission.manageExternalStorage.status;
+        print(
+            '>> actionSetRingTone - sdkInt , Permission.manageExternalStorage.status.isGranted : $sdkInt , ${managedExternalStorageStatus.isGranted}');
+
+        if (managedExternalStorageStatus.isGranted) {
+          storagePermissionStatus = true;
+        } else {
+          print('>> actionSetRingTone : _requestStoragePermission');
+
+          _requestStoragePermission();
+          return;
+        }
+      }
+    }
 
     if (!storagePermissionStatus) {
       showMessage(context, message: "Storage Permission is Required");
@@ -471,7 +500,29 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       return;
     }
 
-    bool storagePermissionStatus = await _requestStoragePermission();
+    bool storagePermissionStatus = false;
+
+    if (Platform.isAndroid) {
+      var androidInfo = await PlatformDeviceId.deviceInfoPlugin.androidInfo;
+      var release = androidInfo.version.release;
+      var sdkInt = androidInfo.version.sdkInt;
+
+      if (sdkInt >= 30) {
+        PermissionStatus managedExternalStorageStatus =
+            await Permission.manageExternalStorage.status;
+        print(
+            '>> actionSetRingTone - sdkInt , Permission.manageExternalStorage.status.isGranted : $sdkInt , ${managedExternalStorageStatus.isGranted}');
+
+        if (managedExternalStorageStatus.isGranted) {
+          storagePermissionStatus = true;
+        } else {
+          print('>> actionSetRingTone : _requestStoragePermission');
+
+          _requestStoragePermission();
+          return;
+        }
+      }
+    }
 
     if (!storagePermissionStatus) {
       showMessage(context, message: "Storage Permission is Required");
@@ -544,7 +595,29 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       return;
     }
 
-    bool storagePermissionStatus = await _requestStoragePermission();
+    bool storagePermissionStatus = false;
+
+    if (Platform.isAndroid) {
+      var androidInfo = await PlatformDeviceId.deviceInfoPlugin.androidInfo;
+      var release = androidInfo.version.release;
+      var sdkInt = androidInfo.version.sdkInt;
+
+      if (sdkInt >= 30) {
+        PermissionStatus managedExternalStorageStatus =
+            await Permission.manageExternalStorage.status;
+        print(
+            '>> actionSetRingTone - sdkInt , Permission.manageExternalStorage.status.isGranted : $sdkInt , ${managedExternalStorageStatus.isGranted}');
+
+        if (managedExternalStorageStatus.isGranted) {
+          storagePermissionStatus = true;
+        } else {
+          print('>> actionSetRingTone : _requestStoragePermission');
+
+          _requestStoragePermission();
+          return;
+        }
+      }
+    }
 
     if (!storagePermissionStatus) {
       showMessage(context, message: "Storage Permission is Required");
