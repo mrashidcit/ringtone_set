@@ -283,7 +283,29 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       return;
     }
 
-    bool storagePermissionStatus = await _requestStoragePermission();
+    bool storagePermissionStatus = false;
+
+    if (Platform.isAndroid) {
+      var androidInfo = await PlatformDeviceId.deviceInfoPlugin.androidInfo;
+      var release = androidInfo.version.release;
+      var sdkInt = androidInfo.version.sdkInt;
+
+      if (sdkInt >= 30) {
+        PermissionStatus managedExternalStorageStatus =
+            await Permission.manageExternalStorage.status;
+        print(
+            '>> actionSetRingTone - sdkInt , Permission.manageExternalStorage.status.isGranted : $sdkInt , ${managedExternalStorageStatus.isGranted}');
+
+        if (managedExternalStorageStatus.isGranted) {
+          storagePermissionStatus = true;
+        } else {
+          print('>> actionSetRingTone : _requestStoragePermission');
+
+          _requestStoragePermission();
+          return;
+        }
+      }
+    }
 
     if (!storagePermissionStatus) {
       showMessage(context, message: "Storage Permission is Required");
@@ -336,7 +358,22 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       return;
     }
 
-    bool storagePermissionStatus = await _requestStoragePermission();
+    bool storagePermissionStatus = false;
+
+    if (Platform.isAndroid) {
+      var androidInfo = await PlatformDeviceId.deviceInfoPlugin.androidInfo;
+      var release = androidInfo.version.release;
+      var sdkInt = androidInfo.version.sdkInt;
+
+      if (sdkInt >= 30) {
+        if ((await Permission.manageExternalStorage.status).isGranted) {
+          storagePermissionStatus = true;
+        } else {
+          storagePermissionStatus = await _requestStoragePermission();
+          return;
+        }
+      }
+    }
 
     if (!storagePermissionStatus) {
       showMessage(context, message: "Storage Permission is Required");
@@ -594,7 +631,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
       var release = androidInfo.version.release;
       var sdkInt = androidInfo.version.sdkInt;
 
-      if (sdkInt >= 23 && sdkInt <= 28) {
+      if (sdkInt >= 23 && sdkInt <= 29) {
         PermissionStatus storageStatus = await Permission.storage.status;
         if ((storageStatus.isDenied || storageStatus.isPermanentlyDenied)) {
           if (storageStatus.isDenied) {
@@ -609,9 +646,11 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
         }
       } else {
         // for API level 29 & Above
-        print('>> for API level 29 & Above ');
+        print('>> for API level 30 & Above ');
+        show_openAppAd.$ = false;
         PermissionStatus managedExternalStorageStatus =
             await Permission.manageExternalStorage.status;
+
         print(
             '>> managedExternalStorageStatus.isGranted : ${managedExternalStorageStatus.isGranted}');
         print(
@@ -623,9 +662,11 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
         if (!managedExternalStorageStatus.isGranted) {
           managedExternalStorageStatus =
               await Permission.manageExternalStorage.request();
-          managedExternalStorageStatus = await Permission.storage.request();
+          // managedExternalStorageStatus = await Permission.storage.request();
 
           output = managedExternalStorageStatus.isGranted;
+          print(
+              '>> after tigger setting - managedExternalStorageStatus.isGranted : ${managedExternalStorageStatus.isRestricted}');
         } else if (managedExternalStorageStatus.isGranted ||
             managedExternalStorageStatus.isLimited) {
           output = true;
@@ -633,9 +674,10 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
           output = false;
         }
       }
+      show_openAppAd.$ = true;
       var manufacturer = androidInfo.manufacturer;
       var model = androidInfo.model;
-      print('Android $release (SDK $sdkInt), $manufacturer $model');
+      print('>> Android $release (SDK $sdkInt), $manufacturer $model');
       // Android 9 (SDK 28), Xiaomi Redmi Note 7
     }
 
