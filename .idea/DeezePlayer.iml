@@ -71,6 +71,9 @@
       <excludeFolder url="file://$MODULE_DIR$/windows/flutter/ephemeral/.plugin_symlinks/platform_device_id_windows/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/windows/flutter/ephemeral/.plugin_symlinks/platform_device_id_windows/build" />
       <excludeFolder url="file://$MODULE_DIR$/windows/flutter/ephemeral/.plugin_symlinks/platform_device_id_windows/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ringtone_set/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/ringtone_set/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/ringtone_set/example/.pub" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 33, extension level 3 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

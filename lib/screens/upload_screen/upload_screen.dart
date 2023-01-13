@@ -1,8 +1,12 @@
 import 'dart:io';
 
 import 'package:deeze_app/bloc/deeze_bloc/Category_bloc/category_bloc.dart';
+import 'package:deeze_app/enums/enum_item_type.dart';
+import 'package:deeze_app/helpers/share_value_helper.dart';
 import 'package:deeze_app/models/deeze_model.dart';
 import 'package:deeze_app/models/search_model.dart';
+import 'package:deeze_app/repositories/file_repository.dart';
+import 'package:deeze_app/repositories/item_repository.dart';
 import 'package:deeze_app/screens/favourite/favourite_screen.dart';
 import 'package:deeze_app/screens/search/search_screen.dart';
 import 'package:deeze_app/screens/upload_screen/upload_status_screen.dart';
@@ -35,7 +39,7 @@ class UploadScreen extends StatefulWidget {
 }
 
 class UploadScreenState extends State<UploadScreen> {
-  File? profileImage;
+  File? _selectedImage;
   final ImagePicker imagePicker = ImagePicker();
   bool isShow = false;
   bool isLoading = false;
@@ -209,7 +213,7 @@ class UploadScreenState extends State<UploadScreen> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    if (profileImage == null)
+                    if (_selectedImage == null)
                       DottedBorder(
                         color: const Color(0XFF979797),
                         strokeWidth: 3,
@@ -233,7 +237,7 @@ class UploadScreenState extends State<UploadScreen> {
                           ),
                         ),
                       ),
-                    profileImage == null
+                    _selectedImage == null
                         ? const AppImageAsset(image: 'assets/upload_add.svg')
                         : SizedBox(
                             height: 250,
@@ -241,7 +245,7 @@ class UploadScreenState extends State<UploadScreen> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
                               child: Image.file(
-                                profileImage!,
+                                _selectedImage!,
                                 height: 250,
                                 width: 150,
                                 fit: BoxFit.fill,
@@ -252,7 +256,7 @@ class UploadScreenState extends State<UploadScreen> {
                 ),
               ),
               const SizedBox(height: 30),
-              if (profileImage != null)
+              if (_selectedImage != null)
                 Container(
                   height: 50,
                   alignment: Alignment.center,
@@ -277,7 +281,7 @@ class UploadScreenState extends State<UploadScreen> {
                   ),
                 ),
               const SizedBox(height: 30),
-              if (profileImage != null)
+              if (_selectedImage != null)
                 Container(
                   height: 50,
                   alignment: Alignment.center,
@@ -315,7 +319,7 @@ class UploadScreenState extends State<UploadScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              if (profileImage != null)
+              if (_selectedImage != null)
                 Container(
                   height: 50,
                   width: double.infinity,
@@ -336,17 +340,7 @@ class UploadScreenState extends State<UploadScreen> {
                         wordSpacing: 0.22,
                       ),
                     ),
-                    onPressed: () {
-                      if (profileImage!.lengthSync() < ((1024 * 1024) * 2)) {
-                        showCupertinoModalPopup(
-                            context: context,
-                            builder: (context) => const UploadSuccess());
-                      } else {
-                        showCupertinoModalPopup(
-                            context: context,
-                            builder: (context) => const UploadFail());
-                      }
-                    },
+                    onPressed: onTapUploadData,
                   ),
                 ),
             ],
@@ -635,26 +629,100 @@ class UploadScreenState extends State<UploadScreen> {
   }
 
   void imageFromCamera() async {
+    show_openAppAd.$ = false;
     XFile? cameraImage = await imagePicker.pickImage(
       source: ImageSource.camera,
       imageQuality: 100,
     );
     if (cameraImage != null) {
-      profileImage = File(cameraImage.path);
-      print('Profile Image from Camera --> $profileImage');
+      _selectedImage = File(cameraImage.path);
+      print('Profile Image from Camera --> $_selectedImage');
       setState(() {});
     }
+    show_openAppAd.$ = true;
   }
 
   void imageFromGallery() async {
+    show_openAppAd.$ = false;
     XFile? galleryImage = await imagePicker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 100,
     );
     if (galleryImage != null) {
-      profileImage = File(galleryImage.path);
-      print('Profile Image from Gallery --> $profileImage');
+      _selectedImage = File(galleryImage.path);
+      print('Profile Image from Gallery --> $_selectedImage');
       setState(() {});
     }
+    show_openAppAd.$ = true;
+  }
+
+  void onTapUploadData() async {
+    if (_selectedImage!.lengthSync() < ((1024 * 1024) * 2)) {
+      var title = _titleTextEditingController.text;
+      var tags = _tagTextEditingController.text;
+
+      if (title.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Please Enter Title.'),
+        ));
+        return;
+      } else if (title.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Please Enter Tags.'),
+        ));
+        return;
+      } else if (_selectedImage == null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Please Select Image File.'),
+        ));
+        return;
+      }
+
+      // Upload Image File
+      var imageUploadResponse = await FileRepository()
+          .getUploadFileResponse(XFile(_selectedImage!.path));
+
+      var uploadedFileName = imageUploadResponse.fileModel!.fileName;
+
+      List<String> tagsList = tags.split(',');
+
+      var itemCreateResponse = await ItemRepository().getCreateItemResponse(
+        title: title,
+        tags: tagsList,
+        uploadedFileName: uploadedFileName,
+        itemType: ItemType.WALLPAPER,
+      );
+
+      if (itemCreateResponse.result) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Successfully Uploaded!'),
+        ));
+        resetValues();
+        // showCupertinoModalPopup(
+        //   context: context,
+        //   builder: (context) => const UploadSuccess(),
+        // );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(itemCreateResponse.message),
+        ));
+        // showCupertinoModalPopup(
+        //   context: context,
+        //   builder: (context) => const UploadFail(),
+        // );
+      }
+    } else {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) => const UploadFail(),
+      );
+    }
+  }
+
+  void resetValues() {
+    _selectedImage = null;
+    _titleTextEditingController.text = '';
+    _tagTextEditingController.text = '';
+    setState(() {});
   }
 }

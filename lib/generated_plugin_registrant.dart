@@ -21,6 +21,7 @@ import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'package:just_audio_web/just_audio_web.dart';
 import 'package:platform_device_id_web/platform_device_id_web.dart';
 import 'package:shared_preferences_web/shared_preferences_web.dart';
+import 'package:toast/toast_web.dart';
 
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
@@ -41,5 +42,6 @@ void registerPlugins(Registrar registrar) {
   JustAudioPlugin.registerWith(registrar);
   PlatformDeviceIdWebPlugin.registerWith(registrar);
   SharedPreferencesPlugin.registerWith(registrar);
+  ToastWebPlugin.registerWith(registrar);
   registrar.registerMessageHandler();
 }

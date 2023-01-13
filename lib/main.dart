@@ -16,6 +16,7 @@ import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:get/get_state_manager/src/simple/list_notifier.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_value/shared_value.dart';
+import 'package:toast/toast.dart';
 
 import 'bloc/deeze_bloc/Category_bloc/category_bloc.dart';
 import 'bloc/deeze_bloc/ringtone_bloc.dart';
@@ -134,6 +135,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    ToastContext().init(context);
     return MultiBlocProvider(
       providers: [
         BlocProvider<RingtoneBloc>(
