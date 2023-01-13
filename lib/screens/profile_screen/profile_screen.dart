@@ -1,12 +1,17 @@
 import 'dart:io';
 
 import 'package:deeze_app/helpers/share_value_helper.dart';
+import 'package:deeze_app/models/deeze_model.dart';
+import 'package:deeze_app/repositories/item_repository.dart';
 import 'package:deeze_app/repositories/user_repository.dart';
+import 'package:deeze_app/screens/custom_widgets/custom_drawer.dart';
 import 'package:deeze_app/screens/dashboard/dashboard.dart';
 import 'package:deeze_app/screens/favourite/favourite_screen.dart';
 import 'package:deeze_app/screens/wallpapers/wallpapers.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
+import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/drawer_header.dart';
+import 'package:deeze_app/widgets/wallpaper_dispaly.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -25,6 +30,32 @@ class ProfileScreenState extends State<ProfileScreen> {
   int selectedIndex = -1;
   XFile? _selectedProfileImage;
   bool _showProfileUploadingProgressBar = false;
+  List<DeezeItemModel> _itemsList = [];
+  var _isItemLoading = true;
+  var _showBottomItemLoadingProgressBar = false;
+  bool _deleteItemProgressBar = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    fetchData();
+  }
+
+  void fetchData() async {
+    var itemResponse = await ItemRepository().getRandomItemsResponse();
+
+    if (itemResponse.result) {
+      _itemsList.addAll(itemResponse.itemList);
+      _isItemLoading = false;
+      setState(() {});
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Unable to load Data!'),
+      ));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -251,277 +282,13 @@ class ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 4),
-            profilePostView(screenWidth, context),
+            _isItemLoading
+                ? Expanded(child: LoadingPage())
+                : profilePostView(screenWidth, context),
           ],
         ),
       ),
-      drawer: Drawer(
-        child: Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF252030),
-            // gradient: const LinearGradient(colors: [
-            //   Color(0xFF252030),
-            // ]),
-            // borderRadius: BorderRadius.circular(10),
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const MyDrawerHeader(showProfile: false),
-                const SizedBox(height: 40),
-                InkWell(
-                  onTap: () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const Dashbaord(
-                          type: "RINGTONE",
-                        ),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 40),
-                    child: Row(
-                      children: [
-                        const AppImageAsset(image: "assets/ringtone.svg"),
-                        const SizedBox(
-                          width: 26,
-                        ),
-                        Text(
-                          "Ringtones",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.white,
-                            fontSize: 18,
-                            // fontWeight: FontWeight.w700,
-                            wordSpacing: -0.09,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    Navigator.of(context).pop();
-                    // ignore: use_build_context_synchronously
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const WallPapers(
-                          type: "WALLPAPER",
-                        ),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 40),
-                    child: Row(
-                      children: [
-                        const AppImageAsset(image: "assets/wallpaper.svg"),
-                        const SizedBox(width: 26),
-                        Text(
-                          "Wallpapers",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.white,
-                            fontSize: 18,
-                            // fontWeight: FontWeight.w700,
-                            wordSpacing: -0.09,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 40),
-                  child: Row(
-                    children: [
-                      const AppImageAsset(image: "assets/bell.svg"),
-                      const SizedBox(width: 20),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "Notifications",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.white,
-                            fontSize: 18,
-                            // fontWeight: FontWeight.w700,
-                            wordSpacing: -0.09,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const FavouriteScreen(
-                                id: 9,
-                                type: 'Favourites',
-                              )),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 40),
-                    child: Row(
-                      children: [
-                        const AppImageAsset(image: "assets/drawer_fav.svg"),
-                        const SizedBox(width: 29),
-                        Text(
-                          "Favourite",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.white,
-                            fontSize: 18,
-                            // fontWeight: FontWeight.w700,
-                            wordSpacing: -0.09,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Colors.grey.shade600,
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 37),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.info,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      const SizedBox(
-                        width: 30,
-                      ),
-                      Text(
-                        "Help",
-                        style: GoogleFonts.archivo(
-                          fontStyle: FontStyle.normal,
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 37),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.settings,
-                        color: Color(0xffA49FAD),
-                        size: 20,
-                      ),
-                      const SizedBox(
-                        width: 30,
-                      ),
-                      Text(
-                        "Settings",
-                        style: GoogleFonts.archivo(
-                          fontStyle: FontStyle.normal,
-                          color: const Color(0xffA49FAD),
-                          fontSize: 13,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 37),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.privacy_tip,
-                        color: Color(0xffA49FAD),
-                        size: 20,
-                      ),
-                      const SizedBox(
-                        width: 25,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "Privacy Policy",
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: const Color(0xffA49FAD),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Colors.grey.shade600,
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 40),
-                  child: Row(
-                    children: [
-                      const AppImageAsset(image: "assets/facebook.svg"),
-                      const SizedBox(width: 30),
-                      Text(
-                        "Join us on Facebook",
-                        style: GoogleFonts.archivo(
-                          fontStyle: FontStyle.normal,
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      drawer: CustomDrawer(),
     );
   }
 
@@ -546,6 +313,20 @@ class ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> performDeleteItem(ctx, int itemId, setState) async {
+    var deleteResponse =
+        await ItemRepository().getDeleteItemResponse(itemId: itemId);
+
+    _deleteItemProgressBar = true;
+    if (deleteResponse.result) {
+      showToast(ctx, message: deleteResponse.message);
+    } else {
+      showToast(ctx, message: deleteResponse.message);
+    }
+    _deleteItemProgressBar = false;
+    setState(() {});
+  }
+
   Expanded profilePostView(double screenWidth, BuildContext context) {
     return Expanded(
       child: GridView(
@@ -560,19 +341,31 @@ class ProfileScreenState extends State<ProfileScreen> {
         ),
         shrinkWrap: true,
         children: List.generate(
-          16,
+          _itemsList.length,
           (index) => Stack(
             children: [
-              SizedBox(
-                width: screenWidth * 0.4,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: const AppImageAsset(
-                    image:
-                        'https://deeze.net/uploads/20220518081758-6284e3f66645a.jpg',
-                    isWebImage: true,
-                    webHeight: double.infinity,
-                    webFit: BoxFit.fill,
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => WallPaperSlider(
+                        listHydra: _itemsList,
+                        index: index,
+                      ),
+                    ),
+                  );
+                },
+                child: SizedBox(
+                  width: screenWidth * 0.4,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: AppImageAsset(
+                      image: _itemsList[index].file,
+                      isWebImage: true,
+                      webHeight: double.infinity,
+                      webFit: BoxFit.fill,
+                    ),
                   ),
                 ),
               ),
@@ -585,10 +378,16 @@ class ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               Positioned(
-                top: 5,
+                top: 10,
                 right: 5,
                 child: GestureDetector(
-                  onTap: () => setState(() => selectedIndex = index),
+                  onTap: () {
+                    if (selectedIndex != index)
+                      selectedIndex = index;
+                    else
+                      selectedIndex = -1;
+                    setState(() {});
+                  },
                   child: const AppImageAsset(
                     image: 'assets/horizontal_more.svg',
                     height: 12,
@@ -604,122 +403,158 @@ class ProfileScreenState extends State<ProfileScreen> {
                       GestureDetector(
                         onTap: () {
                           showCupertinoModalPopup(
-                            context: context,
-                            builder: (context) => Container(
-                              margin: const EdgeInsets.only(bottom: 60),
-                              alignment: Alignment.bottomCenter,
-                              child: Card(
-                                elevation: 10,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 20),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 30),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Are you sure you want to delete ?',
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.archivo(
-                                          fontStyle: FontStyle.normal,
-                                          color: const Color(0XFFA49FAD),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
+                              context: context,
+                              builder: (context) {
+                                return StatefulBuilder(
+                                  builder: ((context, setState) {
+                                    return Container(
+                                      margin: const EdgeInsets.only(bottom: 60),
+                                      alignment: Alignment.bottomCenter,
+                                      child: Card(
+                                        elevation: 10,
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 30),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'Are you sure you want to delete ?',
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.archivo(
+                                                  fontStyle: FontStyle.normal,
+                                                  color:
+                                                      const Color(0XFFA49FAD),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 40),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () =>
+                                                        Navigator.of(context)
+                                                            .pop(),
+                                                    child: Container(
+                                                      height: 40,
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          vertical: 10,
+                                                          horizontal: 30),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(16),
+                                                      ),
+                                                      child: Text(
+                                                        'Cancel',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style:
+                                                            GoogleFonts.archivo(
+                                                          fontStyle:
+                                                              FontStyle.normal,
+                                                          color: Colors.black,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 24),
+                                                  _deleteItemProgressBar
+                                                      ? RefreshProgressIndicator()
+                                                      : InkWell(
+                                                          onTap: () async {
+                                                            await performDeleteItem(
+                                                                context,
+                                                                _itemsList[
+                                                                        index]
+                                                                    .id!,
+                                                                setState);
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                            setState(() =>
+                                                                selectedIndex =
+                                                                    -1);
+                                                          },
+                                                          child: Container(
+                                                            height: 40,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    vertical:
+                                                                        10,
+                                                                    horizontal:
+                                                                        30),
+                                                            alignment: Alignment
+                                                                .center,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                              gradient:
+                                                                  const LinearGradient(
+                                                                begin: Alignment
+                                                                    .bottomLeft,
+                                                                end: Alignment
+                                                                    .bottomRight,
+                                                                colors: [
+                                                                  Color(
+                                                                      0XFF7209B7),
+                                                                  Color(
+                                                                      0XFF5945CE),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            child: Text(
+                                                              'Delete',
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: GoogleFonts
+                                                                  .archivo(
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .normal,
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 18),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(height: 40),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          InkWell(
-                                            onTap: () =>
-                                                Navigator.of(context).pop(),
-                                            child: Container(
-                                              height: 40,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10,
-                                                      horizontal: 30),
-                                              alignment: Alignment.center,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(16),
-                                              ),
-                                              child: Text(
-                                                'Cancel',
-                                                textAlign: TextAlign.center,
-                                                style: GoogleFonts.archivo(
-                                                  fontStyle: FontStyle.normal,
-                                                  color: Colors.black,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 24),
-                                          InkWell(
-                                            onTap: () {
-                                              Navigator.of(context).pop();
-                                              setState(
-                                                  () => selectedIndex = -1);
-                                              Fluttertoast.showToast(
-                                                msg: "Item deleted",
-                                                toastLength: Toast.LENGTH_SHORT,
-                                                gravity: ToastGravity.BOTTOM,
-                                                timeInSecForIosWeb: 1,
-                                                backgroundColor: Colors.white,
-                                                textColor:
-                                                    const Color(0XFFA49FAD),
-                                                fontSize: 16,
-                                              );
-                                            },
-                                            child: Container(
-                                              height: 40,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10,
-                                                      horizontal: 30),
-                                              alignment: Alignment.center,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                gradient: const LinearGradient(
-                                                  begin: Alignment.bottomLeft,
-                                                  end: Alignment.bottomRight,
-                                                  colors: [
-                                                    Color(0XFF7209B7),
-                                                    Color(0XFF5945CE),
-                                                  ],
-                                                ),
-                                              ),
-                                              child: Text(
-                                                'Delete',
-                                                textAlign: TextAlign.center,
-                                                style: GoogleFonts.archivo(
-                                                  fontStyle: FontStyle.normal,
-                                                  color: Colors.white,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 18),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
+                                    );
+                                  }),
+                                );
+                              });
                         },
                         child: Text(
                           'Delete',

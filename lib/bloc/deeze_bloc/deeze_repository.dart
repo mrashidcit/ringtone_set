@@ -1,4 +1,6 @@
+import 'package:deeze_app/app_config.dart';
 import 'package:deeze_app/bloc/deeze_bloc/wallpaper_bloc/wallpaper_bloc.dart';
+import 'package:deeze_app/enums/enum_item_type.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 

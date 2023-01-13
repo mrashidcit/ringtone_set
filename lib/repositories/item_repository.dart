@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:deeze_app/app_config.dart';
@@ -7,6 +8,8 @@ import 'package:deeze_app/models/deeze_model.dart';
 import 'package:deeze_app/models/delete_user_response.dart';
 import 'package:deeze_app/models/file_upload_response.dart';
 import 'package:deeze_app/models/item_create_response.dart';
+import 'package:deeze_app/models/item_delete_response.dart';
+import 'package:deeze_app/models/random_item_response.dart';
 import 'package:deeze_app/models/signin_response.dart';
 import 'package:deeze_app/models/signup_response.dart';
 import 'package:deeze_app/models/user_profile_update_response.dart';
@@ -58,51 +61,69 @@ class ItemRepository {
     return itemCreateResponse;
   }
 
-  Future<SignInResponse> getSignInUserResponse(
-    @required String email,
-    @required String password,
-  ) async {
-    var post_body = jsonEncode({
-      "email": "$email",
-      "password": "$password",
-    });
+  Future<ItemDeleteResponse> getDeleteItemResponse({
+    required int itemId,
+  }) async {
+    var post_body = jsonEncode({});
 
-    Uri url = Uri.parse("${AppConfig.BASE_URL}/auth");
-    print('>> getSignInUserResponse : url = $url');
-    print('>> post_body : $post_body');
-    final response = await http.post(url,
+    Uri url = Uri.parse("${AppConfig.BASE_URL}/items/$itemId");
+    final response = await http.delete(url,
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
+          "x-api-token": api_token.$,
         },
         body: post_body);
 
-    var signInResponse = SignInResponse(api_token: '', user: User());
-
-    if (response.statusCode == 200) {
-      signInResponse = signInResponseFromJson(response.body);
-      print('>> getSignInUserResponse : response = ${response.body}');
-    } else {
-      signInResponse.message = jsonDecode(response.body)['error'];
-    }
-
-    return signInResponse;
-  }
-
-  Future<DeleteUserResponse> getDeleteUserAccountResponse() async {
-    Uri url = Uri.parse("${AppConfig.BASE_URL}/users/${user_id.$}");
-    print('>> getSignInUserResponse : url = $url');
-    final response =
-        await http.delete(url, headers: {'x-api-token': api_token.$});
-
-    var deleteUserResponse =
-        DeleteUserResponse(result: true, message: 'Successfully Deleted!');
+    var outputResponse = ItemDeleteResponse();
 
     if (response.statusCode == 204) {
-      deleteUserResponse.result = true;
-      deleteUserResponse.message = "Successfully Deleted!";
-      print('>> getSignInUserResponse : response = ${response.body}');
+      outputResponse.result = true;
+      outputResponse.message = 'Successfully Delete!';
+    } else if (response.statusCode == 404) {
+      outputResponse.result = false;
+      outputResponse.message = 'Item not found!';
+    } else {
+      outputResponse.result = false;
+      outputResponse.message = 'Unable to Delete The Item!';
     }
 
-    return deleteUserResponse;
+    return outputResponse;
+  }
+
+  Future<RandomItemResponse> getRandomItemsResponse(
+      {ItemType itemType = ItemType.WALLPAPER, pageNumber = 1}) async {
+    Uri uri = Uri.parse(AppConfig.ITEM_RANDOM_COLLECTION_URL)
+        .replace(queryParameters: {
+      "page": "$pageNumber",
+      "itemsPerPage": "10",
+      // "enabled": "true",
+      "type": itemType.name
+    });
+    var outputResponse = RandomItemResponse();
+    try {
+      http.Response response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      print('${response.statusCode} : ${response.request}');
+
+      if (response.statusCode == 200) {
+        print(response.body);
+        outputResponse.result = true;
+        outputResponse.itemList = deezeItemModelFromJson(response.body);
+      } else {
+        outputResponse.result = false;
+        outputResponse.message = 'Unable to Load Data!';
+      }
+    } catch (ex, stack) {
+      Completer().completeError(ex, stack);
+      outputResponse.result = false;
+      outputResponse.message = 'Unable to Load Data!';
+    }
+
+    return outputResponse;
   }
 }

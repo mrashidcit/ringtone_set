@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 
 class LoadingPage extends StatelessWidget {
   const LoadingPage({Key? key}) : super(key: key);
@@ -16,12 +17,24 @@ class LoadingPage extends StatelessWidget {
 }
 
 showMessage(BuildContext context,
-    {@required String? message,
-      Color textColor = Colors.white}) {
+    {@required String? message, Color textColor = Colors.white}) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       backgroundColor: const Color(0xFF4d047d).withOpacity(0.8),
-      content: Text(message!,style: const TextStyle(fontWeight: FontWeight.w600,fontSize: 15)),
+      content: Text(message!,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
     ),
+  );
+}
+
+showToast(
+  BuildContext context, {
+  required String message,
+  Color textColor = Colors.white,
+}) {
+  Toast.show(
+    message,
+    duration: Toast.lengthShort,
+    gravity: Toast.bottom,
   );
 }
