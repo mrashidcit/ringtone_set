@@ -343,11 +343,11 @@ class _BuildImageState extends State<BuildImage> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 500,
+      height: 400,
       child: Stack(
         children: [
           SizedBox(
-            height: 500,
+            height: 400,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: AppImageAsset(

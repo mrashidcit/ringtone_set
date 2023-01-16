@@ -126,4 +126,47 @@ class ItemRepository {
 
     return outputResponse;
   }
+
+  Future<RandomItemResponse> getCurrentUserItemsResponse({
+    ItemType itemType = ItemType.WALLPAPER,
+    pageNumber = 1,
+  }) async {
+    Uri uri =
+        Uri.parse("${AppConfig.BASE_URL}/items").replace(queryParameters: {
+      "page": "$pageNumber",
+      "itemsPerPage": "10",
+      "user_id": "${user_id.$}",
+      "type": itemType.name
+    });
+    var outputResponse = RandomItemResponse();
+    try {
+      http.Response response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-token': api_token.$,
+        },
+      );
+      print('>> x-api-token : ${api_token.$}');
+      print('>> response.statusCode : ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        print(response.body);
+        outputResponse.result = true;
+        outputResponse.itemList = deezeItemModelFromJson(response.body);
+      } else if (response.statusCode == 401) {
+        outputResponse.result = false;
+        outputResponse.message = 'Session Expired!';
+      } else {
+        outputResponse.result = false;
+        outputResponse.message = 'Unable to Load Data!';
+      }
+    } catch (ex, stack) {
+      Completer().completeError(ex, stack);
+      outputResponse.result = false;
+      outputResponse.message = 'Unable to Load Data!';
+    }
+
+    return outputResponse;
+  }
 }

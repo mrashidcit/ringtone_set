@@ -151,7 +151,7 @@ class TagModel {
   List<String>? items;
 
   factory TagModel.fromJson(Map<String, dynamic> json) => TagModel(
-        id: int.parse(json["id"]),
+        id: (json["id"] is String) ? int.parse(json["id"]) : json["id"],
         name: json["name"],
         items: (json['items'] != null)
             ? List<String>.from(json["items"].map((x) => x))

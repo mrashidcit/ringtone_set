@@ -5,4 +5,5 @@ class MyTheme {
   static final Color primaryColor = Color(0xFF4d047d);
 
   static final Color orange = Colors.orange;
+  static final Color white = Colors.white;
 }

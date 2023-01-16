@@ -304,6 +304,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
           _requestStoragePermission();
           return;
         }
+      } else {
+        storagePermissionStatus = await _requestStoragePermission();
       }
     }
 
@@ -379,6 +381,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
           _requestStoragePermission();
           return;
         }
+      } else {
+        storagePermissionStatus = await _requestStoragePermission();
       }
     }
 
@@ -449,6 +453,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
           _requestStoragePermission();
           return;
         }
+      } else {
+        storagePermissionStatus = await _requestStoragePermission();
       }
     }
 
@@ -521,6 +527,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
           _requestStoragePermission();
           return;
         }
+      } else {
+        storagePermissionStatus = await _requestStoragePermission();
       }
     }
 
@@ -616,6 +624,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
           _requestStoragePermission();
           return;
         }
+      } else {
+        storagePermissionStatus = await _requestStoragePermission();
       }
     }
 

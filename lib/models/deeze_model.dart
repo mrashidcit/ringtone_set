@@ -191,6 +191,7 @@
 //
 //     final deezeItemModel = deezeItemModelFromJson(jsonString);
 
+import 'dart:async';
 import 'dart:convert';
 
 // List<DeezeItemModel> deezeItemModelFromJson(String str) => List<DeezeItemModel>.from(json.decode(str).map((x) => DeezeItemModel.fromJson(x)));
@@ -333,8 +334,13 @@ class DeezeItemModel {
         type: json["type"],
         file: json["file"],
         user: User.fromJson(json["user"]),
-        tags: List<TagModel>.from(
-            json['tags'].map((item) => TagModel.fromJson(item))),
+        tags: List<TagModel>.from(json['tags'].map((item) {
+          if (!(item is String)) {
+            return TagModel.fromJson(item);
+          } else {
+            return TagModel();
+          }
+        })),
         isFavourite: json["isFavourite"] ?? false,
       );
 

@@ -51,8 +51,9 @@ class FileRepository {
           fileUploadResponseFromJson(await response.stream.bytesToString());
 
       // signUpResposne = signupResponseFromJson(response.body);
-    } else if (response.statusCode == 409) {
-      // signUpResposne.result = false;
+    } else if (response.statusCode == 401) {
+      fileUploadResponse.result = false;
+      fileUploadResponse.message = "Session Expired!";
       // signUpResposne.message = json.decode(response.body);
     }
 

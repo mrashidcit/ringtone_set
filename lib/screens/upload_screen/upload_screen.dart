@@ -13,6 +13,7 @@ import 'package:deeze_app/screens/upload_screen/upload_status_screen.dart';
 import 'package:deeze_app/screens/wallpapers/wallpapers.dart';
 import 'package:deeze_app/services/search_services.dart';
 import 'package:deeze_app/uitilities/end_points.dart';
+import 'package:deeze_app/uitilities/my_theme.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/category_card.dart';
@@ -27,6 +28,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:http/http.dart' as http;
+import 'package:file_picker/file_picker.dart';
 
 import '../categories/categories.dart';
 import '../tags/tags.dart';
@@ -39,7 +41,8 @@ class UploadScreen extends StatefulWidget {
 }
 
 class UploadScreenState extends State<UploadScreen> {
-  File? _selectedImage;
+  File? _selectedFile;
+  ItemType _selectedItemType = ItemType.WALLPAPER;
   final ImagePicker imagePicker = ImagePicker();
   bool isShow = false;
   bool isLoading = false;
@@ -54,6 +57,7 @@ class UploadScreenState extends State<UploadScreen> {
       RefreshController(initialRefresh: true);
   TextEditingController _titleTextEditingController = TextEditingController();
   TextEditingController _tagTextEditingController = TextEditingController();
+  bool _showUpLoadingProgressBar = false;
 
   Future<bool> fetchWallpapers({bool isRefresh = false}) async {
     if (isRefresh) {
@@ -205,6 +209,38 @@ class UploadScreenState extends State<UploadScreen> {
                               Navigator.of(context).pop();
                             },
                           ),
+                          ListTile(
+                            leading: const AppImageAsset(
+                                image: 'assets/ringtone.svg'),
+                            title: const Text(
+                              'Ringtone',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w200,
+                              ),
+                            ),
+                            onTap: () {
+                              pickAudioForRingtone();
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          ListTile(
+                            leading: SvgPicture.asset("assets/bell.svg"),
+                            title: const Text(
+                              'Notification',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w200,
+                              ),
+                            ),
+                            onTap: () {
+                              pickAudioForRingtone(
+                                  itemType: ItemType.NOTIFICATION);
+                              Navigator.of(context).pop();
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -213,7 +249,7 @@ class UploadScreenState extends State<UploadScreen> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    if (_selectedImage == null)
+                    if (_selectedFile == null)
                       DottedBorder(
                         color: const Color(0XFF979797),
                         strokeWidth: 3,
@@ -237,26 +273,39 @@ class UploadScreenState extends State<UploadScreen> {
                           ),
                         ),
                       ),
-                    _selectedImage == null
+                    _selectedFile == null
                         ? const AppImageAsset(image: 'assets/upload_add.svg')
-                        : SizedBox(
-                            height: 250,
-                            width: 150,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.file(
-                                _selectedImage!,
+                        : (_selectedItemType == ItemType.RINGTONE ||
+                                _selectedItemType == ItemType.NOTIFICATION)
+                            ? Column(
+                                children: [
+                                  const AppImageAsset(
+                                      image: 'assets/ringtone.svg'),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    _selectedFile!.path.split('/').last,
+                                    style: TextStyle(color: MyTheme.white),
+                                  )
+                                ],
+                              )
+                            : SizedBox(
                                 height: 250,
                                 width: 150,
-                                fit: BoxFit.fill,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.file(
+                                    _selectedFile!,
+                                    height: 250,
+                                    width: 150,
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
                   ],
                 ),
               ),
               const SizedBox(height: 30),
-              if (_selectedImage != null)
+              if (_selectedFile != null)
                 Container(
                   height: 50,
                   alignment: Alignment.center,
@@ -281,7 +330,7 @@ class UploadScreenState extends State<UploadScreen> {
                   ),
                 ),
               const SizedBox(height: 30),
-              if (_selectedImage != null)
+              if (_selectedFile != null)
                 Container(
                   height: 50,
                   alignment: Alignment.center,
@@ -319,7 +368,7 @@ class UploadScreenState extends State<UploadScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              if (_selectedImage != null)
+              if (_selectedFile != null)
                 Container(
                   height: 50,
                   width: double.infinity,
@@ -327,22 +376,25 @@ class UploadScreenState extends State<UploadScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: const Color(0xFF560CAD),
-                    ),
-                    child: Text(
-                      'Finnish',
-                      style: GoogleFonts.archivo(
-                        fontStyle: FontStyle.normal,
-                        color: Colors.white,
-                        fontSize: 16,
-                        wordSpacing: 0.22,
-                      ),
-                    ),
-                    onPressed: onTapUploadData,
-                  ),
+                  child: _showUpLoadingProgressBar
+                      ? LoadingPage()
+                      : ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: const Color(0xFF560CAD),
+                          ),
+                          child: Text(
+                            'Finnish',
+                            style: GoogleFonts.archivo(
+                              fontStyle: FontStyle.normal,
+                              color: Colors.white,
+                              fontSize: 16,
+                              wordSpacing: 0.22,
+                            ),
+                          ),
+                          onPressed: onTapUploadData,
+                        ),
                 ),
+              SizedBox(height: 20),
             ],
           ),
         ),
@@ -635,8 +687,9 @@ class UploadScreenState extends State<UploadScreen> {
       imageQuality: 100,
     );
     if (cameraImage != null) {
-      _selectedImage = File(cameraImage.path);
-      print('Profile Image from Camera --> $_selectedImage');
+      _selectedFile = File(cameraImage.path);
+      _selectedItemType = ItemType.WALLPAPER;
+      print('Profile Image from Camera --> $_selectedFile');
       setState(() {});
     }
     show_openAppAd.$ = true;
@@ -649,15 +702,34 @@ class UploadScreenState extends State<UploadScreen> {
       imageQuality: 100,
     );
     if (galleryImage != null) {
-      _selectedImage = File(galleryImage.path);
-      print('Profile Image from Gallery --> $_selectedImage');
+      _selectedFile = File(galleryImage.path);
+      _selectedItemType = ItemType.WALLPAPER;
+      print('Profile Image from Gallery --> $_selectedFile');
+      setState(() {});
+    }
+    show_openAppAd.$ = true;
+  }
+
+  void pickAudioForRingtone({itemType = ItemType.RINGTONE}) async {
+    show_openAppAd.$ = false;
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['mp3'],
+    );
+
+    XFile? audioFile = XFile(result!.files[0].path!);
+
+    if (audioFile != null) {
+      _selectedFile = File(audioFile.path);
+      _selectedItemType = itemType;
+      print('Profile Image from Gallery --> $_selectedFile');
       setState(() {});
     }
     show_openAppAd.$ = true;
   }
 
   void onTapUploadData() async {
-    if (_selectedImage!.lengthSync() < ((1024 * 1024) * 2)) {
+    if (_selectedFile!.lengthSync() < ((1024 * 1024) * 2)) {
       var title = _titleTextEditingController.text;
       var tags = _tagTextEditingController.text;
 
@@ -671,16 +743,30 @@ class UploadScreenState extends State<UploadScreen> {
           content: Text('Please Enter Tags.'),
         ));
         return;
-      } else if (_selectedImage == null) {
+      } else if (_selectedFile == null) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Please Select Image File.'),
         ));
         return;
       }
 
+      _showUpLoadingProgressBar = true;
+      setState(() {});
+
       // Upload Image File
       var imageUploadResponse = await FileRepository()
-          .getUploadFileResponse(XFile(_selectedImage!.path));
+          .getUploadFileResponse(XFile(_selectedFile!.path));
+
+      print('>> imageUploadResponse = ${imageUploadResponse.result}');
+      if (!imageUploadResponse.result) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(imageUploadResponse.message),
+        ));
+        setState(() {
+          _showUpLoadingProgressBar = false;
+        });
+        return;
+      }
 
       var uploadedFileName = imageUploadResponse.fileModel!.fileName;
 
@@ -690,7 +776,7 @@ class UploadScreenState extends State<UploadScreen> {
         title: title,
         tags: tagsList,
         uploadedFileName: uploadedFileName,
-        itemType: ItemType.WALLPAPER,
+        itemType: _selectedItemType,
       );
 
       if (itemCreateResponse.result) {
@@ -717,10 +803,14 @@ class UploadScreenState extends State<UploadScreen> {
         builder: (context) => const UploadFail(),
       );
     }
+
+    setState(() {
+      _showUpLoadingProgressBar = false;
+    });
   }
 
   void resetValues() {
-    _selectedImage = null;
+    _selectedFile = null;
     _titleTextEditingController.text = '';
     _tagTextEditingController.text = '';
     setState(() {});
