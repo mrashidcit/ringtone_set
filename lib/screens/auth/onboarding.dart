@@ -145,58 +145,7 @@ class OnBoardingState extends State<OnBoarding> {
                     color: Color(0XFF4267B2),
                     text: 'Facebook',
                     onTap: () async {
-                      UserCredential userCredentials =
-                          await signInWithFacebook();
-
-                      setState(() {
-                        _showProgressBar = true;
-                      });
-
-                      var firstName = userCredentials.user!.displayName!;
-                      var lastName = '';
-                      var email = userCredentials.user!.email!;
-                      var facebookId =
-                          userCredentials.additionalUserInfo!.providerId!;
-                      var imageUrl = userCredentials.user!.photoURL!;
-
-                      var signUpResponse =
-                          await AuthRepository().getSignUpWithFacebookResponse(
-                        firstName,
-                        lastName,
-                        email,
-                        facebookId,
-                        imageUrl,
-                      );
-
-                      if (signUpResponse.result) {
-                        saveUserInCache(signUpResponse.user!);
-                        api_token.$ = signUpResponse.apiToken;
-                        is_logged_in.$ = true;
-
-                        var snackBar = SnackBar(
-                          content: Text('Successfully Logged In!'),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (ctx) =>
-                                  Dashbaord(type: ItemType.RINGTONE.name),
-                            ),
-                            (route) => false);
-                      } else {
-                        // performSignInAction(email, password);
-                        // is_logged_in.$ = false;
-                        // user_id.$ = 0;
-                        var snackBar = SnackBar(
-                          content: Text(signUpResponse.message),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }
-
-                      setState(() {
-                        _showProgressBar = false;
-                      });
+                      signInWithFacebook();
                     }),
                 const SizedBox(height: 20),
                 AppSocialMediaButton(
@@ -267,21 +216,68 @@ class OnBoardingState extends State<OnBoarding> {
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
-  Future<UserCredential> signInWithFacebook() async {
+  Future<void> signInWithFacebook() async {
     print(">> signInWithFacebook");
     // Trigger the sign-in flow
-    // final LoginResult loginResult = await FacebookAuth.instance.login();
-    final LoginResult loginResult =
-        await FacebookAuth.instance.login(permissions: const ['email']);
+    final LoginResult loginResult = await FacebookAuth.instance.login();
+    // final LoginResult loginResult =
+    //     await FacebookAuth.instance.login(permissions: const ['email']);
 
     print(">> signInWithFacebook - status : ${loginResult.status.name}");
     print(">> signInWithFacebook - message : ${loginResult.message}");
-    // Create a credential from the access token
-    final OAuthCredential facebookAuthCredential =
-        FacebookAuthProvider.credential(loginResult.accessToken!.token);
+    if (loginResult.status == LoginStatus.success) {
+      final userData = await FacebookAuth.instance.getUserData();
+
+      setState(() {
+        _showProgressBar = true;
+      });
+
+      var firstName = userData['name'];
+      var lastName = userData['name'];
+      var email = userData['email'];
+      var facebookId = userData['id'];
+      var imageUrl = userData['picture']['url'];
+
+      var signUpResponse = await AuthRepository().getSignUpWithFacebookResponse(
+        firstName,
+        lastName,
+        email,
+        facebookId,
+        imageUrl ?? '',
+      );
+
+      if (signUpResponse.result) {
+        saveUserInCache(signUpResponse.user!);
+        api_token.$ = signUpResponse.apiToken;
+        is_logged_in.$ = true;
+
+        var snackBar = SnackBar(
+          content: Text('Successfully Logged In!'),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (ctx) => Dashbaord(type: ItemType.RINGTONE.name),
+            ),
+            (route) => false);
+      } else {
+        // performSignInAction(email, password);
+        // is_logged_in.$ = false;
+        // user_id.$ = 0;
+        var snackBar = SnackBar(
+          content: Text(signUpResponse.message),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+
+      setState(() {
+        _showProgressBar = false;
+      });
+    }
 
     // Once signed in, return the UserCredential
-    return FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+    // return FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
   }
 
   Future<void> performSignInAction(email, password) async {
