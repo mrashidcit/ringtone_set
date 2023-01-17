@@ -575,6 +575,7 @@ class ProfileScreenState extends State<ProfileScreen>
               // index: index,
               index: 0,
               type: _selectedItemType.name,
+              loadCurrentUserItemsOnly: true,
             ),
           ),
         );
@@ -589,6 +590,9 @@ class ProfileScreenState extends State<ProfileScreen>
         // } else {}
         await onTapRingtoneCardFunction(index);
       }),
+      onTapDelete: (itemIndex) {
+        showDeleteConfirmationDialog(itemIndex);
+      },
       audioPlayer: selectedIndex == index ? audioPlayer : pausePlayer,
       isPlaying: selectedIndex == index ? isPlaying : false,
       isBuffering: selectedIndex == index ? _isBuffering : false,
@@ -665,6 +669,7 @@ class ProfileScreenState extends State<ProfileScreen>
                 builder: (context) => WallPaperSlider(
                   listHydra: _itemsList,
                   index: index,
+                  loadCurrentUserItemsOnly: true,
                 ),
               ),
             );
@@ -874,5 +879,124 @@ class ProfileScreenState extends State<ProfileScreen>
           ),
       ],
     );
+  }
+
+  void showDeleteConfirmationDialog(int index) {
+    showCupertinoModalPopup(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: ((context, setState) {
+              return Container(
+                margin: const EdgeInsets.only(bottom: 60),
+                alignment: Alignment.bottomCenter,
+                child: Card(
+                  elevation: 10,
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 30),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Are you sure you want to delete ?',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.archivo(
+                            fontStyle: FontStyle.normal,
+                            color: const Color(0XFFA49FAD),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            InkWell(
+                              onTap: () => Navigator.of(context).pop(),
+                              child: Container(
+                                height: 40,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 30),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Text(
+                                  'Cancel',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.archivo(
+                                    fontStyle: FontStyle.normal,
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            _deleteItemProgressBar
+                                ? RefreshProgressIndicator()
+                                : InkWell(
+                                    onTap: () async {
+                                      await performDeleteItem(
+                                          context,
+                                          _itemsList[index].id!,
+                                          index,
+                                          setState);
+
+                                      Navigator.of(context).pop();
+                                      notifyItemDelete(index);
+                                    },
+                                    child: Container(
+                                      height: 40,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 30),
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        gradient: const LinearGradient(
+                                          begin: Alignment.bottomLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: [
+                                            Color(0XFF7209B7),
+                                            Color(0XFF5945CE),
+                                          ],
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Delete',
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.archivo(
+                                          fontStyle: FontStyle.normal,
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                          ],
+                        ),
+                        const SizedBox(height: 18),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+          );
+        });
+  }
+
+  void notifyItemDelete(int index) {
+    // _itemsList.removeAt(index);
+    selectedIndex = -1;
+    setState(() {});
   }
 }

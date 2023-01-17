@@ -9,6 +9,7 @@ import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:social_share/social_share.dart';
 
 import '../../../models/deeze_model.dart';
 
@@ -26,6 +27,7 @@ class ProfileRingtonesCard extends StatefulWidget {
   final VoidCallback onTap;
   final VoidCallback onNavigate;
   final Function(double) onChange;
+  final Function(int) onTapDelete;
   ProfileRingtonesCard(
       {Key? key,
       required this.ringtoneName,
@@ -35,6 +37,7 @@ class ProfileRingtonesCard extends StatefulWidget {
       required this.onTap,
       required this.onNavigate,
       required this.onChange,
+      required this.onTapDelete,
       required this.audioPlayer,
       this.duration,
       this.isPlaying = false,
@@ -92,6 +95,8 @@ class _RingtonesCardState extends State<ProfileRingtonesCard> {
   // Whether the green box should be visible.
   bool _visible = true;
   double _width = 0.0;
+
+  int selectedIndex = -1;
 
   refreshFavorite() async {
     favoriteList = await FavoriteDataBase.instance
@@ -253,31 +258,32 @@ class _RingtonesCardState extends State<ProfileRingtonesCard> {
                       children: [
                         GestureDetector(
                           onTap: (() async {
-                            String? deviceId =
-                                await PlatformDeviceId.getDeviceId;
+                            // String? deviceId =
+                            //     await PlatformDeviceId.getDeviceId;
 
-                            Favorite favorite = Favorite(
-                                name: widget.ringtoneName,
-                                currentDeviceId: deviceId!,
-                                path: widget.file,
-                                deezeId: widget.auidoId,
-                                type: "MUSIC");
-                            favoriteList.isEmpty
-                                ? await FavoriteDataBase.instance
-                                    .addFavorite(favorite)
-                                : await FavoriteDataBase.instance
-                                    .delete(favoriteList.first.deezeId);
-                            refreshFavorite();
+                            // Favorite favorite = Favorite(
+                            //   name: widget.ringtoneName,
+                            //   currentDeviceId: deviceId!,
+                            //   path: widget.file,
+                            //   deezeId: widget.auidoId,
+                            //   type: "MUSIC",
+                            // );
+                            // favoriteList.isEmpty
+                            //     ? await FavoriteDataBase.instance
+                            //         .addFavorite(favorite)
+                            //     : await FavoriteDataBase.instance
+                            //         .delete(favoriteList.first.deezeId);
+                            // refreshFavorite();
+                            if (selectedIndex != widget.index)
+                              selectedIndex = widget.index;
+                            else
+                              selectedIndex = -1;
+                            setState(() {});
                           }),
-                          child: favoriteList.isEmpty
-                              ? const AppImageAsset(
-                                  image: 'assets/favourite.svg', height: 16)
-                              : const AppImageAsset(
-                                  image: "assets/favourite_fill.svg",
-                                  color: Colors.red,
-                                  height: 16,
-                                  width: 16,
-                                ),
+                          child: Container(
+                            // decoration: BoxDecoration(color: MyTheme.white),
+                            child: Icon(Icons.more_horiz),
+                          ),
                         ),
                         const SizedBox(height: 7),
                         Row(
@@ -302,6 +308,54 @@ class _RingtonesCardState extends State<ProfileRingtonesCard> {
                   ],
                 ),
               ),
+              if (selectedIndex == widget.index)
+                Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    width: screenWidth * 0.4,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                ),
+              if (selectedIndex == widget.index)
+                Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          selectedIndex = -1;
+                          widget.onTapDelete(widget.index);
+                        },
+                        child: Text(
+                          'Delete',
+                          style: GoogleFonts.archivo(
+                            fontStyle: FontStyle.normal,
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () {
+                          SocialShare.shareOptions(widget.file);
+                        },
+                        child: Text(
+                          'Share',
+                          style: GoogleFonts.archivo(
+                            fontStyle: FontStyle.normal,
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
             ],
           ),
         ),

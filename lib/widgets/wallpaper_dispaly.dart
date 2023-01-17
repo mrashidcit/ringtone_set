@@ -4,6 +4,9 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:deeze_app/enums/enum_item_type.dart';
+import 'package:deeze_app/repositories/item_repository.dart';
+import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/more_audio_dialog.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
@@ -30,7 +33,12 @@ import '../uitilities/end_points.dart';
 class WallPaperSlider extends StatefulWidget {
   final List<DeezeItemModel>? listHydra;
   final int? index;
-  const WallPaperSlider({Key? key, this.listHydra, this.index})
+  bool loadCurrentUserItemsOnly = false;
+  WallPaperSlider(
+      {Key? key,
+      this.listHydra,
+      this.index,
+      this.loadCurrentUserItemsOnly = false})
       : super(key: key);
 
   @override
@@ -42,6 +50,7 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
   final CarouselController _controller = CarouselController();
   late int activeIndex = 0;
   String file = "";
+  bool _noMoreDataFound = false;
   animateToSilde(int index) => _controller.animateToPage(
         0,
         duration: Duration(milliseconds: 100),
@@ -60,35 +69,65 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
 
   int page = 1;
   Future<bool> fetchWallaper() async {
-    var url = getDeezeAppHpUrlContent;
+    print('>> fetchWallaper');
 
-    Uri uri = Uri.parse(url).replace(queryParameters: {
-      "page": "$page",
-      "itemsPerPage": "10",
-      // "enabled": "true",
-      "type": "WALLPAPER"
-    });
-    try {
-      http.Response response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    if (widget.loadCurrentUserItemsOnly) {
+      setState(() {});
+      var itemResponse = await ItemRepository().getCurrentUserItemsResponse(
+        itemType: ItemType.WALLPAPER,
+        pageNumber: page,
       );
-      print('${response.statusCode} : ${response.request}');
-
-      if (response.statusCode == 200) {
-        print(response.body);
-        var rawResponse = deezeItemModelFromJson(response.body);
-
-        widget.listHydra!.addAll(rawResponse);
-
+      print(
+          '>> fetchWallaper - itemResponse.result , itemResponse.itemList.length : ${itemResponse.result} , ${itemResponse.itemList.length} ');
+      if (itemResponse.result) {
+        if (itemResponse.itemList.length > 0) page++;
+        widget.listHydra!.addAll(itemResponse.itemList);
+        setState(() {});
+        if (itemResponse.itemList.isEmpty) {
+          _noMoreDataFound = true;
+          setState(() {});
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('No Data Found!'),
+          ));
+        }
         return true;
       } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Unable to load Data!'),
+        ));
         return false;
       }
-    } catch (e) {
-      return false;
+    } else {
+      var url = getDeezeAppHpUrlContent;
+
+      Uri uri = Uri.parse(url).replace(queryParameters: {
+        "page": "$page",
+        "itemsPerPage": "10",
+        // "enabled": "true",
+        "type": "WALLPAPER"
+      });
+      try {
+        http.Response response = await http.get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        );
+        print('${response.statusCode} : ${response.request}');
+
+        if (response.statusCode == 200) {
+          print(response.body);
+          var rawResponse = deezeItemModelFromJson(response.body);
+
+          widget.listHydra!.addAll(rawResponse);
+
+          return true;
+        } else {
+          return false;
+        }
+      } catch (e) {
+        return false;
+      }
     }
   }
 
@@ -139,86 +178,97 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                 children: [
                   CarouselSlider.builder(
                     carouselController: _controller,
-                    itemCount: widget.listHydra!.length,
+                    itemCount: widget.listHydra!.length + 1,
                     itemBuilder: (context, index, realIndex) {
-                      final urlImage = widget.listHydra![index].file!;
-
-                      // file = index == 0
-                      //     ? widget.listHydra![0].file!
-                      //     : widget.listHydra![index - 1].file!;
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          BuildImage(
-                            urlImage: urlImage,
-                            index: activeIndex,
-                            userName: widget.listHydra![index].user!.firstName!,
-                            userProfileUrl:
-                                widget.listHydra![index].user!.image,
-                            // isFavourite: widget.listHydra![index].isFavourite,
-                            file: widget.listHydra![index].file!,
-                            id: widget.listHydra![index].id!,
-                            name: widget.listHydra![index].name!,
-                          ),
-                          if (activeIndex == index) const SizedBox(height: 10),
-                          if (activeIndex == index)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    widget.listHydra![activeIndex].user!
-                                                .image !=
-                                            null
-                                        ? CircleAvatar(
-                                            radius: 15,
-                                            backgroundImage: NetworkImage(
-                                              widget.listHydra![activeIndex]
-                                                  .user!.image!,
-                                            ),
-                                          )
-                                        : const CircleAvatar(
-                                            backgroundColor: Colors.grey,
-                                            radius: 15,
-                                          ),
-                                    const SizedBox(width: 15),
-                                    Text(
-                                      widget.listHydra![activeIndex].user!
-                                          .firstName!,
-                                      style: GoogleFonts.archivo(
-                                        fontStyle: FontStyle.normal,
-                                        color: Colors.white,
-                                        fontSize: 15,
-                                        wordSpacing: -0.05,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const AppImageAsset(
-                                      image: 'assets/arrow.svg',
-                                      height: 8,
-                                      width: 8,
-                                      fit: BoxFit.fill,
-                                    ),
-                                    const SizedBox(width: 2),
-                                    Text(
-                                      "23k",
-                                      style: GoogleFonts.archivo(
-                                        fontSize: 11,
-                                        fontStyle: FontStyle.normal,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                      if (index > widget.listHydra!.length - 1) {
+                        if (_noMoreDataFound) {
+                          return buildCarouselItemForNoMoreDateFound(
+                              context, screenWidth);
+                        } else {
+                          return buildCarouselItemForLoading(
+                            context,
+                            screenWidth,
+                          );
+                        }
+                      } else {
+                        final urlImage = widget.listHydra![index].file!;
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            BuildImage(
+                              urlImage: urlImage,
+                              index: activeIndex,
+                              userName:
+                                  widget.listHydra![index].user!.firstName!,
+                              userProfileUrl:
+                                  widget.listHydra![index].user!.image,
+                              // isFavourite: widget.listHydra![index].isFavourite,
+                              file: widget.listHydra![index].file!,
+                              id: widget.listHydra![index].id!,
+                              name: widget.listHydra![index].name!,
                             ),
-                        ],
-                      );
+                            if (activeIndex == index)
+                              const SizedBox(height: 10),
+                            if (activeIndex == index)
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      widget.listHydra![activeIndex].user!
+                                                  .image !=
+                                              null
+                                          ? CircleAvatar(
+                                              radius: 15,
+                                              backgroundImage: NetworkImage(
+                                                widget.listHydra![activeIndex]
+                                                    .user!.image!,
+                                              ),
+                                            )
+                                          : const CircleAvatar(
+                                              backgroundColor: Colors.grey,
+                                              radius: 15,
+                                            ),
+                                      const SizedBox(width: 15),
+                                      Text(
+                                        widget.listHydra![activeIndex].user!
+                                            .firstName!,
+                                        style: GoogleFonts.archivo(
+                                          fontStyle: FontStyle.normal,
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          wordSpacing: -0.05,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const AppImageAsset(
+                                        image: 'assets/arrow.svg',
+                                        height: 8,
+                                        width: 8,
+                                        fit: BoxFit.fill,
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        "23k",
+                                        style: GoogleFonts.archivo(
+                                          fontSize: 11,
+                                          fontStyle: FontStyle.normal,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                          ],
+                        );
+                      }
                     },
                     options: CarouselOptions(
                       height: MediaQuery.of(context).size.height * 0.9,
@@ -227,14 +277,19 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                       pageSnapping: true,
                       enlargeCenterPage: true,
                       onPageChanged: (index, reason) {
-                        setState(() {
-                          page = index;
-                        });
-                        fetchWallaper();
-                        setState(() {
-                          file = widget.listHydra![index].file!;
-                          activeIndex = index;
-                        });
+                        if (index > widget.listHydra!.length - 1) {
+                          setState(() {
+                            page = index;
+                            activeIndex = index;
+                          });
+                          if (!_noMoreDataFound) fetchWallaper();
+                        } else {
+                          setState(() {
+                            page = index;
+                            file = widget.listHydra![index].file!;
+                            activeIndex = index;
+                          });
+                        }
                       },
                     ),
                   ),
@@ -297,6 +352,53 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
           ],
         ),
       ),
+    );
+  }
+
+  Column buildCarouselItemForLoading(BuildContext context, double screenWidth) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Loading ...',
+          style: GoogleFonts.archivo(
+            fontStyle: FontStyle.normal,
+            color: Colors.white,
+            fontSize: 20,
+            wordSpacing: -0.1,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 30),
+        LoadingPage(),
+        const SizedBox(height: 10),
+        const SizedBox(height: 45),
+      ],
+    );
+  }
+
+  Column buildCarouselItemForNoMoreDateFound(
+      BuildContext context, double screenWidth) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'No More Data Found!',
+          style: GoogleFonts.archivo(
+            fontStyle: FontStyle.normal,
+            color: Colors.white,
+            fontSize: 20,
+            wordSpacing: -0.1,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        // const SizedBox(height: 30),
+        // LoadingPage(),
+        // const SizedBox(height: 10),
+        // const SizedBox(height: 45),
+      ],
     );
   }
 }

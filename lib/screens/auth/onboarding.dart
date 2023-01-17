@@ -270,9 +270,9 @@ class OnBoardingState extends State<OnBoarding> {
   Future<UserCredential> signInWithFacebook() async {
     print(">> signInWithFacebook");
     // Trigger the sign-in flow
-    final LoginResult loginResult = await FacebookAuth.instance.login();
-    // final LoginResult loginResult =
-    //     await FacebookAuth.instance.login(permissions: const ['email']);
+    // final LoginResult loginResult = await FacebookAuth.instance.login();
+    final LoginResult loginResult =
+        await FacebookAuth.instance.login(permissions: const ['email']);
 
     print(">> signInWithFacebook - status : ${loginResult.status.name}");
     print(">> signInWithFacebook - message : ${loginResult.message}");

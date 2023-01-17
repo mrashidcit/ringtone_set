@@ -3,13 +3,16 @@ import 'dart:ui';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:deeze_app/enums/enum_item_type.dart';
 import 'package:deeze_app/helpers/ad_helper.dart';
+import 'package:deeze_app/repositories/item_repository.dart';
 import 'package:deeze_app/uitilities/end_points.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/child_widgets/build_play.dart';
 import 'package:deeze_app/widgets/internet_checkor_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -27,12 +30,14 @@ class CustomAudioPlayer extends StatefulWidget {
   List<DeezeItemModel> listHydra;
   final int index;
   final String type;
+  bool loadCurrentUserItemsOnly = false;
 
   CustomAudioPlayer({
     Key? key,
     required this.listHydra,
     required this.index,
     required this.type,
+    this.loadCurrentUserItemsOnly = false,
   }) : super(key: key);
 
   @override
@@ -59,40 +64,68 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   bool isLoading = false;
 
   Future<bool> fetchData() async {
-    var url = getDeezeAppHpUrlContent;
-
-    Uri uri = Uri.parse(url).replace(queryParameters: {
-      "page": "$page",
-      "itemsPerPage": "10",
-      // "enabled": "true",
-      // "type": "RINGTONE"
-      "type": widget.type,
-    });
-    try {
-      http.Response response = await http.get(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    if (widget.loadCurrentUserItemsOnly) {
+      setState(() {});
+      var itemResponse = await ItemRepository().getCurrentUserItemsResponse(
+        itemType: widget.type == ItemType.RINGTONE.name
+            ? ItemType.RINGTONE
+            : ItemType.NOTIFICATION,
+        pageNumber: page,
       );
-      print('${response.statusCode} : ${response.request}');
-
-      if (response.statusCode == 200) {
-        print(response.body);
-        var rawResponse = deezeItemModelFromJson(response.body);
-
-        if (rawResponse.length > 0) page++;
-
-        setState(() {
-          widget.listHydra.addAll(rawResponse);
-        });
-
+      if (itemResponse.result) {
+        if (itemResponse.itemList.length > 0) page++;
+        widget.listHydra.addAll(itemResponse.itemList);
+        setState(() {});
+        if (itemResponse.itemList.isEmpty) {
+          _noMoreDataFound = true;
+          setState(() {});
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('No Data Found!'),
+          ));
+        }
         return true;
       } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Unable to load Data!'),
+        ));
         return false;
       }
-    } catch (e) {
-      return false;
+    } else {
+      var url = getDeezeAppHpUrlContent;
+
+      Uri uri = Uri.parse(url).replace(queryParameters: {
+        "page": "$page",
+        "itemsPerPage": "10",
+        // "enabled": "true",
+        // "type": "RINGTONE"
+        "type": widget.type,
+      });
+      try {
+        http.Response response = await http.get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        );
+        print('${response.statusCode} : ${response.request}');
+
+        if (response.statusCode == 200) {
+          print(response.body);
+          var rawResponse = deezeItemModelFromJson(response.body);
+
+          if (rawResponse.length > 0) page++;
+
+          setState(() {
+            widget.listHydra.addAll(rawResponse);
+          });
+
+          return true;
+        } else {
+          return false;
+        }
+      } catch (e) {
+        return false;
+      }
     }
   }
 
@@ -107,6 +140,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
 
   static final _kAdIndex = 4;
   BannerAd? _ad;
+  bool _noMoreDataFound = false;
 
   @override
   void initState() {
@@ -301,10 +335,15 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                           return buildCarouselItemForAd(
                               index, context, '', '', screenWidth);
                         } else if (index > widget.listHydra.length - 1) {
-                          return buildCarouselItemForLoading(
-                            context,
-                            screenWidth,
-                          );
+                          if (_noMoreDataFound) {
+                            return buildCarouselItemForNoMoreDateFound(
+                                context, screenWidth);
+                          } else {
+                            return buildCarouselItemForLoading(
+                              context,
+                              screenWidth,
+                            );
+                          }
                         } else {
                           final file = widget.listHydra[index].file;
                           final name = widget.listHydra[index].name;
@@ -358,7 +397,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                                           : myGradientList[1];
                               position = Duration.zero;
                               // myfile = widget.listHydra[index].file!;
-                              fetchData();
+                              if (!_noMoreDataFound) fetchData();
                               activeIndex = index;
                               print(
                                   '>> CarouselOptions - onPageChanged : activeIndex = $activeIndex');
@@ -492,6 +531,30 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
         LoadingPage(),
         const SizedBox(height: 10),
         const SizedBox(height: 45),
+      ],
+    );
+  }
+
+  Column buildCarouselItemForNoMoreDateFound(
+      BuildContext context, double screenWidth) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'No More Data Found!',
+          style: GoogleFonts.archivo(
+            fontStyle: FontStyle.normal,
+            color: Colors.white,
+            fontSize: 20,
+            wordSpacing: -0.1,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        // const SizedBox(height: 30),
+        // LoadingPage(),
+        // const SizedBox(height: 10),
+        // const SizedBox(height: 45),
       ],
     );
   }
