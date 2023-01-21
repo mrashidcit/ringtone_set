@@ -149,13 +149,14 @@ class ItemRepository {
       );
       print('>> x-api-token : ${api_token.$}');
       print('>> response.statusCode : ${response.statusCode}');
-
+      outputResponse.statusCode = response.statusCode;
       if (response.statusCode == 200) {
         print(response.body);
         outputResponse.result = true;
         outputResponse.itemList = deezeItemModelFromJson(response.body);
       } else if (response.statusCode == 401) {
         outputResponse.result = false;
+
         outputResponse.message = 'Session Expired!';
       } else {
         outputResponse.result = false;

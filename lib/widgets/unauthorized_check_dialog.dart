@@ -2,10 +2,10 @@ import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class InternetCheckerDialog extends StatelessWidget {
+class UnAuthorizedCheckDialog extends StatelessWidget {
   VoidCallback? onRetryTap;
 
-  InternetCheckerDialog({
+  UnAuthorizedCheckDialog({
     Key? key,
     this.onRetryTap,
   }) : super(key: key);
@@ -28,7 +28,7 @@ class InternetCheckerDialog extends StatelessWidget {
                 // const AppImageAsset(image: 'assets/wifi.svg'),
                 const SizedBox(height: 30),
                 Text(
-                  'No internet connection',
+                  'Unauthorized Access.',
                   style: GoogleFonts.archivo(
                     fontStyle: FontStyle.normal,
                     color: Colors.black,
@@ -38,7 +38,7 @@ class InternetCheckerDialog extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Cannot reach our servers',
+                  'Please Login Again.',
                   style: GoogleFonts.archivo(
                     fontStyle: FontStyle.normal,
                     color: const Color(0xFFA49FAD),
@@ -52,18 +52,6 @@ class InternetCheckerDialog extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Text(
-                          'Exit',
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.black,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
                       InkWell(
                         onTap: onRetryTap ?? () {},
                         child: Container(
@@ -80,7 +68,7 @@ class InternetCheckerDialog extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            'Retry',
+                            'Login',
                             style: GoogleFonts.archivo(
                               fontStyle: FontStyle.normal,
                               color: Colors.white,

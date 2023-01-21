@@ -1,13 +1,18 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deeze_app/enums/enum_item_type.dart';
+import 'package:deeze_app/helpers/ad_helper.dart';
+import 'package:deeze_app/helpers/share_value_helper.dart';
 import 'package:deeze_app/repositories/item_repository.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
+import 'package:deeze_app/widgets/internet_checkor_dialog.dart';
 import 'package:deeze_app/widgets/more_audio_dialog.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
@@ -18,8 +23,10 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 
 import 'package:deeze_app/widgets/app_image_assets.dart';
@@ -51,15 +58,35 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
   late int activeIndex = 0;
   String file = "";
   bool _noMoreDataFound = false;
+  BannerAd? _bannerAd;
+
   animateToSilde(int index) => _controller.animateToPage(
         0,
         duration: Duration(milliseconds: 100),
         curve: Curves.linear,
       );
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      request: AdRequest(),
+      size: AdSize.banner,
+      // size: AdSize.mediumRectangle,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _bannerAd = ad as BannerAd;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          print('Failed to load a banner ad: ${err.message}');
+          ad.dispose();
+        },
+      ),
+    ).load();
     widget.listHydra!.removeRange(0, widget.index!);
     WidgetsBinding.instance
         .addPostFrameCallback((timeStamp) => animateToSilde(widget.index!));
@@ -146,213 +173,244 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
     double screenWidth = MediaQuery.of(context).size.width;
     print(file);
     return Scaffold(
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: CachedNetworkImageProvider(file),
-            fit: BoxFit.cover,
-          ),
-          gradient: const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: <Color>[
-              Color(0xFF965a90),
-              Color(0xFF815d84),
-              Color(0xFF56425d),
-              Color(0xFF17131f),
-              Color(0xFF17131f),
-              Color(0xFF17131f),
-            ],
-          ),
-        ),
-        child: Stack(
-          children: [
-            const AppImageAsset(
-                image: 'assets/drop_shadow.png',
-                height: double.infinity,
-                fit: BoxFit.cover),
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-              child: Column(
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              // height: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: CachedNetworkImageProvider(file),
+                  fit: BoxFit.cover,
+                ),
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: <Color>[
+                    Color(0xFF965a90),
+                    Color(0xFF815d84),
+                    Color(0xFF56425d),
+                    Color(0xFF17131f),
+                    Color(0xFF17131f),
+                    Color(0xFF17131f),
+                  ],
+                ),
+              ),
+              child: Stack(
                 children: [
-                  CarouselSlider.builder(
-                    carouselController: _controller,
-                    itemCount: widget.listHydra!.length + 1,
-                    itemBuilder: (context, index, realIndex) {
-                      if (index > widget.listHydra!.length - 1) {
-                        if (_noMoreDataFound) {
-                          return buildCarouselItemForNoMoreDateFound(
-                              context, screenWidth);
-                        } else {
-                          return buildCarouselItemForLoading(
-                            context,
-                            screenWidth,
-                          );
-                        }
-                      } else {
-                        final urlImage = widget.listHydra![index].file!;
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            BuildImage(
-                              urlImage: urlImage,
-                              index: activeIndex,
-                              userName:
-                                  widget.listHydra![index].user!.firstName!,
-                              userProfileUrl:
-                                  widget.listHydra![index].user!.image,
-                              // isFavourite: widget.listHydra![index].isFavourite,
-                              file: widget.listHydra![index].file!,
-                              id: widget.listHydra![index].id!,
-                              name: widget.listHydra![index].name!,
-                            ),
-                            if (activeIndex == index)
-                              const SizedBox(height: 10),
-                            if (activeIndex == index)
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                  const AppImageAsset(
+                      image: 'assets/drop_shadow.png',
+                      height: double.infinity,
+                      fit: BoxFit.cover),
+                  BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                    child: Column(
+                      children: [
+                        CarouselSlider.builder(
+                          carouselController: _controller,
+                          itemCount: widget.listHydra!.length + 1,
+                          itemBuilder: (context, index, realIndex) {
+                            if (index > widget.listHydra!.length - 1) {
+                              if (_noMoreDataFound) {
+                                return buildCarouselItemForNoMoreDateFound(
+                                    context, screenWidth);
+                              } else {
+                                return buildCarouselItemForLoading(
+                                  context,
+                                  screenWidth,
+                                );
+                              }
+                            } else {
+                              final urlImage = widget.listHydra![index].file!;
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Row(
-                                    children: [
-                                      widget.listHydra![activeIndex].user!
-                                                  .image !=
-                                              null
-                                          ? CircleAvatar(
-                                              radius: 15,
-                                              backgroundImage: NetworkImage(
-                                                widget.listHydra![activeIndex]
-                                                    .user!.image!,
+                                  BuildImage(
+                                    urlImage: urlImage,
+                                    index: activeIndex,
+                                    userName: widget
+                                        .listHydra![index].user!.firstName!,
+                                    userProfileUrl:
+                                        widget.listHydra![index].user!.image,
+                                    // isFavourite: widget.listHydra![index].isFavourite,
+                                    file: widget.listHydra![index].file!,
+                                    id: widget.listHydra![index].id!,
+                                    name: widget.listHydra![index].name!,
+                                  ),
+                                  if (activeIndex == index)
+                                    const SizedBox(height: 10),
+                                  if (activeIndex == index)
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            widget.listHydra![activeIndex].user!
+                                                        .image !=
+                                                    null
+                                                ? CircleAvatar(
+                                                    radius: 15,
+                                                    backgroundImage:
+                                                        NetworkImage(
+                                                      widget
+                                                          .listHydra![
+                                                              activeIndex]
+                                                          .user!
+                                                          .image!,
+                                                    ),
+                                                  )
+                                                : const CircleAvatar(
+                                                    backgroundColor:
+                                                        Colors.grey,
+                                                    radius: 15,
+                                                  ),
+                                            const SizedBox(width: 15),
+                                            Text(
+                                              widget.listHydra![activeIndex]
+                                                  .user!.firstName!,
+                                              style: GoogleFonts.archivo(
+                                                fontStyle: FontStyle.normal,
+                                                color: Colors.white,
+                                                fontSize: 15,
+                                                wordSpacing: -0.05,
+                                                fontWeight: FontWeight.w400,
                                               ),
-                                            )
-                                          : const CircleAvatar(
-                                              backgroundColor: Colors.grey,
-                                              radius: 15,
                                             ),
-                                      const SizedBox(width: 15),
-                                      Text(
-                                        widget.listHydra![activeIndex].user!
-                                            .firstName!,
-                                        style: GoogleFonts.archivo(
-                                          fontStyle: FontStyle.normal,
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                          wordSpacing: -0.05,
-                                          fontWeight: FontWeight.w400,
+                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      const AppImageAsset(
-                                        image: 'assets/arrow.svg',
-                                        height: 8,
-                                        width: 8,
-                                        fit: BoxFit.fill,
-                                      ),
-                                      const SizedBox(width: 2),
-                                      Text(
-                                        "23k",
-                                        style: GoogleFonts.archivo(
-                                          fontSize: 11,
-                                          fontStyle: FontStyle.normal,
-                                          color: Colors.white,
+                                        Row(
+                                          children: [
+                                            const AppImageAsset(
+                                              image: 'assets/arrow.svg',
+                                              height: 8,
+                                              width: 8,
+                                              fit: BoxFit.fill,
+                                            ),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              "23k",
+                                              style: GoogleFonts.archivo(
+                                                fontSize: 11,
+                                                fontStyle: FontStyle.normal,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
+                                      ],
+                                    ),
                                 ],
-                              ),
-                          ],
-                        );
-                      }
-                    },
-                    options: CarouselOptions(
-                      height: MediaQuery.of(context).size.height * 0.9,
-                      viewportFraction: 0.75,
-                      enableInfiniteScroll: false,
-                      pageSnapping: true,
-                      enlargeCenterPage: true,
-                      onPageChanged: (index, reason) {
-                        if (index > widget.listHydra!.length - 1) {
-                          setState(() {
-                            page = index;
-                            activeIndex = index;
-                          });
-                          if (!_noMoreDataFound) fetchWallaper();
-                        } else {
-                          setState(() {
-                            page = index;
-                            file = widget.listHydra![index].file!;
-                            activeIndex = index;
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          showCupertinoModalPopup(
-                            context: context,
-                            barrierColor: Colors.black.withOpacity(0.8),
-                            builder: (context) {
-                              return MoreAudioDialog(
-                                file: '',
-                                fileName: widget.listHydra![activeIndex].name!,
-                                userName: widget
-                                    .listHydra![activeIndex].user!.firstName!,
-                                userImage:
-                                    widget.listHydra![activeIndex].user!.image!,
-                                tags: widget.listHydra![activeIndex].tags,
                               );
+                            }
+                          },
+                          options: CarouselOptions(
+                            height: MediaQuery.of(context).size.height * 0.9 -
+                                (_bannerAd != null ? 52 : 0),
+                            viewportFraction: 0.75,
+                            enableInfiniteScroll: false,
+                            pageSnapping: true,
+                            enlargeCenterPage: true,
+                            onPageChanged: (index, reason) {
+                              if (index > widget.listHydra!.length - 1) {
+                                setState(() {
+                                  page = index;
+                                  activeIndex = index;
+                                });
+                                if (!_noMoreDataFound) fetchWallaper();
+                              } else {
+                                setState(() {
+                                  page = index;
+                                  file = widget.listHydra![index].file!;
+                                  activeIndex = index;
+                                });
+                              }
                             },
-                          );
-                        },
-                        child: const AppImageAsset(
-                            image: 'assets/dot.svg',
-                            color: Colors.white,
-                            height: 6),
-                      ),
-                      const SizedBox(width: 30),
-                      GestureDetector(
-                        onTap: () {
-                          showCupertinoModalPopup(
-                            context: context,
-                            barrierColor: Colors.black.withOpacity(0.8),
-                            builder: (context) =>
-                                WallpaperSelectDialog(file: file),
-                          );
-                        },
-                        child: const AppImageAsset(
-                            image: 'assets/wallpaper_down.svg', height: 50),
-                      ),
-                      const SizedBox(width: 30),
-                      GestureDetector(
-                        onTap: () {
-                          var item = widget.listHydra![activeIndex];
-                          SocialShare.shareOptions("${item.file!}");
-                          ;
-                        },
-                        child: const AppImageAsset(
-                            image: 'assets/share.svg',
-                            color: Colors.white,
-                            height: 18),
-                      ),
-                    ],
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                showCupertinoModalPopup(
+                                  context: context,
+                                  barrierColor: Colors.black.withOpacity(0.8),
+                                  builder: (context) {
+                                    return MoreAudioDialog(
+                                      file: '',
+                                      fileName:
+                                          widget.listHydra![activeIndex].name!,
+                                      userName: widget.listHydra![activeIndex]
+                                          .user!.firstName!,
+                                      userImage: widget
+                                          .listHydra![activeIndex].user!.image!,
+                                      tags: widget.listHydra![activeIndex].tags,
+                                    );
+                                  },
+                                );
+                              },
+                              child: const AppImageAsset(
+                                  image: 'assets/dot.svg',
+                                  color: Colors.white,
+                                  height: 6),
+                            ),
+                            const SizedBox(width: 30),
+                            GestureDetector(
+                              onTap: () {
+                                showCupertinoModalPopup(
+                                  context: context,
+                                  barrierColor: Colors.black.withOpacity(0.8),
+                                  builder: (context) =>
+                                      WallpaperSelectDialog(file: file),
+                                );
+                              },
+                              child: const AppImageAsset(
+                                  image: 'assets/wallpaper_down.svg',
+                                  height: 50),
+                            ),
+                            const SizedBox(width: 30),
+                            GestureDetector(
+                              onTap: () {
+                                var item = widget.listHydra![activeIndex];
+                                SocialShare.shareOptions("${item.file!}");
+                                ;
+                              },
+                              child: const AppImageAsset(
+                                  image: 'assets/share.svg',
+                                  color: Colors.white,
+                                  height: 18),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          if (_bannerAd != null)
+            Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                width: _bannerAd!.size.width.toDouble(),
+                height: _bannerAd!.size.height.toDouble(),
+                child: AdWidget(ad: _bannerAd!),
+              ),
+            ),
+          const SizedBox(height: 2),
+        ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _bannerAd?.dispose();
   }
 
   Column buildCarouselItemForLoading(BuildContext context, double screenWidth) {
@@ -536,18 +594,46 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
     }
   }
 
-  Future<bool> downloadFile(String url) async {
-    final appStorage = await getApplicationDocumentsDirectory();
-    final file = File("${appStorage.path}/wallpaper.png");
+  Future<bool> downloadFile(String url, String fileName) async {
+    Directory directory;
     try {
-      final response = await Dio().get(url,
-          options: Options(
-              responseType: ResponseType.bytes,
-              followRedirects: false,
-              receiveTimeout: 0));
-      final raf = file.openSync(mode: FileMode.write);
-      raf.writeFromSync(response.data);
-      raf.close();
+      if (await _requestStoragePermission()) {
+        directory = (await getExternalStorageDirectory())!;
+        String newPath = "";
+
+        print(directory);
+        List<String> paths = directory.path.split("/");
+        for (int x = 1; x < paths.length; x++) {
+          String folder = paths[x];
+          if (folder != "Android") {
+            newPath += "/" + folder;
+          } else {
+            break;
+          }
+        }
+        newPath = newPath + '/Pictures' + "/DeezePlayer";
+        directory = Directory(newPath);
+      } else {
+        return false;
+      }
+
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+
+      if (await directory.exists()) {
+        File saveFile = File(directory.path + "/$fileName");
+        print('>> saveFile : ${saveFile.path}');
+        final response = await Dio().get(url,
+            options: Options(
+                responseType: ResponseType.bytes,
+                followRedirects: false,
+                receiveTimeout: 0));
+        final raf = saveFile.openSync(mode: FileMode.write);
+        raf.writeFromSync(response.data);
+        raf.close();
+      }
+
       return true;
     } catch (e) {
       return false;
@@ -786,34 +872,7 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                 ),
                 const SizedBox(height: 50),
                 InkWell(
-                  onTap: () async {
-                    ProgressDialog pd = ProgressDialog(
-                      context,
-                      message: Text(
-                        "Please Wait!",
-                        style: GoogleFonts.archivo(
-                          fontStyle: FontStyle.normal,
-                          color: Colors.black,
-                        ),
-                      ),
-                    );
-                    pd.show();
-                    final sucess = await downloadFile(widget.file);
-                    var snackBar;
-                    if (sucess) {
-                      print("sucess");
-                      Fluttertoast.showToast(
-                        msg: "Wallpaper succesfully Downloaded",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: const Color(0xFF7209b7),
-                        textColor: Colors.white,
-                        fontSize: 16.0,
-                      );
-                      Navigator.of(context).pop();
-                    }
-                  },
+                  onTap: actionSaveToMedia,
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
@@ -864,5 +923,139 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
         ),
       ),
     );
+  }
+
+  Future<bool> _requestStoragePermission() async {
+    bool output = false;
+
+    if (Platform.isAndroid) {
+      var androidInfo = await PlatformDeviceId.deviceInfoPlugin.androidInfo;
+      var release = androidInfo.version.release;
+      var sdkInt = androidInfo.version.sdkInt;
+
+      if (sdkInt >= 23 && sdkInt <= 29) {
+        PermissionStatus storageStatus = await Permission.storage.status;
+        if ((storageStatus.isDenied || storageStatus.isPermanentlyDenied)) {
+          if (storageStatus.isDenied) {
+            storageStatus = await Permission.storage.request();
+          }
+
+          output = storageStatus.isGranted;
+        } else if (storageStatus.isGranted || storageStatus.isLimited) {
+          output = true;
+        } else {
+          output = false;
+        }
+      } else {
+        // for API level 29 & Above
+        print('>> for API level 30 & Above ');
+        show_openAppAd.$ = false;
+        PermissionStatus managedExternalStorageStatus =
+            await Permission.manageExternalStorage.status;
+
+        print(
+            '>> managedExternalStorageStatus.isGranted : ${managedExternalStorageStatus.isGranted}');
+        print(
+            '>> managedExternalStorageStatus.isDenied : ${managedExternalStorageStatus.isDenied}');
+        print(
+            '>> managedExternalStorageStatus.isPermanentlyDenied : ${managedExternalStorageStatus.isPermanentlyDenied}');
+        print(
+            '>> managedExternalStorageStatus.isRestricted : ${managedExternalStorageStatus.isRestricted}');
+        if (!managedExternalStorageStatus.isGranted) {
+          managedExternalStorageStatus =
+              await Permission.manageExternalStorage.request();
+          // managedExternalStorageStatus = await Permission.storage.request();
+
+          output = managedExternalStorageStatus.isGranted;
+          print(
+              '>> after tigger setting - managedExternalStorageStatus.isGranted : ${managedExternalStorageStatus.isRestricted}');
+        } else if (managedExternalStorageStatus.isGranted ||
+            managedExternalStorageStatus.isLimited) {
+          output = true;
+        } else {
+          output = false;
+        }
+      }
+      show_openAppAd.$ = true;
+      var manufacturer = androidInfo.manufacturer;
+      var model = androidInfo.model;
+      print('>> Android $release (SDK $sdkInt), $manufacturer $model');
+      // Android 9 (SDK 28), Xiaomi Redmi Note 7
+    }
+
+    return output;
+  }
+
+  Future<void> actionSaveToMedia() async {
+    if (!await InternetConnectionChecker().hasConnection) {
+      showCupertinoModalPopup(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => InternetCheckerDialog(
+          onRetryTap: () {
+            Navigator.pop(context); // Hide Internet Message Dialog
+            Timer(Duration(milliseconds: 500), () => actionSaveToMedia());
+          },
+        ),
+      );
+      return;
+    }
+    bool storagePermissionStatus = false;
+
+    if (Platform.isAndroid) {
+      var androidInfo = await PlatformDeviceId.deviceInfoPlugin.androidInfo;
+      var release = androidInfo.version.release;
+      var sdkInt = androidInfo.version.sdkInt;
+
+      if (sdkInt >= 30) {
+        PermissionStatus managedExternalStorageStatus =
+            await Permission.manageExternalStorage.status;
+        print(
+            '>> actionSetRingTone - sdkInt , Permission.manageExternalStorage.status.isGranted : $sdkInt , ${managedExternalStorageStatus.isGranted}');
+
+        if (managedExternalStorageStatus.isGranted) {
+          storagePermissionStatus = true;
+        } else {
+          print('>> actionSetRingTone : _requestStoragePermission');
+
+          _requestStoragePermission();
+          return;
+        }
+      } else {
+        storagePermissionStatus = await _requestStoragePermission();
+      }
+    }
+
+    if (!storagePermissionStatus) {
+      showMessage(context, message: "Storage Permission is Required");
+      return;
+    }
+
+    bool success = false;
+
+    ProgressDialog pd = ProgressDialog(
+      context,
+      message: Text(
+        "Please Wait!",
+        style: GoogleFonts.archivo(
+          fontStyle: FontStyle.normal,
+          color: Colors.black,
+        ),
+      ),
+    );
+    pd.show();
+    try {
+      success = await downloadFile(widget.file, widget.file.split('/').last);
+      pd.dismiss();
+    } on PlatformException {
+      success = false;
+    }
+
+    if (success) {
+      showMessage(context, message: "Your File successfully Downloaded");
+    } else {
+      showMessage(context, message: "Try again!");
+    }
+    Navigator.pop(context);
   }
 }

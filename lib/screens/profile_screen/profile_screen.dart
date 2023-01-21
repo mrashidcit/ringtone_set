@@ -8,17 +8,24 @@ import 'package:deeze_app/models/deeze_model.dart';
 import 'package:deeze_app/models/random_item_response.dart';
 import 'package:deeze_app/repositories/item_repository.dart';
 import 'package:deeze_app/repositories/user_repository.dart';
+import 'package:deeze_app/screens/auth/onboarding.dart';
 import 'package:deeze_app/screens/custom_widgets/custom_drawer.dart';
 import 'package:deeze_app/screens/dashboard/dashboard.dart';
 import 'package:deeze_app/screens/favourite/favourite_screen.dart';
+import 'package:deeze_app/screens/upload_screen/upload_screen.dart';
+import 'package:deeze_app/screens/upload_screen/widgets/processing_ringtones_card.dart';
 import 'package:deeze_app/screens/upload_screen/widgets/profile_ringtones_card.dart';
+import 'package:deeze_app/screens/upload_screen/widgets/upload_ringtones_card.dart';
 import 'package:deeze_app/screens/wallpapers/wallpapers.dart';
+import 'package:deeze_app/uitilities/constants.dart';
+import 'package:deeze_app/uitilities/my_theme.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/audio_player.dart';
 import 'package:deeze_app/widgets/drawer_header.dart';
 import 'package:deeze_app/widgets/internet_checkor_dialog.dart';
 import 'package:deeze_app/widgets/ringtones_card.dart';
+import 'package:deeze_app/widgets/unauthorized_check_dialog.dart';
 import 'package:deeze_app/widgets/wallpaper_dispaly.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -143,9 +150,27 @@ class ProfileScreenState extends State<ProfileScreen>
         ));
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Unable to load Data!'),
-      ));
+      if (itemResponse.statusCode == Constants.statusCodeForUnauthorized) {
+        showCupertinoModalPopup(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => UnAuthorizedCheckDialog(
+            onRetryTap: () {
+              Navigator.pop(ctx); // Hide Internet Message Dialog
+              Timer(Duration(milliseconds: 500), () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const OnBoarding()),
+                );
+              });
+            },
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Unable to load Data!'),
+        ));
+      }
     }
 
     _isItemLoading = false;
@@ -539,19 +564,22 @@ class ProfileScreenState extends State<ProfileScreen>
             ),
             shrinkWrap: true,
             children: List.generate(
-              _itemsList.length,
+              _itemsList.length + 1,
               (index) {
-                if (_selectedItemType == ItemType.WALLPAPER)
-                  return buildWallpaperCardWidget(context, index, screenWidth);
-                else
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 0),
-                    // child: selectedIndex == index
-                    //     ? buildRingtoneCard(index - 1, context)
-                    //     : buildNonActiveRingtoneCard(
-                    //         index - 1, context),
-                    child: buildRingtoneCard(index, context),
-                  );
+                if (_selectedItemType == ItemType.WALLPAPER) {
+                  if (index == 0)
+                    return buildWallpaperCardToUploadeItemWidget(context);
+                  else
+                    return buildWallpaperCardWidget(
+                        context, index - 1, screenWidth);
+                } else {
+                  if (index == 0)
+                    return buildUploadRingtoneCard(0, context);
+                  else
+                    return _itemsList[index - 1].enabled
+                        ? buildRingtoneCard(index - 1, context)
+                        : buildProcessingRingtoneCard(context);
+                }
               },
             ),
           ),
@@ -603,6 +631,25 @@ class ProfileScreenState extends State<ProfileScreen>
       ringtoneName: _itemsList[index].name!,
       file: _itemsList[index].file!,
     );
+  }
+
+  UploadRingtonesCardForProfileScreen buildUploadRingtoneCard(
+      int index, BuildContext context) {
+    return UploadRingtonesCardForProfileScreen(onNavigate: () {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const UploadScreen(),
+        ),
+      );
+    });
+  }
+
+  ProcessingRingtonesCard buildProcessingRingtoneCard(BuildContext context) {
+    return ProcessingRingtonesCard(onNavigate: () {
+      showMessage(context,
+          message:
+              'This item is Under Review. \nIt will be shown you when Admin Approve this.');
+    });
   }
 
   Future<void> onTapRingtoneCardFunction(int index) async {
@@ -661,28 +708,47 @@ class ProfileScreenState extends State<ProfileScreen>
       BuildContext context, int index, double screenWidth) {
     return Stack(
       children: [
-        InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => WallPaperSlider(
-                  listHydra: _itemsList,
-                  index: index,
-                  loadCurrentUserItemsOnly: true,
+        Container(
+          // height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromRGBO(166, 125, 17, 1),
+                const Color.fromRGBO(129, 84, 87, 1),
+              ],
+              begin: const FractionalOffset(0.0, 0.0),
+              end: const FractionalOffset(0.0, 1.0),
+              stops: [0.0, 1.0],
+              tileMode: TileMode.clamp,
+            ),
+            borderRadius: BorderRadius.all(Radius.circular(6)),
+          ),
+        ),
+        Visibility(
+          visible: _itemsList[index].enabled,
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => WallPaperSlider(
+                    listHydra: _itemsList,
+                    index: index,
+                    loadCurrentUserItemsOnly: true,
+                  ),
                 ),
-              ),
-            );
-          },
-          child: SizedBox(
-            width: screenWidth * 0.4,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: AppImageAsset(
-                image: _itemsList[index].file,
-                isWebImage: true,
-                webHeight: double.infinity,
-                webFit: BoxFit.fill,
+              );
+            },
+            child: SizedBox(
+              width: screenWidth * 0.4,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: AppImageAsset(
+                  image: _itemsList[index].file,
+                  isWebImage: true,
+                  webHeight: double.infinity,
+                  webFit: BoxFit.fill,
+                ),
               ),
             ),
           ),
@@ -695,20 +761,23 @@ class ProfileScreenState extends State<ProfileScreen>
               borderRadius: BorderRadius.circular(6),
             ),
           ),
-        Positioned(
-          top: 10,
-          right: 5,
-          child: GestureDetector(
-            onTap: () {
-              if (selectedIndex != index)
-                selectedIndex = index;
-              else
-                selectedIndex = -1;
-              setState(() {});
-            },
-            child: const AppImageAsset(
-              image: 'assets/horizontal_more.svg',
-              height: 12,
+        Visibility(
+          visible: _itemsList[index].enabled,
+          child: Positioned(
+            top: 10,
+            right: 5,
+            child: GestureDetector(
+              onTap: () {
+                if (selectedIndex != index)
+                  selectedIndex = index;
+                else
+                  selectedIndex = -1;
+                setState(() {});
+              },
+              child: const AppImageAsset(
+                image: 'assets/horizontal_more.svg',
+                height: 12,
+              ),
             ),
           ),
         ),
@@ -877,6 +946,84 @@ class ProfileScreenState extends State<ProfileScreen>
               ],
             ),
           ),
+        Visibility(
+          visible: !_itemsList[index].enabled ? true : false,
+          child: Center(
+            child: const AppImageAsset(
+              image: 'assets/sand-clock.png',
+              height: 20,
+            ),
+          ),
+        ),
+        Positioned(
+            bottom: 4,
+            left: 2,
+            child: Text(
+              !_itemsList[index].enabled ? 'Processing ...' : '',
+              style: TextStyle(color: MyTheme.white),
+            ))
+      ],
+    );
+  }
+
+  Widget buildWallpaperCardToUploadeItemWidget(BuildContext context) {
+    return Stack(
+      children: [
+        InkWell(
+          onTap: () {
+            // Navigator.of(context).push(
+            //   MaterialPageRoute(
+            //     builder: (context) => const UploadScreen(),
+            //   ),
+            // );
+          },
+          child: Container(
+            // height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  colors: [
+                    const Color.fromRGBO(103, 0, 214, 1),
+                    const Color.fromRGBO(190, 133, 104, 1),
+                  ],
+                  begin: const FractionalOffset(0.0, 0.0),
+                  end: const FractionalOffset(0.9, .7),
+                  stops: [0.0, 1.0],
+                  tileMode: TileMode.clamp),
+              borderRadius: BorderRadius.all(Radius.circular(6)),
+            ),
+          ),
+        ),
+        Center(
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const UploadScreen(),
+                ),
+              );
+            },
+            child: Container(
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.file_upload_outlined,
+                    color: MyTheme.white,
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Upload',
+                    style: TextStyle(
+                      color: MyTheme.white,
+                      fontSize: 14,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        )
       ],
     );
   }

@@ -889,229 +889,252 @@ class _DashbaordState extends State<Dashbaord> with WidgetsBindingObserver {
                 ),
               ),
               backgroundColor: const Color(0xFF4d047d),
-              body: Container(
-                height: MediaQuery.of(context).size.height,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: <Color>[
-                        Color(0xFF4d047d),
-                        Color(0xFF17131F),
-                        Color(0xFF17131F),
-                        Color(0xFF17131F),
-                        Color(0xFF17131F),
-                        Color(0xFF17131F),
-                        Color(0xFF17131F),
-                      ]),
-                ),
-                child: SmartRefresher(
-                  enablePullUp: true,
-                  controller: _refreshController,
-                  onRefresh: () async {
-                    print('>> dashboard - SmartRefresher - onRefresh');
-                    final result = await fetchRingtone(isRefresh: true);
-                    if (result) {
-                      _refreshController.refreshCompleted();
-                    } else {
-                      _refreshController.refreshFailed();
-                    }
-                  },
-                  onLoading: () async {
-                    print('>> dashboard - SmartRefresher - onLoading');
-                    final result = await fetchRingtone();
-                    if (result) {
-                      _refreshController.loadComplete();
-                    } else {
-                      _refreshController.loadFailed();
-                    }
-                  },
-                  header: CustomHeader(builder: (context, mode) => Container()),
-                  footer: CustomFooter(builder: (context, mode) {
-                    print(
-                        '>> CustomFooter - isDataLoad , totalPage : $isDataLoad , $totalPage');
-                    return isDataLoad && totalPage != 0
-                        ? const LoadingPage()
-                        : const SizedBox();
-                  }),
-                  child: isLoading
-                      ? const LoadingPage()
-                      : ListView.builder(
-                          itemCount: hydraMember.length + 1,
-                          scrollDirection: Axis.vertical,
-                          controller: scrollController,
-                          itemBuilder: (context, index) {
-                            if (index == 0) {
-                              return SizedBox(
-                                child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(
-                                        height: 20,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 17),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+              body: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      // height: MediaQuery.of(context).size.height,
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: <Color>[
+                              Color(0xFF4d047d),
+                              Color(0xFF17131F),
+                              Color(0xFF17131F),
+                              Color(0xFF17131F),
+                              Color(0xFF17131F),
+                              Color(0xFF17131F),
+                              Color(0xFF17131F),
+                            ]),
+                      ),
+                      child: SmartRefresher(
+                        enablePullUp: true,
+                        controller: _refreshController,
+                        onRefresh: () async {
+                          print('>> dashboard - SmartRefresher - onRefresh');
+                          final result = await fetchRingtone(isRefresh: true);
+                          if (result) {
+                            _refreshController.refreshCompleted();
+                          } else {
+                            _refreshController.refreshFailed();
+                          }
+                        },
+                        onLoading: () async {
+                          print('>> dashboard - SmartRefresher - onLoading');
+                          final result = await fetchRingtone();
+                          if (result) {
+                            _refreshController.loadComplete();
+                          } else {
+                            _refreshController.loadFailed();
+                          }
+                        },
+                        header: CustomHeader(
+                            builder: (context, mode) => Container()),
+                        footer: CustomFooter(builder: (context, mode) {
+                          print(
+                              '>> CustomFooter - isDataLoad , totalPage : $isDataLoad , $totalPage');
+                          return isDataLoad && totalPage != 0
+                              ? const LoadingPage()
+                              : const SizedBox();
+                        }),
+                        child: isLoading
+                            ? const LoadingPage()
+                            : ListView.builder(
+                                itemCount: hydraMember.length + 1,
+                                scrollDirection: Axis.vertical,
+                                controller: scrollController,
+                                itemBuilder: (context, index) {
+                                  if (index == 0) {
+                                    return SizedBox(
+                                      child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              "Categories",
-                                              style: GoogleFonts.archivo(
-                                                fontStyle: FontStyle.normal,
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                                wordSpacing: 0.19,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                            const SizedBox(
+                                              height: 20,
                                             ),
-                                            GestureDetector(
-                                              onTap: (() {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const Categories(
-                                                              isRingtone: true,
-                                                            )));
-                                              }),
+                                            // Categories
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 17),
                                               child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
                                                   Text(
-                                                    "View All",
+                                                    "Categories",
                                                     style: GoogleFonts.archivo(
                                                       fontStyle:
                                                           FontStyle.normal,
                                                       color: Colors.white,
-                                                      fontSize: 10,
-                                                      wordSpacing: 0.16,
+                                                      fontSize: 12,
+                                                      wordSpacing: 0.19,
                                                       fontWeight:
-                                                          FontWeight.w400,
+                                                          FontWeight.w600,
                                                     ),
                                                   ),
-                                                  const SizedBox(
-                                                    width: 10,
-                                                  ),
-                                                  const Icon(
-                                                    Icons.arrow_forward,
-                                                    color: Colors.white,
-                                                    size: 15,
-                                                  ),
+                                                  GestureDetector(
+                                                    onTap: (() {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  const Categories(
+                                                                    isRingtone:
+                                                                        true,
+                                                                  )));
+                                                    }),
+                                                    child: Row(
+                                                      children: [
+                                                        Text(
+                                                          "View All",
+                                                          style: GoogleFonts
+                                                              .archivo(
+                                                            fontStyle: FontStyle
+                                                                .normal,
+                                                            color: Colors.white,
+                                                            fontSize: 10,
+                                                            wordSpacing: 0.16,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 10,
+                                                        ),
+                                                        const Icon(
+                                                          Icons.arrow_forward,
+                                                          color: Colors.white,
+                                                          size: 15,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
                                                 ],
                                               ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 20,
-                                      ),
-                                      SizedBox(
-                                        height: 60,
-                                        width: screenWidth,
-                                        child: BlocConsumer<CategoryBloc,
-                                            CategoryState>(
-                                          listener: (context, state) {
-                                            // TODO: implement listener
-                                          },
-                                          builder: (context, state) {
-                                            if (state is CategoryInitial) {
-                                              return const Center(
-                                                  child:
-                                                      CircularProgressIndicator());
-                                            }
-                                            if (state is LoadedCategory) {
-                                              return Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 17),
-                                                child: ListView.builder(
-                                                  scrollDirection:
-                                                      Axis.horizontal,
-                                                  itemCount: 4,
-                                                  itemBuilder:
-                                                      (context, index) {
+                                            ),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            // categoriy Horizontal List
+                                            SizedBox(
+                                              height: 60,
+                                              width: screenWidth,
+                                              child: BlocConsumer<CategoryBloc,
+                                                  CategoryState>(
+                                                listener: (context, state) {
+                                                  // TODO: implement listener
+                                                },
+                                                builder: (context, state) {
+                                                  if (state
+                                                      is CategoryInitial) {
+                                                    return const Center(
+                                                        child:
+                                                            CircularProgressIndicator());
+                                                  }
+                                                  if (state is LoadedCategory) {
                                                     return Padding(
                                                       padding:
                                                           const EdgeInsets.only(
-                                                              right: 12),
-                                                      child:
-                                                          RingtoneCategoryCard(
-                                                        id: state
-                                                            .categories![index]
-                                                            .id!,
-                                                        image: state
-                                                            .categories![index]
-                                                            .image,
-                                                        name: state
-                                                            .categories![index]
-                                                            .name,
+                                                              left: 17),
+                                                      child: ListView.builder(
+                                                        scrollDirection:
+                                                            Axis.horizontal,
+                                                        itemCount: 4,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          return Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    right: 12),
+                                                            child:
+                                                                RingtoneCategoryCard(
+                                                              id: state
+                                                                  .categories![
+                                                                      index]
+                                                                  .id!,
+                                                              image: state
+                                                                  .categories![
+                                                                      index]
+                                                                  .image,
+                                                              name: state
+                                                                  .categories![
+                                                                      index]
+                                                                  .name,
+                                                            ),
+                                                          );
+                                                        },
                                                       ),
                                                     );
-                                                  },
+                                                  }
+                                                  return const Center(
+                                                      child:
+                                                          CircularProgressIndicator());
+                                                },
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            // Trending Search Label
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 17),
+                                              child: Text(
+                                                "Trending search",
+                                                style: GoogleFonts.archivo(
+                                                  fontStyle: FontStyle.normal,
+                                                  color: Colors.white,
+                                                  fontSize: 15,
                                                 ),
-                                              );
-                                            }
-                                            return const Center(
-                                                child:
-                                                    CircularProgressIndicator());
-                                          },
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 20,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 17),
-                                        child: Text(
-                                          "Trending search",
-                                          style: GoogleFonts.archivo(
-                                            fontStyle: FontStyle.normal,
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 15,
-                                      ),
-                                      SizedBox(
-                                        height: 33,
-                                        width: screenWidth,
-                                        child:
-                                            buildTrendingSearchContainerForMainScreen(),
-                                      ),
-                                      SizedBox(height: 5),
-                                      if (_bannerAd != null)
-                                        Align(
-                                          alignment: Alignment.topCenter,
-                                          child: Container(
-                                            width: _bannerAd!.size.width
-                                                .toDouble(),
-                                            height: _bannerAd!.size.height
-                                                .toDouble(),
-                                            child: AdWidget(ad: _bannerAd!),
-                                          ),
-                                        ),
-                                      const SizedBox(height: 5),
-                                    ]),
-                              );
-                            }
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15),
-                              // child: selectedIndex == index
-                              //     ? buildActiveRingtoneCard(index - 1, context)
-                              //     : buildNonActiveRingtoneCard(
-                              //         index - 1, context),
-                              child:
-                                  buildActiveRingtoneCard(index - 1, context),
-                            );
-                          },
-                        ),
-                ),
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 15,
+                                            ),
+                                            // Trending Search Horizontal List
+                                            SizedBox(
+                                              height: 33,
+                                              width: screenWidth,
+                                              child:
+                                                  buildTrendingSearchContainerForMainScreen(),
+                                            ),
+                                            SizedBox(height: 5),
+                                          ]),
+                                    );
+                                  }
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15),
+                                    // child: selectedIndex == index
+                                    //     ? buildActiveRingtoneCard(index - 1, context)
+                                    //     : buildNonActiveRingtoneCard(
+                                    //         index - 1, context),
+                                    child: buildActiveRingtoneCard(
+                                        index - 1, context),
+                                  );
+                                },
+                              ),
+                      ),
+                    ),
+                  ),
+                  if (_bannerAd != null)
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: Container(
+                        width: _bannerAd!.size.width.toDouble(),
+                        height: _bannerAd!.size.height.toDouble(),
+                        child: AdWidget(ad: _bannerAd!),
+                      ),
+                    ),
+                  const SizedBox(height: 2),
+                ],
               ),
               drawer: CustomDrawer(),
             ),

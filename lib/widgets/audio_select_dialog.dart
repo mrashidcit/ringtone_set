@@ -784,7 +784,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
             break;
           }
         }
-        newPath = newPath + '/Download' + "/DeezePlayer";
+        newPath = newPath + '/Ringtones' + "/DeezePlayer";
         directory = Directory(newPath);
       } else {
         return false;

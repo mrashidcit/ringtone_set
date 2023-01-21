@@ -306,6 +306,7 @@ class DeezeItemModel {
     this.user,
     this.tags = const [],
     this.isFavourite = false,
+    this.enabled = false,
   });
 
   int? id;
@@ -315,6 +316,7 @@ class DeezeItemModel {
   User? user;
   List<TagModel> tags;
   bool isFavourite;
+  bool enabled;
 
   factory DeezeItemModel.fromSearchQueryJson(Map<String, dynamic> json) =>
       DeezeItemModel(
@@ -326,6 +328,7 @@ class DeezeItemModel {
         tags: List<TagModel>.from(
             json['tags'].map((item) => TagModel.fromJson(item))),
         isFavourite: false,
+        enabled: json["enabled"] ?? false,
       );
 
   factory DeezeItemModel.fromJson(Map<String, dynamic> json) => DeezeItemModel(
@@ -342,6 +345,7 @@ class DeezeItemModel {
           }
         })),
         isFavourite: json["isFavourite"] ?? false,
+        enabled: json["enabled"] ?? false,
       );
 
   Map<String, dynamic> toJson() => {

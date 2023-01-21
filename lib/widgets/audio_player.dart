@@ -62,6 +62,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   ScrollController scrollController = ScrollController();
   bool isDataLoad = false;
   bool isLoading = false;
+  BannerAd? _bannerAd;
 
   Future<bool> fetchData() async {
     if (widget.loadCurrentUserItemsOnly) {
@@ -147,6 +148,23 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     // TODO: implement initState
     super.initState();
     _loadInterstitialAd();
+    BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      request: AdRequest(),
+      size: AdSize.banner,
+      // size: AdSize.mediumRectangle,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _bannerAd = ad as BannerAd;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          print('Failed to load a banner ad: ${err.message}');
+          ad.dispose();
+        },
+      ),
+    ).load();
     widget.listHydra.removeRange(0, widget.index);
     WidgetsBinding.instance
         .addPostFrameCallback((timeStamp) => animateToSilde(widget.index));
@@ -212,7 +230,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     // TODO: implement dispose
     _ad?.dispose();
     super.dispose();
-
+    _bannerAd?.dispose();
     audioPlayer.dispose();
     isPlaying = false;
     // PlayerState.STOPPED;
@@ -502,6 +520,23 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                         ),
                       ],
                     ),
+                    if (_bannerAd != null)
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                width: _bannerAd!.size.width.toDouble(),
+                                height: _bannerAd!.size.height.toDouble(),
+                                child: AdWidget(ad: _bannerAd!),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    const SizedBox(height: 2),
                   ],
                 ),
               ],
@@ -562,9 +597,10 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
   Column buildCarouselItem(int index, BuildContext context, String? file,
       String? name, double screenWidth) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      // mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
+        Expanded(child: Center()),
         Text(
           widget.listHydra[index].name!,
           style: GoogleFonts.archivo(

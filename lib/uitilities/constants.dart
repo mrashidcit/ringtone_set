@@ -7,4 +7,5 @@ class Constants {
 
   static const PackageId = 'com.aggyapps.top2015.ringtones';
   static const ItemsPerPage = 10;
+  static const int statusCodeForUnauthorized = 401;
 }

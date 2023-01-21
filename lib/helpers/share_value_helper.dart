@@ -43,6 +43,16 @@ final SharedValue<bool> show_openAppAd = SharedValue(
   autosave: true,
 );
 
+/**
+ * Show The OpenAppAd When user come back to App 5th Time
+ */
+final SharedValue<int> show_openAppAd_counter_check = SharedValue(
+  value: 0, // initial value
+  key:
+      "show_openAppAd_counter_check", // disk storage key for shared_preferences
+  autosave: true,
+);
+
 void saveUserInCache(User user) {
   user_id.$ = user.id!;
   first_name.$ = user.firstName!;
