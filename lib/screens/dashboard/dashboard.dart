@@ -248,7 +248,7 @@ class _DashbaordState extends State<Dashbaord> with WidgetsBindingObserver {
   }
 
   final TextEditingController _typeAheadController = TextEditingController();
-  bool ishow = false;
+  bool _showSearchHeader = false;
   int? selectedIndex;
   bool isLoading = false;
 
@@ -256,641 +256,755 @@ class _DashbaordState extends State<Dashbaord> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     // print('>> dashboard - build()');
     double screenWidth = MediaQuery.of(context).size.width;
-    return ishow
-        ? WillPopScope(
-            onWillPop: _onWillPop,
-            child: Scaffold(
-              resizeToAvoidBottomInset: false,
-              backgroundColor: const Color(0xFF4d047d),
-              body: Container(
-                height: MediaQuery.of(context).size.height,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: <Color>[
-                        Color(0xFF4d047d),
-                        Color(0xFF17131F),
-                        Color(0xFF17131F),
-                        Color(0xFF17131F),
-                        Color(0xFF17131F),
-                        Color(0xFF17131F),
-                        Color(0xFF17131F),
-                      ]),
-                ),
-                child: SmartRefresher(
-                  enablePullUp: true,
-                  controller: _refreshController,
-                  onRefresh: () async {
-                    final result = await fetchRingtone(isRefresh: true);
-                    if (result) {
-                      _refreshController.refreshCompleted();
-                    } else {
-                      _refreshController.refreshFailed();
-                    }
-                  },
-                  onLoading: () async {
-                    final result = await fetchRingtone();
-                    if (result) {
-                      _refreshController.loadComplete();
-                    } else {
-                      _refreshController.loadFailed();
-                    }
-                  },
-                  header: CustomHeader(builder: (context, mode) => Container()),
-                  footer: CustomFooter(
-                      builder: (context, mode) => isDataLoad && totalPage != 0
-                          ? const LoadingPage()
-                          : const SizedBox()),
-                  child: SafeArea(
-                    child: Stack(
-                      children: [
-                        Column(
-                          children: [
-                            const SizedBox(height: 60),
-                            Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 20),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 17),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Categories",
-                                          style: GoogleFonts.archivo(
-                                            fontStyle: FontStyle.normal,
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            wordSpacing: 0.19,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: (() {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const Categories(
-                                                          isRingtone: true,
-                                                        )));
-                                          }),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                "View All",
-                                                style: GoogleFonts.archivo(
-                                                  fontStyle: FontStyle.normal,
-                                                  color: Colors.white,
-                                                  fontSize: 10,
-                                                  wordSpacing: 0.16,
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              const Icon(
-                                                Icons.arrow_forward,
-                                                color: Colors.white,
-                                                size: 15,
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  SizedBox(
-                                    height: 60,
-                                    width: screenWidth,
-                                    child: BlocConsumer<CategoryBloc,
-                                        CategoryState>(
-                                      listener: (context, state) {
-                                        // TODO: implement listener
-                                      },
-                                      builder: (context, state) {
-                                        if (state is CategoryInitial) {
-                                          return const Center(
-                                              child:
-                                                  CircularProgressIndicator());
-                                        }
-                                        if (state is LoadedCategory) {
-                                          return Container(
-                                            height: 50,
-                                            margin:
-                                                const EdgeInsets.only(left: 17),
-                                            child: ListView.builder(
-                                              scrollDirection: Axis.horizontal,
-                                              itemCount: 4,
-                                              itemBuilder: (context, index) {
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          right: 12),
-                                                  child: RingtoneCategoryCard(
-                                                    id: state
-                                                        .categories![index].id!,
-                                                    image: state
-                                                        .categories![index]
-                                                        .image,
-                                                    name: state
-                                                        .categories![index]
-                                                        .name,
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          );
-                                        }
-                                        return const Center(
-                                            child: CircularProgressIndicator());
-                                      },
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 17),
-                                    child: Text(
-                                      "Trending Search",
-                                      style: GoogleFonts.archivo(
-                                        fontStyle: FontStyle.normal,
-                                        color: Colors.white,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 15),
-                                  SizedBox(
-                                    height: 33,
-                                    width: screenWidth,
-                                    child:
-                                        buildTrendingSearchContainerForMainScreen(),
-                                  ),
-                                  const SizedBox(height: 30),
-                                ]),
-                            Expanded(
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                controller: scrollController,
-                                itemCount: hydraMember.length,
-                                itemBuilder: (context, index) => Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15),
-                                  child: selectedIndex == index
-                                      ? RingtonesCard(
-                                          auidoId:
-                                              hydraMember[index].id!.toString(),
-                                          onNavigate: () async {
-                                            await audioPlayer.pause();
-                                            // ignore: use_build_context_synchronously
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    CustomAudioPlayer(
-                                                  listHydra: hydraMember,
-                                                  index: index,
-                                                  type: widget.type,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          onChange: (value) async {
-                                            final myposition = Duration(
-                                                seconds: value.toInt());
-                                            await audioPlayer.seek(myposition);
-                                            await audioPlayer.resume();
-                                          },
-                                          onTap: (() async {
-                                            await activeRingtoneCardOnTapFunction(
-                                                index);
-                                          }),
-                                          audioPlayer: selectedIndex == index
-                                              ? audioPlayer
-                                              : pausePlayer,
-                                          isPlaying: selectedIndex == index
-                                              ? isPlaying
-                                              : false,
-                                          isBuffering: selectedIndex == index
-                                              ? _isBuffering
-                                              : false,
-                                          duration: selectedIndex == index
-                                              ? duration
-                                              : pauseDuration,
-                                          position: selectedIndex == index
-                                              ? position
-                                              : pausePosition,
-                                          index: index,
-                                          listHydra: hydraMember,
-                                          ringtoneName:
-                                              hydraMember[index].name!,
-                                          file: hydraMember[index].file!,
-                                        )
-                                      : RingtonesCard(
-                                          auidoId:
-                                              hydraMember[index].id!.toString(),
-                                          onNavigate: () async {
-                                            await audioPlayer.pause();
-                                            // ignore: use_build_context_synchronously
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    CustomAudioPlayer(
-                                                  listHydra: hydraMember,
-                                                  index: index - 1,
-                                                  type: widget.type,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          onChange: (value) async {
-                                            final myposition = Duration(
-                                                seconds: value.toInt());
-                                            await audioPlayer.seek(myposition);
-                                            await audioPlayer.resume();
-                                          },
-                                          onTap: (() async {
-                                            await nonActiveRingtoneCardFunction(
-                                                index);
-                                          }),
-                                          audioPlayer: selectedIndex == index
-                                              ? audioPlayer
-                                              : pausePlayer,
-                                          isPlaying: selectedIndex == index
-                                              ? isPlaying
-                                              : false,
-                                          duration: selectedIndex == index
-                                              ? duration
-                                              : pauseDuration,
-                                          position: selectedIndex == index
-                                              ? position
-                                              : pausePosition,
-                                          index: index,
-                                          listHydra: hydraMember,
-                                          ringtoneName:
-                                              hydraMember[index].name!,
-                                          file: hydraMember[index].file!,
-                                        ),
-                                ),
-                              ),
+    // return
+    // _showSearchHeader
+    // ? WillPopScope(
+    //     onWillPop: _onWillPop,
+    //     child: Scaffold(
+    //       resizeToAvoidBottomInset: false,
+    //       backgroundColor: const Color(0xFF4d047d),
+    //       body: Container(
+    //         height: MediaQuery.of(context).size.height,
+    //         decoration: const BoxDecoration(
+    //           gradient: LinearGradient(
+    //               begin: Alignment.topCenter,
+    //               end: Alignment.bottomCenter,
+    //               colors: <Color>[
+    //                 Color(0xFF4d047d),
+    //                 Color(0xFF17131F),
+    //                 Color(0xFF17131F),
+    //                 Color(0xFF17131F),
+    //                 Color(0xFF17131F),
+    //                 Color(0xFF17131F),
+    //                 Color(0xFF17131F),
+    //               ]),
+    //         ),
+    //         child: SmartRefresher(
+    //           enablePullUp: true,
+    //           controller: _refreshController,
+    //           onRefresh: () async {
+    //             final result = await fetchRingtone(isRefresh: true);
+    //             if (result) {
+    //               _refreshController.refreshCompleted();
+    //             } else {
+    //               _refreshController.refreshFailed();
+    //             }
+    //           },
+    //           onLoading: () async {
+    //             final result = await fetchRingtone();
+    //             if (result) {
+    //               _refreshController.loadComplete();
+    //             } else {
+    //               _refreshController.loadFailed();
+    //             }
+    //           },
+    //           header: CustomHeader(builder: (context, mode) => Container()),
+    //           footer: CustomFooter(
+    //               builder: (context, mode) => isDataLoad && totalPage != 0
+    //                   ? const LoadingPage()
+    //                   : const SizedBox()),
+    //           child: SafeArea(
+    //             child: Stack(
+    //               children: [
+    //                 Column(
+    //                   children: [
+    //                     const SizedBox(height: 60),
+    //                     Column(
+    //                         crossAxisAlignment: CrossAxisAlignment.start,
+    //                         children: [
+    //                           const SizedBox(height: 20),
+    //                           Padding(
+    //                             padding: const EdgeInsets.symmetric(
+    //                                 horizontal: 17),
+    //                             child: Row(
+    //                               mainAxisAlignment:
+    //                                   MainAxisAlignment.spaceBetween,
+    //                               children: [
+    //                                 Text(
+    //                                   "Categories",
+    //                                   style: GoogleFonts.archivo(
+    //                                     fontStyle: FontStyle.normal,
+    //                                     color: Colors.white,
+    //                                     fontSize: 12,
+    //                                     wordSpacing: 0.19,
+    //                                     fontWeight: FontWeight.w600,
+    //                                   ),
+    //                                 ),
+    //                                 GestureDetector(
+    //                                   onTap: (() {
+    //                                     Navigator.push(
+    //                                         context,
+    //                                         MaterialPageRoute(
+    //                                             builder: (context) =>
+    //                                                 const Categories(
+    //                                                   isRingtone: true,
+    //                                                 )));
+    //                                   }),
+    //                                   child: Row(
+    //                                     children: [
+    //                                       Text(
+    //                                         "View All",
+    //                                         style: GoogleFonts.archivo(
+    //                                           fontStyle: FontStyle.normal,
+    //                                           color: Colors.white,
+    //                                           fontSize: 10,
+    //                                           wordSpacing: 0.16,
+    //                                           fontWeight: FontWeight.w400,
+    //                                         ),
+    //                                       ),
+    //                                       const SizedBox(
+    //                                         width: 10,
+    //                                       ),
+    //                                       const Icon(
+    //                                         Icons.arrow_forward,
+    //                                         color: Colors.white,
+    //                                         size: 15,
+    //                                       ),
+    //                                     ],
+    //                                   ),
+    //                                 )
+    //                               ],
+    //                             ),
+    //                           ),
+    //                           const SizedBox(height: 20),
+    //                           SizedBox(
+    //                             height: 60,
+    //                             width: screenWidth,
+    //                             child: BlocConsumer<CategoryBloc,
+    //                                 CategoryState>(
+    //                               listener: (context, state) {
+    //                                 // TODO: implement listener
+    //                               },
+    //                               builder: (context, state) {
+    //                                 if (state is CategoryInitial) {
+    //                                   return const Center(
+    //                                       child:
+    //                                           CircularProgressIndicator());
+    //                                 }
+    //                                 if (state is LoadedCategory) {
+    //                                   return Container(
+    //                                     height: 50,
+    //                                     margin:
+    //                                         const EdgeInsets.only(left: 17),
+    //                                     child: ListView.builder(
+    //                                       scrollDirection: Axis.horizontal,
+    //                                       itemCount: 4,
+    //                                       itemBuilder: (context, index) {
+    //                                         return Padding(
+    //                                           padding:
+    //                                               const EdgeInsets.only(
+    //                                                   right: 12),
+    //                                           child: RingtoneCategoryCard(
+    //                                             id: state
+    //                                                 .categories![index].id!,
+    //                                             image: state
+    //                                                 .categories![index]
+    //                                                 .image,
+    //                                             name: state
+    //                                                 .categories![index]
+    //                                                 .name,
+    //                                           ),
+    //                                         );
+    //                                       },
+    //                                     ),
+    //                                   );
+    //                                 }
+    //                                 return const Center(
+    //                                     child: CircularProgressIndicator());
+    //                               },
+    //                             ),
+    //                           ),
+    //                           const SizedBox(height: 20),
+    //                           Padding(
+    //                             padding: const EdgeInsets.symmetric(
+    //                                 horizontal: 17),
+    //                             child: Text(
+    //                               "Trending Search",
+    //                               style: GoogleFonts.archivo(
+    //                                 fontStyle: FontStyle.normal,
+    //                                 color: Colors.white,
+    //                                 fontSize: 15,
+    //                               ),
+    //                             ),
+    //                           ),
+    //                           const SizedBox(height: 15),
+    //                           SizedBox(
+    //                             height: 33,
+    //                             width: screenWidth,
+    //                             child:
+    //                                 buildTrendingSearchContainerForMainScreen(),
+    //                           ),
+    //                           const SizedBox(height: 30),
+    //                         ]),
+    //                     Expanded(
+    //                       child: ListView.builder(
+    //                         shrinkWrap: true,
+    //                         controller: scrollController,
+    //                         itemCount: hydraMember.length,
+    //                         itemBuilder: (context, index) => Padding(
+    //                           padding: const EdgeInsets.symmetric(
+    //                               horizontal: 15),
+    //                           child: selectedIndex == index
+    //                               ? RingtonesCard(
+    //                                   auidoId:
+    //                                       hydraMember[index].id!.toString(),
+    //                                   onNavigate: () async {
+    //                                     await audioPlayer.pause();
+    //                                     // ignore: use_build_context_synchronously
+    //                                     Navigator.push(
+    //                                       context,
+    //                                       MaterialPageRoute(
+    //                                         builder: (context) =>
+    //                                             CustomAudioPlayer(
+    //                                           listHydra: hydraMember,
+    //                                           index: index,
+    //                                           type: widget.type,
+    //                                         ),
+    //                                       ),
+    //                                     );
+    //                                   },
+    //                                   onChange: (value) async {
+    //                                     final myposition = Duration(
+    //                                         seconds: value.toInt());
+    //                                     await audioPlayer.seek(myposition);
+    //                                     await audioPlayer.resume();
+    //                                   },
+    //                                   onTap: (() async {
+    //                                     await activeRingtoneCardOnTapFunction(
+    //                                         index);
+    //                                   }),
+    //                                   audioPlayer: selectedIndex == index
+    //                                       ? audioPlayer
+    //                                       : pausePlayer,
+    //                                   isPlaying: selectedIndex == index
+    //                                       ? isPlaying
+    //                                       : false,
+    //                                   isBuffering: selectedIndex == index
+    //                                       ? _isBuffering
+    //                                       : false,
+    //                                   duration: selectedIndex == index
+    //                                       ? duration
+    //                                       : pauseDuration,
+    //                                   position: selectedIndex == index
+    //                                       ? position
+    //                                       : pausePosition,
+    //                                   index: index,
+    //                                   listHydra: hydraMember,
+    //                                   ringtoneName:
+    //                                       hydraMember[index].name!,
+    //                                   file: hydraMember[index].file!,
+    //                                 )
+    //                               : RingtonesCard(
+    //                                   auidoId:
+    //                                       hydraMember[index].id!.toString(),
+    //                                   onNavigate: () async {
+    //                                     await audioPlayer.pause();
+    //                                     // ignore: use_build_context_synchronously
+    //                                     Navigator.push(
+    //                                       context,
+    //                                       MaterialPageRoute(
+    //                                         builder: (context) =>
+    //                                             CustomAudioPlayer(
+    //                                           listHydra: hydraMember,
+    //                                           index: index - 1,
+    //                                           type: widget.type,
+    //                                         ),
+    //                                       ),
+    //                                     );
+    //                                   },
+    //                                   onChange: (value) async {
+    //                                     final myposition = Duration(
+    //                                         seconds: value.toInt());
+    //                                     await audioPlayer.seek(myposition);
+    //                                     await audioPlayer.resume();
+    //                                   },
+    //                                   onTap: (() async {
+    //                                     await nonActiveRingtoneCardFunction(
+    //                                         index);
+    //                                   }),
+    //                                   audioPlayer: selectedIndex == index
+    //                                       ? audioPlayer
+    //                                       : pausePlayer,
+    //                                   isPlaying: selectedIndex == index
+    //                                       ? isPlaying
+    //                                       : false,
+    //                                   duration: selectedIndex == index
+    //                                       ? duration
+    //                                       : pauseDuration,
+    //                                   position: selectedIndex == index
+    //                                       ? position
+    //                                       : pausePosition,
+    //                                   index: index,
+    //                                   listHydra: hydraMember,
+    //                                   ringtoneName:
+    //                                       hydraMember[index].name!,
+    //                                   file: hydraMember[index].file!,
+    //                                 ),
+    //                         ),
+    //                       ),
+    //                     ),
+    //                   ],
+    //                 ),
+    //                 buildSearchHeaderContainer(context),
+    //               ],
+    //             ),
+    //           ),
+    //         ),
+    //       ),
+    //     ),
+    //   )
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        // appBar: PreferredSize(
+        //   preferredSize: const Size(0, 60),
+        //   child: AppBar(
+        //     backgroundColor: const Color(0xFF4d047d),
+        //     elevation: 0,
+        //     centerTitle: true,
+        //     leading: Builder(
+        //       builder: (ctx) {
+        //         return GestureDetector(
+        //           onTap: () async {
+        //             await audioPlayer.pause();
+        //             Scaffold.of(ctx).openDrawer();
+        //           },
+        //           child: const Padding(
+        //             padding: EdgeInsets.symmetric(horizontal: 15),
+        //             child: AppImageAsset(image: 'assets/menu.svg'),
+        //           ),
+        //         );
+        //       },
+        //     ),
+        //     title: _showSearchHeader
+        //         ? SizedBox(
+        //             height: 43,
+        //             width: MediaQuery.of(context).size.width,
+        //             child: TypeAheadField<SearchModel?>(
+        //                 suggestionsBoxDecoration:
+        //                     const SuggestionsBoxDecoration(
+        //                         color: Color(0xFF4d047d)),
+        //                 suggestionsCallback: (value) {
+        //                   return performSearchRintone();
+        //                 },
+        //                 debounceDuration: const Duration(milliseconds: 500),
+        //                 // hideSuggestionsOnKeyboardHide: false,
+        //                 textFieldConfiguration: TextFieldConfiguration(
+        //                   decoration: InputDecoration(
+        //                     hintText: "",
+        //                     hintStyle: const TextStyle(
+        //                       color: Colors.white,
+        //                       fontSize: 12,
+        //                     ),
+        //                     fillColor: const Color(0xFF5d318c),
+        //                     filled: true,
+        //                     contentPadding: const EdgeInsets.symmetric(
+        //                       vertical: 5,
+        //                       horizontal: 20,
+        //                     ),
+        //                     focusedBorder: const OutlineInputBorder(
+        //                       borderRadius:
+        //                           BorderRadius.all(Radius.circular(7)),
+        //                       borderSide: BorderSide(
+        //                           color: Color(0xFF5d318c), width: 0),
+        //                     ),
+        //                     enabledBorder: const OutlineInputBorder(
+        //                       borderRadius:
+        //                           BorderRadius.all(Radius.circular(7)),
+        //                       borderSide: BorderSide(
+        //                           color: Color(0xFF5d318c), width: 0.0),
+        //                     ),
+        //                     suffixIcon: GestureDetector(
+        //                       onTap: () =>
+        //                           setState(() => _showSearchHeader = false),
+        //                       child: Padding(
+        //                         padding: EdgeInsets.symmetric(horizontal: 12),
+        //                         child: const AppImageAsset(
+        //                           image: 'assets/search.svg',
+        //                           color: Colors.black,
+        //                         ),
+        //                       ),
+        //                     ),
+        //                   ),
+        //                 ),
+        //                 itemBuilder: (context, SearchModel? suggestion) {
+        //                   final ringtone = suggestion!;
+        //                   return Padding(
+        //                     padding: const EdgeInsets.only(bottom: 20),
+        //                     child: Container(
+        //                         height: 65,
+        //                         width: screenWidth,
+        //                         decoration: BoxDecoration(
+        //                           gradient: const LinearGradient(
+        //                               begin: Alignment.centerLeft,
+        //                               end: Alignment.centerRight,
+        //                               colors: [
+        //                                 Color(0xFF279A88),
+        //                                 Color(0xFF737B64),
+        //                                 Color(0xFF4F4C7E),
+        //                                 Color(0xFF4F4C7E),
+        //                               ]),
+        //                           borderRadius: BorderRadius.circular(10),
+        //                         ),
+        //                         child: Padding(
+        //                           padding: const EdgeInsets.symmetric(
+        //                               horizontal: 20),
+        //                           child: Row(
+        //                             mainAxisAlignment:
+        //                                 MainAxisAlignment.spaceBetween,
+        //                             children: [
+        //                               Row(
+        //                                 children: [
+        //                                   Container(
+        //                                     height: 35,
+        //                                     width: 35,
+        //                                     alignment: Alignment.center,
+        //                                     decoration: const BoxDecoration(
+        //                                       shape: BoxShape.circle,
+        //                                       color: Color(0xFF798975),
+        //                                     ),
+        //                                     child: const Icon(
+        //                                       Icons.play_arrow_sharp,
+        //                                       color: Colors.white,
+        //                                     ),
+        //                                   ),
+        //                                   const SizedBox(
+        //                                     width: 15,
+        //                                   ),
+        //                                   Text(
+        //                                     ringtone.name!,
+        //                                     style: GoogleFonts.archivo(
+        //                                       fontStyle: FontStyle.normal,
+        //                                       color: Colors.white,
+        //                                       fontSize: 18,
+        //                                     ),
+        //                                   ),
+        //                                 ],
+        //                               ),
+        //                               Column(
+        //                                 children: [
+        //                                   const AppImageAsset(
+        //                                       image:
+        //                                           'assets/favourite_fill.svg',
+        //                                       height: 30),
+        //                                   Row(
+        //                                     children: const [
+        //                                       Icon(
+        //                                         Icons.arrow_downward,
+        //                                         color: Colors.white,
+        //                                         size: 15,
+        //                                       ),
+        //                                       Text(
+        //                                         "23k",
+        //                                         style: TextStyle(
+        //                                           fontSize: 15,
+        //                                           color: Colors.white,
+        //                                         ),
+        //                                       ),
+        //                                     ],
+        //                                   ),
+        //                                 ],
+        //                               )
+        //                             ],
+        //                           ),
+        //                         )),
+        //                   );
+        //                 },
+        //                 onSuggestionSelected: (SearchModel? suggestion) {},
+        //                 noItemsFoundBuilder: (context) => const Center(
+        //                       child: Text(
+        //                         "No Found",
+        //                         style: TextStyle(
+        //                           fontSize: 18,
+        //                           fontFamily: 'Poppins-Regular',
+        //                         ),
+        //                       ),
+        //                     ),
+        //                 errorBuilder: (BuildContext context, error) {
+        //                   return const Center(
+        //                     child: Text(
+        //                       "Please enter ",
+        //                       style: TextStyle(
+        //                         fontSize: 18,
+        //                         fontFamily: 'Poppins-Regular',
+        //                       ),
+        //                     ),
+        //                   );
+        //                 }),
+        //           )
+        //         // ? Center()
+        //         : Text(
+        //             buildAppBarTitle,
+        //             style: GoogleFonts.archivo(
+        //               fontStyle: FontStyle.normal,
+        //               color: Colors.white,
+        //               fontSize: 22,
+        //               fontWeight: FontWeight.w600,
+        //               wordSpacing: 0.34,
+        //             ),
+        //           ),
+        //     actions: [
+        //       _showSearchHeader
+        //           ? const SizedBox.shrink()
+        //           : GestureDetector(
+        //               onTap: () {
+        //                 print('>> search - onTap');
+        //                 setState(() => _showSearchHeader = true);
+        //               },
+        //               // onTap: () {
+        //               //   Navigator.push(
+        //               //     context,
+        //               //     MaterialPageRoute(
+        //               //         builder: (context) => SearchScreen(
+        //               //               searchText: _typeAheadController.text,
+        //               //             )),
+        //               //   );
+        //               // },
+        //               child: const Padding(
+        //                 padding:
+        //                     EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        //                 child: AppImageAsset(image: 'assets/search.svg'),
+        //               ),
+        //             ),
+        //     ],
+        //   ),
+        // ),
+        backgroundColor: const Color(0xFF4d047d),
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  PreferredSize(
+                    preferredSize: const Size(0, 60),
+                    child: AppBar(
+                      backgroundColor: const Color(0xFF4d047d),
+                      elevation: 0,
+                      centerTitle: true,
+                      leading: Builder(
+                        builder: (ctx) {
+                          return GestureDetector(
+                            onTap: () async {
+                              await audioPlayer.pause();
+                              Scaffold.of(ctx).openDrawer();
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              child: AppImageAsset(image: 'assets/menu.svg'),
                             ),
-                          ],
-                        ),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              height: 46,
-                              // height: 30,
-                              width: MediaQuery.of(context).size.width,
-                              child: TextFormField(
-                                controller: _typeAheadController,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                // onChanged: (data) => setState(() {}),
-                                onChanged: (newValue) {
-                                  if (_searchQueryTimer != null) {
-                                    print('>> _searchQueryTimer is not null');
-                                    _searchQueryTimer!.cancel();
-                                  }
-
-                                  _searchQueryTimer =
-                                      Timer(Duration(milliseconds: 2000), () {
-                                    DateTime now = DateTime.now();
-                                    String formattedDate =
-                                        DateFormat('yyyy-MM-dd – HH:mm:ss')
-                                            .format(now);
-                                    print(
-                                        '>> ${DateTime.now()} performSearch - newValue : $newValue');
-                                    performSearchRintone();
-                                  });
-                                  // performSearchRintone();
-                                },
-                                onFieldSubmitted: (val) {
-                                  FocusScope.of(context).unfocus();
-                                  if (_typeAheadController.text.isNotEmpty) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => SearchScreen(
-                                                searchText:
-                                                    _typeAheadController.text,
-                                                itemType: widget.type,
-                                              )),
-                                    );
-                                  }
-                                  _typeAheadController.clear();
-                                  ishow = false;
-                                },
-                                decoration: InputDecoration(
-                                  hintText: "",
-                                  hintStyle: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 5,
-                                    horizontal: 20,
-                                  ),
-                                  focusedBorder: const OutlineInputBorder(
-                                    borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(7),
-                                        topLeft: Radius.circular(7)),
-                                    borderSide: BorderSide(
-                                        color: Color(0xFF5d318c), width: 0),
-                                  ),
-                                  enabledBorder: const OutlineInputBorder(
-                                    borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(7),
-                                        topLeft: Radius.circular(7)),
-                                    borderSide: BorderSide(
-                                        color: Color(0xFF5d318c), width: 0.0),
-                                  ),
-                                  suffixIcon: GestureDetector(
-                                    onTap: () {
-                                      FocusScope.of(context).unfocus();
-                                      if (_typeAheadController.text.isEmpty) {
-                                        ishow = false;
-                                      } else {
-                                        _typeAheadController.clear();
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  SearchScreen(
-                                                    searchText:
-                                                        _typeAheadController
-                                                            .text,
-                                                    itemType: widget.type,
-                                                  )),
-                                        );
-                                        ishow = false;
-                                      }
-                                      _typeAheadController.clear();
-                                      setState(() {});
-                                    },
-                                    child: const Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 14,
-                                      ),
-                                      child: AppImageAsset(
-                                        image: 'assets/search.svg',
-                                        color: Colors.black,
-                                        // color: Colors.orange,
-                                      ),
-                                      // child: Icon(Icons.search),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            buildSearchResultContainer(),
-                            // buildTrendingSearchContainer(context),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          )
-        : WillPopScope(
-            onWillPop: _onWillPop,
-            child: Scaffold(
-              appBar: PreferredSize(
-                preferredSize: const Size(0, 60),
-                child: AppBar(
-                  backgroundColor: const Color(0xFF4d047d),
-                  elevation: 0,
-                  centerTitle: true,
-                  leading: Builder(
-                    builder: (ctx) {
-                      return GestureDetector(
-                        onTap: () async {
-                          await audioPlayer.pause();
-                          Scaffold.of(ctx).openDrawer();
+                          );
                         },
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 15),
-                          child: AppImageAsset(image: 'assets/menu.svg'),
-                        ),
-                      );
-                    },
-                  ),
-                  title: ishow
-                      ? SizedBox(
-                          height: 43,
-                          width: MediaQuery.of(context).size.width,
-                          child: TypeAheadField<SearchModel?>(
-                              suggestionsBoxDecoration:
-                                  const SuggestionsBoxDecoration(
-                                      color: Color(0xFF4d047d)),
-                              suggestionsCallback: (value) {
-                                return performSearchRintone();
-                              },
-                              debounceDuration:
-                                  const Duration(milliseconds: 500),
-                              // hideSuggestionsOnKeyboardHide: false,
-                              textFieldConfiguration: TextFieldConfiguration(
-                                decoration: InputDecoration(
-                                  hintText: "",
-                                  hintStyle: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
-                                  fillColor: const Color(0xFF5d318c),
-                                  filled: true,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 5,
-                                    horizontal: 20,
-                                  ),
-                                  focusedBorder: const OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(7)),
-                                    borderSide: BorderSide(
-                                        color: Color(0xFF5d318c), width: 0),
-                                  ),
-                                  enabledBorder: const OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(7)),
-                                    borderSide: BorderSide(
-                                        color: Color(0xFF5d318c), width: 0.0),
-                                  ),
-                                  suffixIcon: GestureDetector(
-                                    onTap: () => setState(() => ishow = false),
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 12),
-                                      child: const AppImageAsset(
-                                        image: 'assets/search.svg',
-                                        color: Colors.black,
+                      ),
+                      title: _showSearchHeader
+                          ? SizedBox(
+                              height: 43,
+                              width: MediaQuery.of(context).size.width,
+                              child: TypeAheadField<SearchModel?>(
+                                  suggestionsBoxDecoration:
+                                      const SuggestionsBoxDecoration(
+                                          color: Color(0xFF4d047d)),
+                                  suggestionsCallback: (value) {
+                                    return performSearchRintone();
+                                  },
+                                  debounceDuration:
+                                      const Duration(milliseconds: 500),
+                                  // hideSuggestionsOnKeyboardHide: false,
+                                  textFieldConfiguration:
+                                      TextFieldConfiguration(
+                                    decoration: InputDecoration(
+                                      hintText: "",
+                                      hintStyle: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                      fillColor: const Color(0xFF5d318c),
+                                      filled: true,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        vertical: 5,
+                                        horizontal: 20,
+                                      ),
+                                      focusedBorder: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(7)),
+                                        borderSide: BorderSide(
+                                            color: Color(0xFF5d318c), width: 0),
+                                      ),
+                                      enabledBorder: const OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(7)),
+                                        borderSide: BorderSide(
+                                            color: Color(0xFF5d318c),
+                                            width: 0.0),
+                                      ),
+                                      suffixIcon: GestureDetector(
+                                        onTap: () => setState(
+                                            () => _showSearchHeader = false),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 12),
+                                          child: const AppImageAsset(
+                                            image: 'assets/search.svg',
+                                            color: Colors.black,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              itemBuilder: (context, SearchModel? suggestion) {
-                                final ringtone = suggestion!;
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
-                                  child: Container(
-                                      height: 65,
-                                      width: screenWidth,
-                                      decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                            colors: [
-                                              Color(0xFF279A88),
-                                              Color(0xFF737B64),
-                                              Color(0xFF4F4C7E),
-                                              Color(0xFF4F4C7E),
-                                            ]),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Row(
+                                  itemBuilder:
+                                      (context, SearchModel? suggestion) {
+                                    final ringtone = suggestion!;
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 20),
+                                      child: Container(
+                                          height: 65,
+                                          width: screenWidth,
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                                begin: Alignment.centerLeft,
+                                                end: Alignment.centerRight,
+                                                colors: [
+                                                  Color(0xFF279A88),
+                                                  Color(0xFF737B64),
+                                                  Color(0xFF4F4C7E),
+                                                  Color(0xFF4F4C7E),
+                                                ]),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
-                                                Container(
-                                                  height: 35,
-                                                  width: 35,
-                                                  alignment: Alignment.center,
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Color(0xFF798975),
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.play_arrow_sharp,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  width: 15,
-                                                ),
-                                                Text(
-                                                  ringtone.name!,
-                                                  style: GoogleFonts.archivo(
-                                                    fontStyle: FontStyle.normal,
-                                                    color: Colors.white,
-                                                    fontSize: 18,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Column(
-                                              children: [
-                                                const AppImageAsset(
-                                                    image:
-                                                        'assets/favourite_fill.svg',
-                                                    height: 30),
                                                 Row(
-                                                  children: const [
-                                                    Icon(
-                                                      Icons.arrow_downward,
-                                                      color: Colors.white,
-                                                      size: 15,
+                                                  children: [
+                                                    Container(
+                                                      height: 35,
+                                                      width: 35,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color:
+                                                            Color(0xFF798975),
+                                                      ),
+                                                      child: const Icon(
+                                                        Icons.play_arrow_sharp,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 15,
                                                     ),
                                                     Text(
-                                                      "23k",
-                                                      style: TextStyle(
-                                                        fontSize: 15,
+                                                      ringtone.name!,
+                                                      style:
+                                                          GoogleFonts.archivo(
+                                                        fontStyle:
+                                                            FontStyle.normal,
                                                         color: Colors.white,
+                                                        fontSize: 18,
                                                       ),
                                                     ),
                                                   ],
                                                 ),
+                                                Column(
+                                                  children: [
+                                                    const AppImageAsset(
+                                                        image:
+                                                            'assets/favourite_fill.svg',
+                                                        height: 30),
+                                                    Row(
+                                                      children: const [
+                                                        Icon(
+                                                          Icons.arrow_downward,
+                                                          color: Colors.white,
+                                                          size: 15,
+                                                        ),
+                                                        Text(
+                                                          "23k",
+                                                          style: TextStyle(
+                                                            fontSize: 15,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                )
                                               ],
-                                            )
-                                          ],
+                                            ),
+                                          )),
+                                    );
+                                  },
+                                  onSuggestionSelected:
+                                      (SearchModel? suggestion) {},
+                                  noItemsFoundBuilder: (context) =>
+                                      const Center(
+                                        child: Text(
+                                          "No Found",
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontFamily: 'Poppins-Regular',
+                                          ),
                                         ),
-                                      )),
-                                );
-                              },
-                              onSuggestionSelected:
-                                  (SearchModel? suggestion) {},
-                              noItemsFoundBuilder: (context) => const Center(
-                                    child: Text(
-                                      "No Found",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontFamily: 'Poppins-Regular',
                                       ),
-                                    ),
-                                  ),
-                              errorBuilder: (BuildContext context, error) {
-                                return const Center(
-                                  child: Text(
-                                    "Please enter ",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontFamily: 'Poppins-Regular',
-                                    ),
-                                  ),
-                                );
-                              }),
-                        )
-                      : Text(
-                          buildAppBarTitle,
-                          style: GoogleFonts.archivo(
-                            fontStyle: FontStyle.normal,
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w600,
-                            wordSpacing: 0.34,
-                          ),
-                        ),
-                  actions: [
-                    ishow
-                        ? const SizedBox.shrink()
-                        : GestureDetector(
-                            onTap: () {
-                              print('>> search - onTap');
-                              setState(() => ishow = true);
-                            },
-                            // onTap: () {
-                            //   Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //         builder: (context) => SearchScreen(
-                            //               searchText: _typeAheadController.text,
-                            //             )),
-                            //   );
-                            // },
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 15),
-                              child: AppImageAsset(image: 'assets/search.svg'),
+                                  errorBuilder: (BuildContext context, error) {
+                                    return const Center(
+                                      child: Text(
+                                        "Please enter ",
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontFamily: 'Poppins-Regular',
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                            )
+                          // ? Center()
+                          : Text(
+                              buildAppBarTitle,
+                              style: GoogleFonts.archivo(
+                                fontStyle: FontStyle.normal,
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
+                                wordSpacing: 0.34,
+                              ),
                             ),
-                          ),
-                  ],
-                ),
-              ),
-              backgroundColor: const Color(0xFF4d047d),
-              body: Column(
-                children: [
+                      actions: [
+                        _showSearchHeader
+                            ? const SizedBox.shrink()
+                            : GestureDetector(
+                                onTap: () {
+                                  print('>> search - onTap');
+                                  setState(() => _showSearchHeader = true);
+                                },
+                                // onTap: () {
+                                //   Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) => SearchScreen(
+                                //               searchText: _typeAheadController.text,
+                                //             )),
+                                //   );
+                                // },
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 15),
+                                  child:
+                                      AppImageAsset(image: 'assets/search.svg'),
+                                ),
+                              ),
+                      ],
+                    ),
+                  ),
                   Expanded(
                     child: Container(
                       // height: MediaQuery.of(context).size.height,
@@ -1136,9 +1250,126 @@ class _DashbaordState extends State<Dashbaord> with WidgetsBindingObserver {
                   const SizedBox(height: 2),
                 ],
               ),
-              drawer: CustomDrawer(),
+              _showSearchHeader
+                  ? buildSearchHeaderContainer(context)
+                  : Center(),
+            ],
+          ),
+        ),
+        drawer: CustomDrawer(),
+      ),
+    );
+  }
+
+  Widget buildSearchHeaderContainer(BuildContext context) {
+    return Column(
+      // mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          height: 46,
+          // height: 30,
+          width: MediaQuery.of(context).size.width,
+          child: TextFormField(
+            controller: _typeAheadController,
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
             ),
-          );
+            // onChanged: (data) => setState(() {}),
+            onChanged: (newValue) {
+              if (_searchQueryTimer != null) {
+                print('>> _searchQueryTimer is not null');
+                _searchQueryTimer!.cancel();
+              }
+
+              _searchQueryTimer = Timer(Duration(milliseconds: 2000), () {
+                DateTime now = DateTime.now();
+                String formattedDate =
+                    DateFormat('yyyy-MM-dd – HH:mm:ss').format(now);
+                print(
+                    '>> ${DateTime.now()} performSearch - newValue : $newValue');
+                performSearchRintone();
+              });
+              // performSearchRintone();
+            },
+            onFieldSubmitted: (val) {
+              FocusScope.of(context).unfocus();
+              if (_typeAheadController.text.isNotEmpty) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SearchScreen(
+                            searchText: _typeAheadController.text,
+                            itemType: widget.type,
+                          )),
+                );
+              }
+              _typeAheadController.clear();
+              _showSearchHeader = false;
+            },
+            decoration: InputDecoration(
+              hintText: "",
+              hintStyle: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+              ),
+              fillColor: Colors.white,
+              filled: true,
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 5,
+                horizontal: 20,
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(7), topLeft: Radius.circular(7)),
+                borderSide: BorderSide(color: Color(0xFF5d318c), width: 0),
+              ),
+              enabledBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(7), topLeft: Radius.circular(7)),
+                borderSide: BorderSide(color: Color(0xFF5d318c), width: 0.0),
+              ),
+              suffixIcon: GestureDetector(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                  if (_typeAheadController.text.isEmpty) {
+                    _showSearchHeader = false;
+                  } else {
+                    _typeAheadController.clear();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SearchScreen(
+                                searchText: _typeAheadController.text,
+                                itemType: widget.type,
+                              )),
+                    );
+                    _showSearchHeader = false;
+                  }
+                  _typeAheadController.clear();
+                  setState(() {});
+                },
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
+                  child: AppImageAsset(
+                    image: 'assets/search.svg',
+                    color: Colors.black,
+                    // color: Colors.orange,
+                  ),
+                  // child: Icon(Icons.search),
+                ),
+              ),
+            ),
+          ),
+        ),
+        buildSearchResultContainer(),
+        // buildTrendingSearchContainer(context),
+      ],
+    );
   }
 
   RingtonesCard buildActiveRingtoneCard(int index, BuildContext context) {
@@ -1457,67 +1688,6 @@ class _DashbaordState extends State<Dashbaord> with WidgetsBindingObserver {
     return _searchResultList;
   }
 
-  // FutureBuilder<List<SearchModel>> buildSearchResultContainer() {
-  //   return FutureBuilder<List<SearchModel>>(
-  //       future:
-  //           _searchServices.searchRingtone(_typeAheadController.text.trim()),
-  //       builder:
-  //           (BuildContext context, AsyncSnapshot<List<SearchModel>> snapshot) {
-  //         print('>> FutureBuilder<List<SearchModel>> - builder');
-  //         if (snapshot.hasError) {
-  //           return Container(
-  //               color: Colors.white,
-  //               alignment: Alignment.centerLeft,
-  //               margin: const EdgeInsets.symmetric(horizontal: 16),
-  //               padding:
-  //                   const EdgeInsets.symmetric(vertical: 10).copyWith(left: 30),
-  //               child: const Text(
-  //                 "Something went wrong",
-  //                 style: TextStyle(color: Color(0xFF5d318c)),
-  //               ));
-  //         }
-  //         if (snapshot.connectionState == ConnectionState.done) {
-  //           return Container(
-  //             color: Colors.white,
-  //             margin: const EdgeInsets.symmetric(horizontal: 16),
-  //             child: ListView.builder(
-  //               shrinkWrap: true,
-  //               padding: EdgeInsets.zero,
-  //               itemCount:
-  //                   snapshot.data!.length > 4 ? 4 : snapshot.data!.length,
-  //               itemBuilder: (context, index) => GestureDetector(
-  //                 onTap: (() {
-  //                   _typeAheadController.clear();
-  //                   Navigator.push(
-  //                     context,
-  //                     MaterialPageRoute(
-  //                         builder: (context) => SearchScreen(
-  //                               searchText: snapshot.data![index].name!,
-  //                             )),
-  //                   );
-  //                   ishow = false;
-  //                 }),
-  //                 child: Padding(
-  //                     padding:
-  //                         const EdgeInsets.only(left: 30, top: 10, bottom: 10),
-  //                     child: Text(
-  //                       "${snapshot.data![index].name}",
-  //                       style: GoogleFonts.archivo(
-  //                         fontStyle: FontStyle.normal,
-  //                         color: const Color(0xFF5d318c),
-  //                         fontSize: 18,
-  //                         fontWeight: FontWeight.w500,
-  //                       ),
-  //                     )),
-  //               ),
-  //             ),
-  //           );
-  //         } else {
-  //           return Container();
-  //         }
-  //       });
-  // }
-
   Widget buildSearchResultContainer() {
     if (_showSearchQueryProgressBar) {
       return Container(
@@ -1580,7 +1750,7 @@ class _DashbaordState extends State<Dashbaord> with WidgetsBindingObserver {
                         searchText: _searchResultList[index].name!,
                         itemType: widget.type)),
               );
-              ishow = false;
+              _showSearchHeader = false;
             }),
             child: Padding(
                 padding: const EdgeInsets.only(left: 30, top: 10, bottom: 10),
@@ -1613,8 +1783,8 @@ class _DashbaordState extends State<Dashbaord> with WidgetsBindingObserver {
   }
 
   Future<bool> _onWillPop() async {
-    ishow
-        ? setState(() => ishow = false)
+    _showSearchHeader
+        ? setState(() => _showSearchHeader = false)
         : await showDialog(
             context: context,
             builder: (context) => AlertDialog(
