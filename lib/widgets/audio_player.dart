@@ -5,6 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:deeze_app/enums/enum_item_type.dart';
 import 'package:deeze_app/helpers/ad_helper.dart';
+import 'package:deeze_app/helpers/share_value_helper.dart';
 import 'package:deeze_app/repositories/item_repository.dart';
 import 'package:deeze_app/uitilities/end_points.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
@@ -322,7 +323,11 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
     double screenWidth = MediaQuery.of(context).size.width;
     return WillPopScope(
       onWillPop: () async {
-        if (_interstitialAd != null) {
+        interstitial_audio_detail_screen_counter.$ =
+            interstitial_audio_detail_screen_counter.$ + 1;
+        if (_interstitialAd != null &&
+            interstitial_audio_detail_screen_counter.$ >= 5) {
+          interstitial_audio_detail_screen_counter.$ = 0; // Reseting Value
           _interstitialAd?.show();
           return false;
         } else {
@@ -439,6 +444,7 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                         },
                       ),
                     ),
+                    // Bottom Buttons
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -520,22 +526,24 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer> {
                         ),
                       ],
                     ),
-                    if (_bannerAd != null)
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Align(
-                              alignment: Alignment.topCenter,
-                              child: Container(
-                                width: _bannerAd!.size.width.toDouble(),
-                                height: _bannerAd!.size.height.toDouble(),
-                                child: AdWidget(ad: _bannerAd!),
-                              ),
-                            ),
-                          ],
-                        ),
+                    // Banner Ad Section
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Align(
+                            alignment: Alignment.topCenter,
+                            child: _bannerAd != null
+                                ? Container(
+                                    width: _bannerAd!.size.width.toDouble(),
+                                    height: _bannerAd!.size.height.toDouble(),
+                                    child: AdWidget(ad: _bannerAd!),
+                                  )
+                                : SizedBox(height: 50),
+                          ),
+                        ],
                       ),
+                    ),
                     const SizedBox(height: 2),
                   ],
                 ),

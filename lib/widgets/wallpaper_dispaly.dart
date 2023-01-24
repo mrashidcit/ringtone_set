@@ -8,7 +8,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deeze_app/enums/enum_item_type.dart';
 import 'package:deeze_app/helpers/ad_helper.dart';
 import 'package:deeze_app/helpers/share_value_helper.dart';
+import 'package:deeze_app/models/deeze_model.dart';
 import 'package:deeze_app/repositories/item_repository.dart';
+import 'package:deeze_app/uitilities/my_theme.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
 import 'package:deeze_app/widgets/internet_checkor_dialog.dart';
 import 'package:deeze_app/widgets/more_audio_dialog.dart';
@@ -59,6 +61,7 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
   String file = "";
   bool _noMoreDataFound = false;
   BannerAd? _bannerAd;
+  InterstitialAd? _interstitialAd;
 
   animateToSilde(int index) => _controller.animateToPage(
         0,
@@ -70,6 +73,7 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _loadInterstitialAd();
     BannerAd(
       adUnitId: AdHelper.bannerAdUnitId,
       request: AdRequest(),
@@ -90,8 +94,35 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
     widget.listHydra!.removeRange(0, widget.index!);
     WidgetsBinding.instance
         .addPostFrameCallback((timeStamp) => animateToSilde(widget.index!));
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => loadData());
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) => loadData());
     file = widget.listHydra![0].file!;
+  }
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              _moveToHome();
+            },
+          );
+
+          setState(() {
+            _interstitialAd = ad;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          print('Failed to load an interstitial ad: ${err.message}');
+        },
+      ),
+    );
+  }
+
+  _moveToHome() {
+    Navigator.of(context).pop();
   }
 
   int page = 1;
@@ -171,40 +202,60 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    print(file);
-    return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              // height: MediaQuery.of(context).size.height,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: CachedNetworkImageProvider(file),
+    const LinearGradient linearGradient = const LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: <Color>[
+        Color(0xFF965a90),
+        Color(0xFF815d84),
+        Color(0xFF56425d),
+        Color(0xFF17131f),
+        Color(0xFF17131f),
+        Color(0xFF17131f),
+      ],
+    );
+
+    return WillPopScope(
+      onWillPop: () async {
+        interstitial_wallpaper_detail_screen_counter.$ =
+            interstitial_wallpaper_detail_screen_counter.$ + 1;
+        if (_interstitialAd != null &&
+            interstitial_wallpaper_detail_screen_counter.$ >= 5) {
+          interstitial_wallpaper_detail_screen_counter.$ = 0;
+          _interstitialAd?.show();
+          return false;
+        } else {
+          return true;
+        }
+      },
+      child: Scaffold(
+        body: Container(
+          height: MediaQuery.of(context).size.height,
+          // height: double.infinity,
+          // decoration: BoxDecoration(
+          //   image: DecorationImage(
+          //     image: CachedNetworkImageProvider(file),
+          //     fit: BoxFit.cover,
+          //   ),
+          //   gradient: linearGradient,
+          // ),
+          decoration: const BoxDecoration(gradient: linearGradient),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
+            child: Stack(
+              children: [
+                const AppImageAsset(
+                  image: 'assets/drop_shadow.png',
+                  height: double.infinity,
                   fit: BoxFit.cover,
                 ),
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: <Color>[
-                    Color(0xFF965a90),
-                    Color(0xFF815d84),
-                    Color(0xFF56425d),
-                    Color(0xFF17131f),
-                    Color(0xFF17131f),
-                    Color(0xFF17131f),
-                  ],
-                ),
-              ),
-              child: Stack(
-                children: [
-                  const AppImageAsset(
-                      image: 'assets/drop_shadow.png',
-                      height: double.infinity,
-                      fit: BoxFit.cover),
-                  BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-                    child: Column(
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Expanded(child: Center()),
+                    // Slider
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         CarouselSlider.builder(
                           carouselController: _controller,
@@ -224,7 +275,7 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                               final urlImage = widget.listHydra![index].file!;
                               return Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
+                                // mainAxisSize: MainAxisSize.min,
                                 children: [
                                   BuildImage(
                                     urlImage: urlImage,
@@ -238,6 +289,13 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                                     id: widget.listHydra![index].id!,
                                     name: widget.listHydra![index].name!,
                                   ),
+                                  // Container(
+                                  //   // height: 516.4,
+                                  //   height: 400,
+                                  //   width: 240,
+                                  //   color: MyTheme.orange,
+                                  //   child: Center(),
+                                  // ),
                                   if (activeIndex == index)
                                     const SizedBox(height: 10),
                                   if (activeIndex == index)
@@ -306,8 +364,9 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                             }
                           },
                           options: CarouselOptions(
-                            height: MediaQuery.of(context).size.height * 0.9 -
-                                (_bannerAd != null ? 52 : 0),
+                            // height: MediaQuery.of(context).size.height * 0.9 -
+                            //     (_bannerAd != null ? 52 : 0),
+                            height: 500,
                             viewportFraction: 0.75,
                             enableInfiniteScroll: false,
                             pageSnapping: true,
@@ -329,79 +388,122 @@ class _WallPaperSliderState extends State<WallPaperSlider> {
                             },
                           ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                showCupertinoModalPopup(
-                                  context: context,
-                                  barrierColor: Colors.black.withOpacity(0.8),
-                                  builder: (context) {
-                                    return MoreAudioDialog(
-                                      file: '',
-                                      fileName:
-                                          widget.listHydra![activeIndex].name!,
-                                      userName: widget.listHydra![activeIndex]
-                                          .user!.firstName!,
-                                      userImage: widget
-                                          .listHydra![activeIndex].user!.image!,
-                                      tags: widget.listHydra![activeIndex].tags,
-                                    );
-                                  },
+                      ],
+                    ),
+// Bottom Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            showCupertinoModalPopup(
+                              context: context,
+                              barrierColor: Colors.black.withOpacity(0.8),
+                              builder: (context) {
+                                return MoreAudioDialog(
+                                  file: '',
+                                  fileName:
+                                      widget.listHydra![activeIndex].name!,
+                                  userName: widget
+                                      .listHydra![activeIndex].user!.firstName!,
+                                  userImage: widget
+                                      .listHydra![activeIndex].user!.image!,
+                                  tags: widget.listHydra![activeIndex].tags,
                                 );
                               },
-                              child: const AppImageAsset(
-                                  image: 'assets/dot.svg',
-                                  color: Colors.white,
-                                  height: 6),
-                            ),
-                            const SizedBox(width: 30),
-                            GestureDetector(
-                              onTap: () {
-                                showCupertinoModalPopup(
-                                  context: context,
-                                  barrierColor: Colors.black.withOpacity(0.8),
-                                  builder: (context) =>
-                                      WallpaperSelectDialog(file: file),
-                                );
-                              },
-                              child: const AppImageAsset(
-                                  image: 'assets/wallpaper_down.svg',
-                                  height: 50),
-                            ),
-                            const SizedBox(width: 30),
-                            GestureDetector(
-                              onTap: () {
-                                var item = widget.listHydra![activeIndex];
-                                SocialShare.shareOptions("${item.file!}");
-                                ;
-                              },
-                              child: const AppImageAsset(
-                                  image: 'assets/share.svg',
-                                  color: Colors.white,
-                                  height: 18),
-                            ),
-                          ],
+                            );
+                          },
+                          child: const AppImageAsset(
+                              image: 'assets/dot.svg',
+                              color: Colors.white,
+                              height: 6),
+                        ),
+                        const SizedBox(width: 30),
+                        GestureDetector(
+                          onTap: () {
+                            showCupertinoModalPopup(
+                              context: context,
+                              barrierColor: Colors.black.withOpacity(0.8),
+                              builder: (context) =>
+                                  WallpaperSelectDialog(file: file),
+                            );
+                          },
+                          child: const AppImageAsset(
+                              image: 'assets/wallpaper_down.svg', height: 50),
+                        ),
+                        const SizedBox(width: 30),
+                        GestureDetector(
+                          onTap: () {
+                            var item = widget.listHydra![activeIndex];
+                            SocialShare.shareOptions("${item.file!}");
+                            ;
+                          },
+                          child: const AppImageAsset(
+                              image: 'assets/share.svg',
+                              color: Colors.white,
+                              height: 18),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
+                    // Banner Ad Section
+                    // Expanded(
+                    //   child: Column(
+                    //     mainAxisAlignment: MainAxisAlignment.end,
+                    //     children: [
+                    //       Align(
+                    //         alignment: Alignment.topCenter,
+                    //         child: _bannerAd != null
+                    //             ? Container(
+                    //                 width: _bannerAd!.size.width.toDouble(),
+                    //                 height: _bannerAd!.size.height.toDouble(),
+                    //                 child: AdWidget(ad: _bannerAd!),
+                    //               )
+                    //             : SizedBox(height: 50),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    // Align(
+                    //   alignment: Alignment.topCenter,
+                    //   child: _bannerAd != null
+                    //       ? Container(
+                    //           width: _bannerAd!.size.width.toDouble(),
+                    //           height: _bannerAd!.size.height.toDouble(),
+                    //           child: AdWidget(ad: _bannerAd!),
+                    //         )
+                    //       : SizedBox(height: 50),
+                    // ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: _bannerAd != null
+                      ? Container(
+                          width: _bannerAd!.size.width.toDouble(),
+                          height: _bannerAd!.size.height.toDouble(),
+                          child: AdWidget(ad: _bannerAd!),
+                        )
+                      : SizedBox(height: 50),
+                ),
+              ],
             ),
           ),
-          if (_bannerAd != null)
-            Align(
-              alignment: Alignment.topCenter,
-              child: Container(
-                width: _bannerAd!.size.width.toDouble(),
-                height: _bannerAd!.size.height.toDouble(),
-                child: AdWidget(ad: _bannerAd!),
-              ),
-            ),
-          const SizedBox(height: 2),
-        ],
+        ),
+        // _bannerAd != null
+        //     ? Align(
+        //         alignment: Alignment.topCenter,
+        //         child: Container(
+        //           width: _bannerAd!.size.width.toDouble(),
+        //           height: _bannerAd!.size.height.toDouble(),
+        //           child: AdWidget(ad: _bannerAd!),
+        //         ),
+        //       )
+        //     :
+        // Align(
+        //   alignment: Alignment.topCenter,
+        //   child: Container(height: 50, child: Center()),
+        // ),
       ),
     );
   }
@@ -497,6 +599,7 @@ class _BuildImageState extends State<BuildImage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     refreshFavorite();
   }
 
@@ -571,10 +674,52 @@ class WallpaperSelectDialog extends StatefulWidget {
 }
 
 class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
+  InterstitialAd? _interstitialAd;
+
   @override
   void initState() {
     super.initState();
+    _loadInterstitialAd();
     initPlatformState();
+  }
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              _moveToHome();
+            },
+          );
+
+          setState(() {
+            _interstitialAd = ad;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          print('Failed to load an interstitial ad: ${err.message}');
+        },
+      ),
+    );
+  }
+
+  _moveToHome() {
+    Navigator.pop(context);
+  }
+
+  /**
+   * @return true Ad is Loaded And Shown to the user
+   */
+  bool _showInterstitialAd() {
+    bool output = false;
+    if (_interstitialAd != null) {
+      _interstitialAd?.show();
+      output = false;
+    }
+    return true;
   }
 
   bool isloading = false;
@@ -729,6 +874,7 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                         textColor: Colors.white,
                         fontSize: 16.0,
                       );
+                      if (_showInterstitialAd()) return;
                       Navigator.of(context).pop();
                     }
                   },
@@ -784,6 +930,7 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                         textColor: Colors.white,
                         fontSize: 16.0,
                       );
+                      if (_showInterstitialAd()) return;
                       Navigator.of(context).pop();
                     }
                   },
@@ -840,6 +987,7 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
                         textColor: Colors.white,
                         fontSize: 16.0,
                       );
+                      if (_showInterstitialAd()) return;
                       Navigator.of(context).pop();
                     }
                   },
@@ -1053,6 +1201,7 @@ class _WallpaperSelectDialogState extends State<WallpaperSelectDialog> {
 
     if (success) {
       showMessage(context, message: "Your File successfully Downloaded");
+      if (_showInterstitialAd()) return;
     } else {
       showMessage(context, message: "Try again!");
     }

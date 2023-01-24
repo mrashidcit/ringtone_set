@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:deeze_app/db_services/favorite_database.dart';
 import 'package:deeze_app/models/favorite.dart';
+import 'package:deeze_app/uitilities/constants.dart';
 import 'package:deeze_app/uitilities/my_theme.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
@@ -84,57 +85,36 @@ class _RingtonesCardState extends State<ProcessingRingtonesCard> {
     double screenWidth = MediaQuery.of(context).size.width;
     var element = mygradientList[_random.nextInt(mygradientList.length)];
 
-    return SliderTheme(
-      data: SliderThemeData(
-        trackHeight: 70,
-        thumbShape: SliderComponentShape.noOverlay,
-        overlayShape: SliderComponentShape.noOverlay,
-        valueIndicatorShape: SliderComponentShape.noOverlay,
-        trackShape: const RectangularSliderTrackShape(),
-      ),
-      child: InkWell(
-        onTap: widget.onNavigate,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 14),
-          child: Container(
-            height: 70,
-            width: screenWidth,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color.fromRGBO(166, 125, 17, 1),
-                  const Color.fromRGBO(129, 84, 87, 1),
-                ],
-                begin: const FractionalOffset(0.0, 0.0),
-                end: const FractionalOffset(0.0, 1.0),
-                stops: [0.0, 1.0],
-                tileMode: TileMode.clamp,
+    return InkWell(
+      onTap: widget.onNavigate,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 0),
+        child: Container(
+          // height: 70,
+          height: double.infinity,
+          width: screenWidth,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('assets/processing_card_background.png'),
+                fit: BoxFit.fill),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Stack(
+            children: [
+              Center(
+                child: AppImageAsset(
+                  image: 'assets/sand-clock.png',
+                  height: Constants.sandbox_height,
+                ),
               ),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Stack(
-              children: [
-                Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AppImageAsset(
-                        image: 'assets/sand-clock.png',
-                        height: 20,
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Processing ...',
-                        style: TextStyle(
-                          color: MyTheme.white,
-                          fontSize: 14,
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
+              Positioned(
+                  bottom: 4,
+                  left: 2,
+                  child: Text(
+                    'Processing ...',
+                    style: TextStyle(color: MyTheme.white),
+                  ))
+            ],
           ),
         ),
       ),

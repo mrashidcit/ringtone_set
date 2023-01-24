@@ -53,6 +53,29 @@ final SharedValue<int> show_openAppAd_counter_check = SharedValue(
   autosave: true,
 );
 
+/**
+ * AudioDetailScreen Counter When user get back from Detail Screen to List Screen
+ * Show Ad When value is 5
+ */
+final SharedValue<int> interstitial_audio_detail_screen_counter = SharedValue(
+  value: 0, // initial value
+  key:
+      "interstitial_audio_detail_screen_counter", // disk storage key for shared_preferences
+  autosave: true,
+);
+
+/**
+ * WallpaperDetailScreen Counter When user get back from Detail Screen to List Screen
+ * Show Ad When value is 5
+ */
+final SharedValue<int> interstitial_wallpaper_detail_screen_counter =
+    SharedValue(
+  value: 0, // initial value
+  key:
+      "interstitial_wallpaper_detail_screen_counter", // disk storage key for shared_preferences
+  autosave: true,
+);
+
 void saveUserInCache(User user) {
   user_id.$ = user.id!;
   first_name.$ = user.firstName!;

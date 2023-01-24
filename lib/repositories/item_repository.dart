@@ -136,7 +136,7 @@ class ItemRepository {
       "page": "$pageNumber",
       "itemsPerPage": "10",
       "user_id": "${user_id.$}",
-      "type": itemType.name
+      // "type": itemType.name  // If We Skip this paramter then It will return all the items
     });
     var outputResponse = RandomItemResponse();
     try {

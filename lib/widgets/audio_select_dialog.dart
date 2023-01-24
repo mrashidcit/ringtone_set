@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:deeze_app/helpers/ad_helper.dart';
 import 'package:deeze_app/helpers/share_value_helper.dart';
 import 'package:deeze_app/widgets/app_image_assets.dart';
 import 'package:deeze_app/widgets/app_loader.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:path_provider/path_provider.dart';
@@ -29,10 +31,52 @@ class AudioSelectDialog extends StatefulWidget {
 }
 
 class _AudioSelectDialogState extends State<AudioSelectDialog> {
+  InterstitialAd? _interstitialAd;
+
   @override
   void initState() {
     super.initState();
+    _loadInterstitialAd();
     initPlatformState();
+  }
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              _moveToHome();
+            },
+          );
+
+          setState(() {
+            _interstitialAd = ad;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          print('Failed to load an interstitial ad: ${err.message}');
+        },
+      ),
+    );
+  }
+
+  _moveToHome() {
+    Navigator.pop(context);
+  }
+
+  /**
+   * @return true Ad is Loaded And Shown to the user
+   */
+  bool _showInterstitialAd() {
+    bool output = false;
+    if (_interstitialAd != null) {
+      _interstitialAd?.show();
+      output = false;
+    }
+    return true;
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -339,6 +383,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
     }
     if (success) {
       showMessage(context, message: "Ringtone set successfully!");
+      if (_showInterstitialAd()) return;
     } else {
       showMessage(context, message: "Unable to complete this action.");
     }
@@ -412,6 +457,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
     }
     if (success) {
       showMessage(context, message: "Notifications sound set successfully!");
+      if (_showInterstitialAd()) return;
     } else {
       showMessage(context, message: "Error");
     }
@@ -485,6 +531,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
 
     if (success) {
       showMessage(context, message: "Set to Alarm successfully!");
+      if (_showInterstitialAd()) return;
     } else {
       showMessage(context, message: "Error");
     }
@@ -576,6 +623,7 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
 
       if (success) {
         showMessage(context, message: "Rintone Successfully Set to Contact!");
+        if (_showInterstitialAd()) return;
       } else {
         showMessage(context, message: "Error");
       }
@@ -658,7 +706,8 @@ class _AudioSelectDialogState extends State<AudioSelectDialog> {
     }
 
     if (success) {
-      showMessage(context, message: "Your File  successfully Downloaded");
+      showMessage(context, message: "Your File successfully Downloaded");
+      if (_showInterstitialAd()) return;
     } else {
       showMessage(context, message: "Try again!");
     }

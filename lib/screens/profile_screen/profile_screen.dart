@@ -431,37 +431,37 @@ class ProfileScreenState extends State<ProfileScreen>
                 //   },
                 //   // other Properties...
                 // )
-                SelectionMenu<ItemType>(
-                  initiallySelectedItemIndex: 0,
-                  itemsList: <ItemType>[
-                    ItemType.WALLPAPER,
-                    ItemType.RINGTONE,
-                    ItemType.NOTIFICATION
-                  ],
-                  onItemSelected: (ItemType selectedItem) {
-                    _selectedItemType = selectedItem;
-                    resetValues();
-                    fetchData(refreshData: true);
-                  },
-                  itemBuilder: (BuildContext ctx, ItemType item,
-                      OnItemTapped onItemTapped) {
-                    return Material(
-                      child: InkWell(
-                        onTap: onItemTapped,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            item.name,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  showSelectedItemAsTrigger: true,
-                  closeMenuInsteadOfPop: true,
-                  closeMenuOnItemSelected: true,
-                  // other Properties...
-                )
+                // SelectionMenu<ItemType>(
+                //   initiallySelectedItemIndex: 0,
+                //   itemsList: <ItemType>[
+                //     ItemType.WALLPAPER,
+                //     ItemType.RINGTONE,
+                //     ItemType.NOTIFICATION
+                //   ],
+                //   onItemSelected: (ItemType selectedItem) {
+                //     _selectedItemType = selectedItem;
+                //     resetValues();
+                //     fetchData(refreshData: true);
+                //   },
+                //   itemBuilder: (BuildContext ctx, ItemType item,
+                //       OnItemTapped onItemTapped) {
+                //     return Material(
+                //       child: InkWell(
+                //         onTap: onItemTapped,
+                //         child: Padding(
+                //           padding: const EdgeInsets.all(8.0),
+                //           child: Text(
+                //             item.name,
+                //           ),
+                //         ),
+                //       ),
+                //     );
+                //   },
+                //   showSelectedItemAsTrigger: true,
+                //   closeMenuInsteadOfPop: true,
+                //   closeMenuOnItemSelected: true,
+                //   // other Properties...
+                // )
               ],
             ),
             _showMainProgressBar
@@ -566,20 +566,25 @@ class ProfileScreenState extends State<ProfileScreen>
             children: List.generate(
               _itemsList.length + 1,
               (index) {
-                if (_selectedItemType == ItemType.WALLPAPER) {
-                  if (index == 0)
-                    return buildWallpaperCardToUploadeItemWidget(context);
-                  else
-                    return buildWallpaperCardWidget(
-                        context, index - 1, screenWidth);
-                } else {
-                  if (index == 0)
-                    return buildUploadRingtoneCard(0, context);
-                  else
-                    return _itemsList[index - 1].enabled
-                        ? buildRingtoneCard(index - 1, context)
-                        : buildProcessingRingtoneCard(context);
-                }
+                // if (_selectedItemType == ItemType.WALLPAPER) {
+                if (index == 0)
+                  return buildWallpaperCardToUploadeItemWidget(context);
+                else
+                  return (_itemsList[index - 1].type == ItemType.WALLPAPER.name)
+                      ? buildWallpaperCardWidget(
+                          context, index - 1, screenWidth)
+                      : (_itemsList[index - 1].enabled
+                          ? buildRingtoneCard(index - 1, context)
+                          : buildProcessingRingtoneCard(context));
+                // : buildRingtoneCard(index - 1, context);
+                // } else {
+                //   if (index == 0)
+                //     return buildUploadRingtoneCard(0, context);
+                //   else
+                //     return _itemsList[index - 1].enabled
+                //         ? buildRingtoneCard(index - 1, context)
+                //         : buildProcessingRingtoneCard(context);
+                // }
               },
             ),
           ),
@@ -711,16 +716,19 @@ class ProfileScreenState extends State<ProfileScreen>
         Container(
           // height: double.infinity,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color.fromRGBO(166, 125, 17, 1),
-                const Color.fromRGBO(129, 84, 87, 1),
-              ],
-              begin: const FractionalOffset(0.0, 0.0),
-              end: const FractionalOffset(0.0, 1.0),
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp,
-            ),
+            // gradient: LinearGradient(
+            //   colors: [
+            //     const Color.fromRGBO(166, 125, 17, 1),
+            //     const Color.fromRGBO(129, 84, 87, 1),
+            //   ],
+            //   begin: const FractionalOffset(0.0, 0.0),
+            //   end: const FractionalOffset(0.0, 1.0),
+            //   stops: [0.0, 1.0],
+            //   tileMode: TileMode.clamp,
+            // ),
+            image: DecorationImage(
+                image: AssetImage('assets/processing_card_background.png'),
+                fit: BoxFit.fill),
             borderRadius: BorderRadius.all(Radius.circular(6)),
           ),
         ),
@@ -951,7 +959,7 @@ class ProfileScreenState extends State<ProfileScreen>
           child: Center(
             child: const AppImageAsset(
               image: 'assets/sand-clock.png',
-              height: 20,
+              height: Constants.sandbox_height,
             ),
           ),
         ),
@@ -980,15 +988,19 @@ class ProfileScreenState extends State<ProfileScreen>
           child: Container(
             // height: double.infinity,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  colors: [
-                    const Color.fromRGBO(103, 0, 214, 1),
-                    const Color.fromRGBO(190, 133, 104, 1),
-                  ],
-                  begin: const FractionalOffset(0.0, 0.0),
-                  end: const FractionalOffset(0.9, .7),
-                  stops: [0.0, 1.0],
-                  tileMode: TileMode.clamp),
+              // gradient: LinearGradient(
+              //   colors: [
+              //     const Color.fromRGBO(18, 29, 212, 1),
+              //     const Color.fromRGBO(188, 142, 103, 1),
+              //   ],
+              //   begin: const FractionalOffset(0.1, 0.4),
+              //   end: const FractionalOffset(0.9, 0.7),
+              //   stops: [0.0, 1.0],
+              //   tileMode: TileMode.clamp,
+              // ),
+              image: DecorationImage(
+                  image: AssetImage('assets/upload_card_background.png'),
+                  fit: BoxFit.fill),
               borderRadius: BorderRadius.all(Radius.circular(6)),
             ),
           ),
